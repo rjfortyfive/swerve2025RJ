@@ -358,31 +358,11 @@ public class RobotContainer {
 
                                 );
 
-                buttonPanel.button(Constants.buttonPanel.intake.intakeDropButton)
-                                .onTrue(
-                                                new StartEndCommand(
-                                                                () -> Hang.intakeDrop(-1.0),
-                                                                () -> Hang.intakeDrop(0),
-                                                                m_hang).withTimeout(10));
-
 
                 // joystick.button(Constants.Joystick.Function2).onTrue(new InstantCommand(() ->
                 // Effector.algaeEffectorUp(null)));
 
                 joystick.button(Constants.Joystick.servoControl).onTrue(new InstantCommand(() -> Hang.brakeHang()));
-
-                joystick.button(Constants.Joystick.intakeResetButton)
-                                .onTrue(
-                                                new StartEndCommand(
-                                                                () -> Hang.intakeDrop(1.0),
-                                                                () -> Hang.intakeDrop(0),
-                                                                m_hang).withTimeout(5.5));
-
-                XboxController.button(Constants.XboxController.button.B).onTrue (
-                        new StartEndCommand(
-                                                                () -> Hang.intakeDrop(-1.0),
-                                                                () -> Hang.intakeDrop(0),
-                                                                m_hang).withTimeout(10));
 
                 XboxController.button(Constants.XboxController.button.A).onTrue(
                                 new SequentialCommandGroup(

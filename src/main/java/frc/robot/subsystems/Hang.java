@@ -7,19 +7,12 @@ import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Hang extends SubsystemBase{
     public static TalonFX hangMotor = new TalonFX(Constants.hang.hangMotor);
     public final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(0);
-
-    // private static Servo ratchetServo = new Servo(0);
-    private static double ratchetPosition = 0;
-
-    private static Spark intakeActuator = new Spark(0);
 
     public static void activateHang(Boolean reverseDirection) {
         if (reverseDirection == false) {
@@ -50,24 +43,4 @@ public class Hang extends SubsystemBase{
         hangConfig.Slot0.kS = 5;
     }
 
-    // public static void toggleRatchet() {
-    //     if (ratchetPosition == 1) {
-    //         ratchetServo.setAngle(0);
-    //         ratchetPosition = 0;
-    //     }
-    //     else {
-    //         ratchetServo.setAngle(90);
-    //         ratchetPosition = 1;
-    //     }
-    // }
-
-    public static void intakeDrop(double value) {
-        if (Timer.getMatchTime() < 30) {
-            intakeActuator.set(value);
-        }
-    }
-
-    public static void intakeReset() {
-        intakeActuator.set(1);
-    }
 }
