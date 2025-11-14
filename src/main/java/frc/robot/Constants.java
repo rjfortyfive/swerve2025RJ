@@ -192,13 +192,9 @@ public class Constants {
         public static final double kSEffector = 1.0; // Output to overcome static friction (volts)
         public static final double kVEffector = 0.123; // Output per unit of target velocity (volts/rps)
         public static final double kAEffector = 0.0; // Output per unit of target accelleration (volts/rps/rps)
-        public static final double kPIntake = 0.3;
-        public static final double kDIntake = 0.0;
-        public static final double kIIntake = 0.0;
-        public static final double kAIntake = 0.0;
-        public static final double kGIntake = 0.0;
-        public static final double kSIntake = 0.0;
-        public static final double kVIntake = 0.0;
+
+        public static final double kEffectorStatorCurrent = 80.0;
+        public static final double kEffectorSupplyCurrent = 40.0;
 
     }
 
@@ -208,7 +204,15 @@ public class Constants {
         public static final double lockRotations = -2.75;
         public static final double intakeRotations = 2.5;
         public static final double lockSpeedRPS = 25;
-
+        public static final double kPIntake = 0.3;
+        public static final double kDIntake = 0.0;
+        public static final double kIIntake = 0.0;
+        public static final double kAIntake = 0.0;
+        public static final double kGIntake = 0.0;
+        public static final double kSIntake = 0.0;
+        public static final double kVIntake = 0.0;
+        public static final double kIntakeStatorCurrent = 80.0;
+        public static final double kIntakeSupplyCurrent = 40.0;
     }
 
     public static final class hang {

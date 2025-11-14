@@ -65,19 +65,67 @@ public class Effector extends SubsystemBase {
 
         effectorTimer = new Timer();
 
-        effectorConfig.Slot0.kS = 1; // Static friction
-        effectorConfig.Slot0.kV = 0; // 0.12 for Kraken X60
-        effectorConfig.Slot0.kP = 1.0; // Rotational error per second
-        effectorConfig.Slot0.kI = 0; // Integrated error
-        effectorConfig.Slot0.kD = 0; // Error derivative
+        effectorLeft.getConfigurator().apply(new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(Constants.effector.kEffectorStatorCurrent)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(Constants.effector.kEffectorSupplyCurrent)
+            .withSupplyCurrentLimitEnable(true));
+
+        effectorRight.getConfigurator().apply(new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(Constants.effector.kEffectorStatorCurrent)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(Constants.effector.kEffectorSupplyCurrent)
+            .withSupplyCurrentLimitEnable(true));
+        
+        intakeLeft.getConfigurator().apply(new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(Constants.effector.kEffectorStatorCurrent)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(Constants.effector.kEffectorSupplyCurrent)
+            .withSupplyCurrentLimitEnable(true));
+        
+        intakeRight.getConfigurator().apply(new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(Constants.effector.kEffectorStatorCurrent)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(Constants.effector.kEffectorSupplyCurrent)
+            .withSupplyCurrentLimitEnable(true));            
+
+        effectorLeft.getConfigurator().apply( new Slot0Configs()
+            .withKP(Constants.effector.kPEffector)
+            .withKI(Constants.effector.kIEffector)
+            .withKD(Constants.effector.kDEffector)
+            .withKG(Constants.effector.kGEffector)
+            .withKS(Constants.effector.kSEffector)
+            .withKV(Constants.effector.kVEffector)
+            .withKA(Constants.effector.kAEffector));
+            
+        effectorRight.getConfigurator().apply( new Slot0Configs()
+            .withKP(Constants.effector.kPEffector)
+            .withKI(Constants.effector.kIEffector)
+            .withKD(Constants.effector.kDEffector)
+            .withKG(Constants.effector.kGEffector)
+            .withKS(Constants.effector.kSEffector)
+            .withKV(Constants.effector.kVEffector)
+            .withKA(Constants.effector.kAEffector));
+
+        intakeLeft.getConfigurator().apply( new Slot0Configs()
+            .withKP(Constants.intake.kPIntake)
+            .withKI(Constants.intake.kIIntake)
+            .withKD(Constants.intake.kDIntake)
+            .withKG(Constants.intake.kGIntake)
+            .withKS(Constants.intake.kSIntake)
+            .withKV(Constants.intake.kVIntake)
+            .withKA(Constants.intake.kAIntake));
+
+        intakeRight.getConfigurator().apply( new Slot0Configs()
+            .withKP(Constants.intake.kPIntake)
+            .withKI(Constants.intake.kIIntake)
+            .withKD(Constants.intake.kDIntake)
+            .withKG(Constants.intake.kGIntake)
+            .withKS(Constants.intake.kSIntake)
+            .withKV(Constants.intake.kVIntake)
+            .withKA(Constants.intake.kAIntake));            
 
         effectorConfig.Voltage.withPeakForwardVoltage(Volts.of(8 * Constants.masterVoltageMultiplier)).withPeakReverseVoltage(Volts.of(-8 * Constants.masterVoltageMultiplier));
-
-        intakeConfig.Slot0.kS = 0;
-        intakeConfig.Slot0.kV = 0;
-        intakeConfig.Slot0.kP = 0.3;
-        intakeConfig.Slot0.kI = 0;
-        intakeConfig.Slot0.kD = 0;
 
         intakeConfig.Voltage.withPeakForwardVoltage(Volts.of(8*Constants.masterVoltageMultiplier)).withPeakReverseVoltage(Volts.of(-8*Constants.masterVoltageMultiplier));
 
@@ -127,8 +175,8 @@ public class Effector extends SubsystemBase {
             ),
             // 3) stop motors
             Commands.runOnce(() -> {
-                effectorLeft.setControl(m_velocityVoltage.withVelocity(0));
-                effectorRight.setControl(m_velocityVoltage.withVelocity(0));
+                effectorLeft.set(0);
+                effectorRight.set(0);
             }, this)
         );
     }
@@ -137,10 +185,10 @@ public class Effector extends SubsystemBase {
      * Stops all intake and effector motors immediately.
      */
     public void stopIntake() {
-        effectorLeft.setControl(m_velocityVoltage.withVelocity(0));
-        effectorRight.setControl(m_velocityVoltage.withVelocity(0));
-  //      intakeRight.setControl(m_velocityVoltage.withVelocity(0));
-        intakeLeft.setControl(m_velocityVoltage.withVelocity(0));
+        effectorLeft.set(0);
+        effectorRight.set(0);
+  //      intakeRight.set(0);
+        intakeLeft.set(0);
         return;
 
     }
@@ -189,8 +237,8 @@ public class Effector extends SubsystemBase {
             symmetricalOuttake(null);
             }
         }
-        effectorLeft.setControl(m_velocityVoltage.withVelocity(0));
-        effectorRight.setControl(m_velocityVoltage.withVelocity(0));
+        effectorLeft.set(0);
+        effectorRight.set(0);
         effectorTimer.stop();
         effectorTimer.reset();
         return;
@@ -210,8 +258,8 @@ public class Effector extends SubsystemBase {
             effectorLeft.setControl(m_velocityVoltage.withVelocity(motorSpeed * Constants.masterSpeedMultiplier));
             effectorRight.setControl(m_velocityVoltage.withVelocity(-motorSpeed * Constants.masterSpeedMultiplier));
         }
-        effectorLeft.setControl(m_velocityVoltage.withVelocity(0));
-        effectorRight.setControl(m_velocityVoltage.withVelocity(0));
+        effectorLeft.set(0);
+        effectorRight.set(0);
         effectorTimer.stop();
         effectorTimer.reset();
         return;
@@ -239,8 +287,8 @@ public class Effector extends SubsystemBase {
             effectorRight.setControl(m_velocityVoltage.withVelocity(-motorSpeedR));
         }
 
-        effectorLeft.setControl(m_velocityVoltage.withVelocity(0));
-        effectorRight.setControl(m_velocityVoltage.withVelocity(0));
+        effectorLeft.set(0);
+        effectorRight.set(0);
         effectorTimer.stop();
         effectorTimer.reset();
         return;
