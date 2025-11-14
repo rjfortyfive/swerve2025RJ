@@ -28,8 +28,8 @@ import com.revrobotics.RelativeEncoder;
 public class Effector extends SubsystemBase {
     private static LaserCan intakeSensor = new LaserCan(2);
 
-    private static TalonFX effectorLeft = new TalonFX(Constants.effector.EffectorLeft);
-    private static TalonFX effectorRight = new TalonFX(Constants.effector.EffectorRight);
+    private static TalonFX effectorLeft = new TalonFX(Constants.effector.EffectorLeftID);
+    private static TalonFX effectorRight = new TalonFX(Constants.effector.EffectorRightID);
 
     private static TalonFX intakeRight = new TalonFX(Constants.intake.intakeRightID);
     private static TalonFX intakeLeft = new TalonFX(Constants.intake.intakeLeftID);

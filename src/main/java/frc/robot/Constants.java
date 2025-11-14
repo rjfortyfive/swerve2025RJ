@@ -178,11 +178,27 @@ public class Constants {
     }
 
     public static final class effector {
-        public static final int EffectorLeft = 12;
-        public static final int EffectorRight = 13;
+        public static final int EffectorLeftID = 12;
+        public static final int EffectorRightID = 13;
         public static final double defaultVelocity = 15;
         public static final double scoreRotations = 4;
         public static final double scoreVelocity = 15;
+  // We are using Motion Magic position control with voltage countrol output type,
+  // so the PID parameters are in volts
+        public static final double kPEffector = 1.0; // Output per unit of error in position (volts/rotation)
+        public static final double kIEffector = 0.0; // Output per unit of integrated error in position (volts/(rotation*s))
+        public static final double kDEffector = 0.0; // Output per unit of error in velocity (volts/rotation)
+        public static final double kGEffector = 0.0; // Output to overcome gravity (volts) - modified by ArmCosine
+        public static final double kSEffector = 1.0; // Output to overcome static friction (volts)
+        public static final double kVEffector = 0.123; // Output per unit of target velocity (volts/rps)
+        public static final double kAEffector = 0.0; // Output per unit of target accelleration (volts/rps/rps)
+        public static final double kPIntake = 0.3;
+        public static final double kDIntake = 0.0;
+        public static final double kIIntake = 0.0;
+        public static final double kAIntake = 0.0;
+        public static final double kGIntake = 0.0;
+        public static final double kSIntake = 0.0;
+        public static final double kVIntake = 0.0;
 
     }
 
