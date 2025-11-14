@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
-import frc.robot.Constants.elevator;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
@@ -10,16 +9,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
-import static edu.wpi.first.wpilibj2.command.Commands.run;
-import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 import com.ctre.phoenix6.StatusCode;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -32,13 +26,13 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
 public class Effector extends SubsystemBase {
-    private static LaserCan intakeSensor;
+    private static LaserCan intakeSensor = new LaserCan(2);
 
-    private static TalonFX effectorLeft;
-    private static TalonFX effectorRight;
+    private static TalonFX effectorLeft = new TalonFX(Constants.effector.EffectorLeft);
+    private static TalonFX effectorRight = new TalonFX(Constants.effector.EffectorRight);
 
-    private static TalonFX intakeRight;
-    private static TalonFX intakeLeft;
+    private static TalonFX intakeRight = new TalonFX(Constants.intake.intakeRightID);
+    private static TalonFX intakeLeft = new TalonFX(Constants.intake.intakeLeftID);
 
     private static SparkMax algaeMotor = new SparkMax(1, MotorType.kBrushed);
 
@@ -47,103 +41,53 @@ public class Effector extends SubsystemBase {
 
     private final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(0);
 
-    private final static MotionMagicVoltage motionMagicLeft = new MotionMagicVoltage(0).withSlot(1);
-    private final static MotionMagicVoltage motionMagicRight = new MotionMagicVoltage(0).withSlot(1);
-
-    private final static PositionVoltage m_positionVoltage = new PositionVoltage(0).withSlot(1);
+    private final static PositionVoltage m_positionVoltage = new PositionVoltage(0).withSlot(0);
 
     private volatile static boolean isAlgaeOut = false;
 
     // for speed-controlled bump rotations
     private double m_initialLeftRot = 0.0;
-    
+
     public Effector() {
-        intakeSensor = new LaserCan(2);
-
-        effectorLeft = new TalonFX(Constants.effector.EffectorLeft);
-        effectorRight = new TalonFX(Constants.effector.EffectorRight);
-
-        intakeLeft = new TalonFX(Constants.intake.intakeLeftID);
-        intakeRight = new TalonFX(Constants.intake.intakeRightID);
-        intakeLeft.setControl(new Follower(intakeRight.getDeviceID(), false));
+        intakeLeft.setControl(new Follower(intakeRight.getDeviceID(), true));
 
         effectorLeft.setNeutralMode(NeutralModeValue.Coast);
         effectorRight.setNeutralMode(NeutralModeValue.Coast);
-        // effectorRight.setControl(new Follower(effectorLeft.getDeviceID(), true));
-        ConfigureEffector();
-    }
 
-    public void ConfigureEffector() {
         TalonFXConfiguration effectorConfig = new TalonFXConfiguration();
-        TalonFXConfiguration effectorLeftConfig = new TalonFXConfiguration();
-        TalonFXConfiguration effectorRightConfig = new TalonFXConfiguration();
 
-        TalonFXConfiguration intakeLeftConfig = new TalonFXConfiguration();
-        TalonFXConfiguration intakeRightConfig = new TalonFXConfiguration();
+        TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
 
-        MotionMagicConfigs effectorLeftMotion = effectorLeftConfig.MotionMagic;
-        MotionMagicConfigs effectorRightMotion = effectorRightConfig.MotionMagic;
+        MotionMagicConfigs effectorLeftMotion = effectorConfig.MotionMagic;
+        MotionMagicConfigs effectorRightMotion = effectorConfig.MotionMagic;
         effectorLeftMotion.withMotionMagicCruiseVelocity(RotationsPerSecond.of(30 * Constants.masterSpeedMultiplier)).withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.masterSpeedMultiplier));
         effectorRightMotion.withMotionMagicCruiseVelocity(RotationsPerSecond.of(10 * Constants.masterSpeedMultiplier)).withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.masterSpeedMultiplier));
 
-        var limitConfigs = new CurrentLimitsConfigs();
-
         effectorTimer = new Timer();
 
-        effectorLeftConfig.Slot0.kS = 0; // Static friction
-        effectorLeftConfig.Slot0.kV = 0; // 0.12 for Kraken X60
-        effectorLeftConfig.Slot0.kP = 0.3; // Rotational error per second
-        effectorLeftConfig.Slot0.kI = 0; // Integrated error
-        effectorLeftConfig.Slot0.kD = 0; // Error derivative
+        effectorConfig.Slot0.kS = 1; // Static friction
+        effectorConfig.Slot0.kV = 0; // 0.12 for Kraken X60
+        effectorConfig.Slot0.kP = 1.0; // Rotational error per second
+        effectorConfig.Slot0.kI = 0; // Integrated error
+        effectorConfig.Slot0.kD = 0; // Error derivative
 
-        effectorLeftConfig.Voltage.withPeakForwardVoltage(Volts.of(8 * Constants.masterVoltageMultiplier)).withPeakReverseVoltage(Volts.of(-8 * Constants.masterVoltageMultiplier));
+        effectorConfig.Voltage.withPeakForwardVoltage(Volts.of(8 * Constants.masterVoltageMultiplier)).withPeakReverseVoltage(Volts.of(-8 * Constants.masterVoltageMultiplier));
 
-        effectorRightConfig.Slot0.kS = 0; // Static friction
-        effectorRightConfig.Slot0.kV = 0; // 0.12 for Kraken X60
-        effectorRightConfig.Slot0.kP = 0.3; // Rotational error per second
-        effectorRightConfig.Slot0.kI = 0; // Integrated error
-        effectorRightConfig.Slot0.kD = 0; // Error derivative
+        intakeConfig.Slot0.kS = 0;
+        intakeConfig.Slot0.kV = 0;
+        intakeConfig.Slot0.kP = 0.3;
+        intakeConfig.Slot0.kI = 0;
+        intakeConfig.Slot0.kD = 0;
 
-        effectorRightConfig.Voltage.withPeakForwardVoltage(Volts.of(8 * Constants.masterVoltageMultiplier)).withPeakReverseVoltage(Volts.of(-8 * Constants.masterVoltageMultiplier));
-
-        intakeLeftConfig.Slot0.kS = 0;
-        intakeLeftConfig.Slot0.kV = 0;
-        intakeLeftConfig.Slot0.kP = 0.3;
-        intakeLeftConfig.Slot0.kI = 0;
-        intakeLeftConfig.Slot0.kD = 0;
-
-        intakeLeftConfig.Voltage.withPeakForwardVoltage(Volts.of(8*Constants.masterVoltageMultiplier)).withPeakReverseVoltage(Volts.of(-8*Constants.masterVoltageMultiplier));
-
-        intakeRightConfig.Slot0.kS = 0;
-        intakeRightConfig.Slot0.kV = 0;
-        intakeRightConfig.Slot0.kP = 0.3;
-        intakeRightConfig.Slot0.kI = 0;
-        intakeRightConfig.Slot0.kD = 0;
-
-        intakeRightConfig.Voltage.withPeakForwardVoltage(Volts.of(8*Constants.masterVoltageMultiplier)).withPeakReverseVoltage(Volts.of(-8*Constants.masterVoltageMultiplier));
-
-        effectorLeftConfig.Slot1.kS = 1; // Static friction
-        effectorLeftConfig.Slot1.kV = 0; // 0.12 for Kraken X60
-        effectorLeftConfig.Slot1.kP = 1.0; // Rotational error per second
-        effectorLeftConfig.Slot1.kI = 0; // Integrated error
-        effectorLeftConfig.Slot1.kD = 0; // Error derivative
-
-        effectorLeftConfig.Voltage.withPeakForwardVoltage(Volts.of(8 * Constants.masterVoltageMultiplier)).withPeakReverseVoltage(Volts.of(-8 * Constants.masterVoltageMultiplier));
-
-        effectorRightConfig.Slot1.kS = 1; // Static friction
-        effectorRightConfig.Slot1.kV = 0; // 0.12 for Kraken X60
-        effectorRightConfig.Slot1.kP = 1.0; // Rotational error per second
-        effectorRightConfig.Slot1.kI = 0; // Integrated error
-        effectorRightConfig.Slot1.kD = 0; // Error derivative
-
-        effectorRightConfig.Voltage.withPeakForwardVoltage(Volts.of(8 * Constants.masterVoltageMultiplier)).withPeakReverseVoltage(Volts.of(-8 * Constants.masterVoltageMultiplier));
+        intakeConfig.Voltage.withPeakForwardVoltage(Volts.of(8*Constants.masterVoltageMultiplier)).withPeakReverseVoltage(Volts.of(-8*Constants.masterVoltageMultiplier));
 
         StatusCode status = StatusCode.StatusCodeNotInitialized;
         for (int i = 0; i < 5; ++i) {
-            status = effectorRight.getConfigurator().apply(effectorRightConfig);
-            effectorLeft.getConfigurator().apply(effectorLeftConfig);
-            intakeLeft.getConfigurator().apply(intakeLeftConfig);
-            intakeRight.getConfigurator().apply(intakeRightConfig);
+            status = 
+            effectorLeft.getConfigurator().apply(effectorConfig);
+            effectorRight.getConfigurator().apply(effectorConfig);
+            intakeLeft.getConfigurator().apply(effectorConfig);
+            intakeRight.getConfigurator().apply(intakeConfig);
             if (status.isOK()) break;
         }
         if (!status.isOK()) {
@@ -154,8 +98,8 @@ public class Effector extends SubsystemBase {
     public void bumpRotations(double rotations) {
         double currentRotL = effectorLeft.getPosition().getValueAsDouble();
         double currentRotR = effectorRight.getPosition().getValueAsDouble();
-    
-        effectorLeft .setControl(m_positionVoltage.withPosition(currentRotL + rotations));
+
+        effectorLeft.setControl(m_positionVoltage.withPosition(currentRotL + rotations));
         effectorRight.setControl(m_positionVoltage.withPosition(currentRotR - rotations));
     }
 
@@ -195,7 +139,7 @@ public class Effector extends SubsystemBase {
     public void stopIntake() {
         effectorLeft.setControl(m_velocityVoltage.withVelocity(0));
         effectorRight.setControl(m_velocityVoltage.withVelocity(0));
-        intakeRight.setControl(m_velocityVoltage.withVelocity(0));
+  //      intakeRight.setControl(m_velocityVoltage.withVelocity(0));
         intakeLeft.setControl(m_velocityVoltage.withVelocity(0));
         return;
 
@@ -206,13 +150,13 @@ public class Effector extends SubsystemBase {
         effectorLeft.setControl(m_velocityVoltage.withVelocity(40 * Constants.masterSpeedMultiplier));
         effectorRight.setControl(m_velocityVoltage.withVelocity(-40 * Constants.masterSpeedMultiplier));
 
-        intakeRight.setControl(m_velocityVoltage.withVelocity(-20 * Constants.masterSpeedMultiplier));
+    //    intakeRight.setControl(m_velocityVoltage.withVelocity(-20 * Constants.masterSpeedMultiplier));
         intakeLeft.setControl(m_velocityVoltage.withVelocity(20 * Constants.masterSpeedMultiplier));
         return;
     }
 
     public void startLock() {
-        // Turn on intake 
+        // Turn on intake
         effectorLeft.setControl(m_velocityVoltage.withVelocity(15 * Constants.masterSpeedMultiplier));
         effectorRight.setControl(m_velocityVoltage.withVelocity(-15 * Constants.masterSpeedMultiplier));
         return;
@@ -220,7 +164,7 @@ public class Effector extends SubsystemBase {
     }
 
     public void startOutTake() {
-        // Turn on intake 
+        // Turn on intake
         effectorLeft.setControl(m_velocityVoltage.withVelocity(40 * Constants.masterSpeedMultiplier));
         effectorRight.setControl(m_velocityVoltage.withVelocity(-40 * Constants.masterSpeedMultiplier));
         return;
@@ -233,8 +177,8 @@ public class Effector extends SubsystemBase {
 
     public boolean isCoralNotDetected() {
         return intakeSensor.getMeasurement().distance_mm > 10;
-    }   
-    
+    }
+
 
     public static void outtakeUntilDetected() {
         if (Elevator.getPosition() < 5) {
@@ -342,7 +286,7 @@ public class Effector extends SubsystemBase {
         isAlgaeOut = false;
 
         algaeTimer.stop();
-        algaeTimer.reset();     
+        algaeTimer.reset();
         return;
 
     }
