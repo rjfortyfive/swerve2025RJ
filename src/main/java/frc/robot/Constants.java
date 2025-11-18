@@ -185,13 +185,13 @@ public class Constants {
         public static final double scoreVelocity = 15;
   // We are using Motion Magic position control with voltage countrol output type,
   // so the PID parameters are in volts
-        public static final double kPEffector = 1.0; // Output per unit of error in position (volts/rotation)
-        public static final double kIEffector = 0.0; // Output per unit of integrated error in position (volts/(rotation*s))
-        public static final double kDEffector = 0.0; // Output per unit of error in velocity (volts/rotation)
-        public static final double kGEffector = 0.0; // Output to overcome gravity (volts) - modified by ArmCosine
-        public static final double kSEffector = 1.0; // Output to overcome static friction (volts)
-        public static final double kVEffector = 0.123; // Output per unit of target velocity (volts/rps)
-        public static final double kAEffector = 0.0; // Output per unit of target accelleration (volts/rps/rps)
+        public static final double kPEffector = 1.0; 
+        public static final double kIEffector = 0.0;
+        public static final double kDEffector = 0.0; 
+        public static final double kGEffector = 0.0;
+        public static final double kSEffector = 1.0;
+        public static final double kVEffector = 0.123;
+        public static final double kAEffector = 0.0;
 
         public static final double kEffectorStatorCurrent = 80.0;
         public static final double kEffectorSupplyCurrent = 40.0;
