@@ -52,8 +52,8 @@ public class Effector extends SubsystemBase {
     public Effector() {
         intakeLeft.setControl(new Follower(intakeRight.getDeviceID(), true));
 
-        effectorLeft.setNeutralMode(NeutralModeValue.Coast);
-        effectorRight.setNeutralMode(NeutralModeValue.Coast);
+        effectorLeft.setNeutralMode(NeutralModeValue.Brake);
+        effectorRight.setNeutralMode(NeutralModeValue.Brake);
 
         TalonFXConfiguration effectorConfig = new TalonFXConfiguration();
 
@@ -67,27 +67,27 @@ public class Effector extends SubsystemBase {
         effectorTimer = new Timer();
 
         effectorLeft.getConfigurator().apply(new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Constants.effector.kEffectorStatorCurrent)
+            .withStatorCurrentLimit(Constants.effector.K_EFFECTOR_STATOR_CURRENT)
             .withStatorCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(Constants.effector.kEffectorSupplyCurrent)
+            .withSupplyCurrentLimit(Constants.effector.K_EFFECTOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));
 
         effectorRight.getConfigurator().apply(new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Constants.effector.kEffectorStatorCurrent)
+            .withStatorCurrentLimit(Constants.effector.K_EFFECTOR_STATOR_CURRENT)
             .withStatorCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(Constants.effector.kEffectorSupplyCurrent)
+            .withSupplyCurrentLimit(Constants.effector.K_EFFECTOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));
         
         intakeLeft.getConfigurator().apply(new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Constants.effector.kEffectorStatorCurrent)
+            .withStatorCurrentLimit(Constants.effector.K_EFFECTOR_STATOR_CURRENT)
             .withStatorCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(Constants.effector.kEffectorSupplyCurrent)
+            .withSupplyCurrentLimit(Constants.effector.K_EFFECTOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));
         
         intakeRight.getConfigurator().apply(new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Constants.effector.kEffectorStatorCurrent)
+            .withStatorCurrentLimit(Constants.effector.K_EFFECTOR_STATOR_CURRENT)
             .withStatorCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(Constants.effector.kEffectorSupplyCurrent)
+            .withSupplyCurrentLimit(Constants.effector.K_EFFECTOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));            
 
         effectorLeft.getConfigurator().apply( new Slot0Configs()

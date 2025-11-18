@@ -193,8 +193,8 @@ public class Constants {
         public static final double KV_EFFECTOR = 0.123;
         public static final double KA_EFFECTOR = 0.0;
 
-        public static final double kEffectorStatorCurrent = 80.0;
-        public static final double kEffectorSupplyCurrent = 40.0;
+        public static final double K_EFFECTOR_STATOR_CURRENT = 80.0;
+        public static final double K_EFFECTOR_SUPPLY_CURRENT = 40.0;
 
         public static final double EFFECTOR_PEAK_VOLTAGE = 8.0 * Constants.masterVoltageMultiplier;
 
