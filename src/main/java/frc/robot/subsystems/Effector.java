@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import edu.wpi.first.wpilibj2.command.Commands;
 
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -54,7 +53,7 @@ public class Effector extends SubsystemBase {
 
         effectorLeft.setNeutralMode(NeutralModeValue.Brake);
         effectorRight.setNeutralMode(NeutralModeValue.Brake);
-        
+
         effectorTimer = new Timer();
 
         effectorLeft.getConfigurator().apply(new CurrentLimitsConfigs()
