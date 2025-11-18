@@ -185,16 +185,18 @@ public class Constants {
         public static final double scoreVelocity = 15;
   // We are using Motion Magic position control with voltage countrol output type,
   // so the PID parameters are in volts
-        public static final double kPEffector = 1.0; 
-        public static final double kIEffector = 0.0;
-        public static final double kDEffector = 0.0; 
-        public static final double kGEffector = 0.0;
-        public static final double kSEffector = 1.0;
-        public static final double kVEffector = 0.123;
-        public static final double kAEffector = 0.0;
+        public static final double KP_EFFECTOR = 1.0; 
+        public static final double KI_EFFECTOR = 0.0;
+        public static final double KD_EFFECTOR = 0.0; 
+        public static final double KG_EFFECTOR = 0.0;
+        public static final double KS_EFFECTOR = 1.0;
+        public static final double KV_EFFECTOR = 0.123;
+        public static final double KA_EFFECTOR = 0.0;
 
         public static final double kEffectorStatorCurrent = 80.0;
         public static final double kEffectorSupplyCurrent = 40.0;
+
+        public static final double EFFECTOR_PEAK_VOLTAGE = 8.0 * Constants.masterVoltageMultiplier;
 
     }
 
@@ -204,15 +206,18 @@ public class Constants {
         public static final double lockRotations = -2.75;
         public static final double intakeRotations = 2.5;
         public static final double lockSpeedRPS = 25;
-        public static final double kPIntake = 0.3;
-        public static final double kDIntake = 0.0;
-        public static final double kIIntake = 0.0;
-        public static final double kAIntake = 0.0;
-        public static final double kGIntake = 0.0;
-        public static final double kSIntake = 0.0;
-        public static final double kVIntake = 0.0;
+        public static final double KP_INTAKE = 0.3;
+        public static final double KD_INTAKE = 0.0;
+        public static final double KI_INTAKE = 0.0;
+        public static final double KA_INTAKE = 0.0;
+        public static final double KG_INTAKE = 0.0;
+        public static final double KS_INTAKE = 0.0;
+        public static final double KV_INTAKE = 0.0;
+
         public static final double kIntakeStatorCurrent = 80.0;
         public static final double kIntakeSupplyCurrent = 40.0;
+
+        public static final double INTAKE_PEAK_VOLTAGE = 8.0 * Constants.masterVoltageMultiplier;
     }
 
     public static final class hang {

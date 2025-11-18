@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
+import frc.robot.Constants.buttonPanel.intake;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
@@ -90,51 +91,63 @@ public class Effector extends SubsystemBase {
             .withSupplyCurrentLimitEnable(true));            
 
         effectorLeft.getConfigurator().apply( new Slot0Configs()
-            .withKP(Constants.effector.kPEffector)
-            .withKI(Constants.effector.kIEffector)
-            .withKD(Constants.effector.kDEffector)
-            .withKG(Constants.effector.kGEffector)
-            .withKS(Constants.effector.kSEffector)
-            .withKV(Constants.effector.kVEffector)
-            .withKA(Constants.effector.kAEffector));
+            .withKP(Constants.effector.KP_EFFECTOR)
+            .withKI(Constants.effector.KI_EFFECTOR)
+            .withKD(Constants.effector.KD_EFFECTOR)
+            .withKG(Constants.effector.KG_EFFECTOR)
+            .withKS(Constants.effector.KS_EFFECTOR)
+            .withKV(Constants.effector.KV_EFFECTOR)
+            .withKA(Constants.effector.KA_EFFECTOR));
             
         effectorRight.getConfigurator().apply( new Slot0Configs()
-            .withKP(Constants.effector.kPEffector)
-            .withKI(Constants.effector.kIEffector)
-            .withKD(Constants.effector.kDEffector)
-            .withKG(Constants.effector.kGEffector)
-            .withKS(Constants.effector.kSEffector)
-            .withKV(Constants.effector.kVEffector)
-            .withKA(Constants.effector.kAEffector));
+            .withKP(Constants.effector.KP_EFFECTOR)
+            .withKI(Constants.effector.KI_EFFECTOR)
+            .withKD(Constants.effector.KD_EFFECTOR)
+            .withKG(Constants.effector.KG_EFFECTOR)
+            .withKS(Constants.effector.KS_EFFECTOR)
+            .withKV(Constants.effector.KV_EFFECTOR)
+            .withKA(Constants.effector.KA_EFFECTOR));
 
         intakeLeft.getConfigurator().apply( new Slot0Configs()
-            .withKP(Constants.intake.kPIntake)
-            .withKI(Constants.intake.kIIntake)
-            .withKD(Constants.intake.kDIntake)
-            .withKG(Constants.intake.kGIntake)
-            .withKS(Constants.intake.kSIntake)
-            .withKV(Constants.intake.kVIntake)
-            .withKA(Constants.intake.kAIntake));
+            .withKP(Constants.intake.KP_INTAKE)
+            .withKI(Constants.intake.KI_INTAKE)
+            .withKD(Constants.intake.KD_INTAKE)
+            .withKG(Constants.intake.KG_INTAKE)
+            .withKS(Constants.intake.KS_INTAKE)
+            .withKV(Constants.intake.KV_INTAKE)
+            .withKA(Constants.intake.KA_INTAKE));
 
         intakeRight.getConfigurator().apply( new Slot0Configs()
-            .withKP(Constants.intake.kPIntake)
-            .withKI(Constants.intake.kIIntake)
-            .withKD(Constants.intake.kDIntake)
-            .withKG(Constants.intake.kGIntake)
-            .withKS(Constants.intake.kSIntake)
-            .withKV(Constants.intake.kVIntake)
-            .withKA(Constants.intake.kAIntake));            
-
-        effectorConfig.Voltage.withPeakForwardVoltage(Volts.of(8 * Constants.masterVoltageMultiplier)).withPeakReverseVoltage(Volts.of(-8 * Constants.masterVoltageMultiplier));
-
-        intakeConfig.Voltage.withPeakForwardVoltage(Volts.of(8*Constants.masterVoltageMultiplier)).withPeakReverseVoltage(Volts.of(-8*Constants.masterVoltageMultiplier));
+            .withKP(Constants.intake.KP_INTAKE)
+            .withKI(Constants.intake.KI_INTAKE)
+            .withKD(Constants.intake.KD_INTAKE)
+            .withKG(Constants.intake.KG_INTAKE)
+            .withKS(Constants.intake.KS_INTAKE)
+            .withKV(Constants.intake.KV_INTAKE)
+            .withKA(Constants.intake.KA_INTAKE));
+        
+        effectorLeft.getConfigurator().apply(new VoltageConfigs()
+            .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
+            .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+            
+        effectorRight.getConfigurator().apply(new VoltageConfigs()
+            .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
+            .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+            
+        intakeLeft.getConfigurator().apply(new VoltageConfigs()
+            .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
+            .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+            
+        intakeRight.getConfigurator().apply(new VoltageConfigs()
+            .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
+            .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
 
         StatusCode status = StatusCode.StatusCodeNotInitialized;
         for (int i = 0; i < 5; ++i) {
             status = 
             effectorLeft.getConfigurator().apply(effectorConfig);
             effectorRight.getConfigurator().apply(effectorConfig);
-            intakeLeft.getConfigurator().apply(effectorConfig);
+            intakeLeft.getConfigurator().apply(intakeConfig);
             intakeRight.getConfigurator().apply(intakeConfig);
             if (status.isOK()) break;
         }
