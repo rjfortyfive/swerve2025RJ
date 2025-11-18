@@ -54,14 +54,7 @@ public class Effector extends SubsystemBase {
 
         effectorLeft.setNeutralMode(NeutralModeValue.Brake);
         effectorRight.setNeutralMode(NeutralModeValue.Brake);
-
-        TalonFXConfiguration effectorConfig = new TalonFXConfiguration();
-
-        MotionMagicConfigs effectorLeftMotion = effectorConfig.MotionMagic;
-        MotionMagicConfigs effectorRightMotion = effectorConfig.MotionMagic;
-        effectorLeftMotion.withMotionMagicCruiseVelocity(RotationsPerSecond.of(30 * Constants.masterSpeedMultiplier)).withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.masterSpeedMultiplier));
-        effectorRightMotion.withMotionMagicCruiseVelocity(RotationsPerSecond.of(10 * Constants.masterSpeedMultiplier)).withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.masterSpeedMultiplier));
-
+        
         effectorTimer = new Timer();
 
         effectorLeft.getConfigurator().apply(new CurrentLimitsConfigs()
@@ -139,6 +132,14 @@ public class Effector extends SubsystemBase {
         intakeRight.getConfigurator().apply(new VoltageConfigs()
             .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
             .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+        
+        effectorLeft.getConfigurator().apply(new MotionMagicConfigs()
+            .withMotionMagicCruiseVelocity(RotationsPerSecond.of(30 * Constants.masterSpeedMultiplier))
+            .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.masterSpeedMultiplier)));
+
+        effectorRight.getConfigurator().apply(new MotionMagicConfigs()
+            .withMotionMagicCruiseVelocity(RotationsPerSecond.of(10 * Constants.masterSpeedMultiplier))
+            .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.masterSpeedMultiplier)));
     }
 
     public void bumpRotations(double rotations) {
