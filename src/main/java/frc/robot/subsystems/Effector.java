@@ -57,8 +57,6 @@ public class Effector extends SubsystemBase {
 
         TalonFXConfiguration effectorConfig = new TalonFXConfiguration();
 
-        TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
-
         MotionMagicConfigs effectorLeftMotion = effectorConfig.MotionMagic;
         MotionMagicConfigs effectorRightMotion = effectorConfig.MotionMagic;
         effectorLeftMotion.withMotionMagicCruiseVelocity(RotationsPerSecond.of(30 * Constants.masterSpeedMultiplier)).withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.masterSpeedMultiplier));
@@ -141,19 +139,6 @@ public class Effector extends SubsystemBase {
         intakeRight.getConfigurator().apply(new VoltageConfigs()
             .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
             .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
-
-        StatusCode status = StatusCode.StatusCodeNotInitialized;
-        for (int i = 0; i < 5; ++i) {
-            status = 
-            effectorLeft.getConfigurator().apply(effectorConfig);
-            effectorRight.getConfigurator().apply(effectorConfig);
-            intakeLeft.getConfigurator().apply(intakeConfig);
-            intakeRight.getConfigurator().apply(intakeConfig);
-            if (status.isOK()) break;
-        }
-        if (!status.isOK()) {
-            System.out.println("Could not apply configs, error code: " + status.toString());
-        }
     }
 
     public void bumpRotations(double rotations) {
