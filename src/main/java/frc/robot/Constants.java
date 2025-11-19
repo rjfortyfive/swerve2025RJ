@@ -202,8 +202,8 @@ public class Constants {
     }
 
     public static final class intake {
-        public static final int intakeRightID = 15;
-        public static final int intakeLeftID = 16;
+        public static final int INTAKE_RIGHT_ID = 15;
+        public static final int INTAKE_LEFT_ID = 16;
         public static final double lockRotations = -2.75;
         public static final double intakeRotations = 2.5;
         public static final double lockSpeedRPS = 25;

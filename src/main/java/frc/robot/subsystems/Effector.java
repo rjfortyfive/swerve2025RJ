@@ -30,8 +30,8 @@ public class Effector extends SubsystemBase {
     private static TalonFX effectorLeft = new TalonFX(Constants.effector.EFFECTOR_LEFT_ID);
     private static TalonFX effectorRight = new TalonFX(Constants.effector.EFFECTOR_RIGHT_ID);
 
-    private static TalonFX intakeRight = new TalonFX(Constants.intake.intakeRightID);
-    private static TalonFX intakeLeft = new TalonFX(Constants.intake.intakeLeftID);
+    private static TalonFX intakeLeft = new TalonFX(Constants.intake.INTAKE_LEFT_ID);
+    private static TalonFX intakeRight = new TalonFX(Constants.intake.INTAKE_RIGHT_ID);
 
     private static SparkMax algaeMotor = new SparkMax(1, MotorType.kBrushed);
 
