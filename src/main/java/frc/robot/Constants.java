@@ -16,13 +16,11 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.math.Matrix;
 
 public class Constants {
-    public static final double masterSpeedMultiplier = 1; // For troubleshooting/testing
+    public static final double MASTER_SPEED_MULTIPLIER = 1; // For troubleshooting/testing
     public static final double masterDriveMultiplier = 1; // For troubleshooting/testing Drivetrain
     public static final boolean masterNerf = false; // For troubleshooting/testing Drivetrain
 
     public static final double masterVoltageMultiplier = 1;
-    public static final double stearingMultiplier = 0.65; // 0.3-0.7 is pretty normal. Higher is more smoothed better
-                                                          // for small ajustments
 
     // Right Camera
     public static final String CameraName1 = "EagleEye01";

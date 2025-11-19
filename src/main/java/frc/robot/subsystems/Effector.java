@@ -132,12 +132,12 @@ public class Effector extends SubsystemBase {
             .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
         
         effectorLeft.getConfigurator().apply(new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(RotationsPerSecond.of(30 * Constants.masterSpeedMultiplier))
-            .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.masterSpeedMultiplier)));
+            .withMotionMagicCruiseVelocity(RotationsPerSecond.of(30 * Constants.MASTER_SPEED_MULTIPLIER))
+            .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.MASTER_SPEED_MULTIPLIER)));
 
         effectorRight.getConfigurator().apply(new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(RotationsPerSecond.of(10 * Constants.masterSpeedMultiplier))
-            .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.masterSpeedMultiplier)));
+            .withMotionMagicCruiseVelocity(RotationsPerSecond.of(10 * Constants.MASTER_SPEED_MULTIPLIER))
+            .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.MASTER_SPEED_MULTIPLIER)));
     }
 
     public void bumpRotations(double rotations) {
@@ -163,7 +163,7 @@ public class Effector extends SubsystemBase {
             Commands.runOnce(() -> m_initialLeftRot = effectorLeft.getPosition().getValueAsDouble(), this),
             // 2) spin at constant speed until we've turned enough
             Commands.run(() -> {
-                double vel = direction * speedRPS * Constants.masterSpeedMultiplier;
+                double vel = direction * speedRPS * Constants.MASTER_SPEED_MULTIPLIER;
                 effectorLeft.setControl(m_velocityVoltage.withVelocity(vel));
                 effectorRight.setControl(m_velocityVoltage.withVelocity(-vel));
             }, this)
@@ -192,26 +192,26 @@ public class Effector extends SubsystemBase {
 
     public void startIntake() {
         // Turn on intake and effector wheels
-        effectorLeft.setControl(m_velocityVoltage.withVelocity(40 * Constants.masterSpeedMultiplier));
-        effectorRight.setControl(m_velocityVoltage.withVelocity(-40 * Constants.masterSpeedMultiplier));
+        effectorLeft.setControl(m_velocityVoltage.withVelocity(40 * Constants.MASTER_SPEED_MULTIPLIER));
+        effectorRight.setControl(m_velocityVoltage.withVelocity(-40 * Constants.MASTER_SPEED_MULTIPLIER));
 
     //    intakeRight.setControl(m_velocityVoltage.withVelocity(-20 * Constants.masterSpeedMultiplier));
-        intakeLeft.setControl(m_velocityVoltage.withVelocity(20 * Constants.masterSpeedMultiplier));
+        intakeLeft.setControl(m_velocityVoltage.withVelocity(20 * Constants.MASTER_SPEED_MULTIPLIER));
         return;
     }
 
     public void startLock() {
         // Turn on intake
-        effectorLeft.setControl(m_velocityVoltage.withVelocity(15 * Constants.masterSpeedMultiplier));
-        effectorRight.setControl(m_velocityVoltage.withVelocity(-15 * Constants.masterSpeedMultiplier));
+        effectorLeft.setControl(m_velocityVoltage.withVelocity(15 * Constants.MASTER_SPEED_MULTIPLIER));
+        effectorRight.setControl(m_velocityVoltage.withVelocity(-15 * Constants.MASTER_SPEED_MULTIPLIER));
         return;
 
     }
 
     public void startOutTake() {
         // Turn on intake
-        effectorLeft.setControl(m_velocityVoltage.withVelocity(40 * Constants.masterSpeedMultiplier));
-        effectorRight.setControl(m_velocityVoltage.withVelocity(-40 * Constants.masterSpeedMultiplier));
+        effectorLeft.setControl(m_velocityVoltage.withVelocity(40 * Constants.MASTER_SPEED_MULTIPLIER));
+        effectorRight.setControl(m_velocityVoltage.withVelocity(-40 * Constants.MASTER_SPEED_MULTIPLIER));
         return;
 
     }
@@ -252,8 +252,8 @@ public class Effector extends SubsystemBase {
         }
         effectorTimer.start();
         while (effectorTimer.get() < 2) {
-            effectorLeft.setControl(m_velocityVoltage.withVelocity(motorSpeed * Constants.masterSpeedMultiplier));
-            effectorRight.setControl(m_velocityVoltage.withVelocity(-motorSpeed * Constants.masterSpeedMultiplier));
+            effectorLeft.setControl(m_velocityVoltage.withVelocity(motorSpeed * Constants.MASTER_SPEED_MULTIPLIER));
+            effectorRight.setControl(m_velocityVoltage.withVelocity(-motorSpeed * Constants.MASTER_SPEED_MULTIPLIER));
         }
         effectorLeft.set(0);
         effectorRight.set(0);
@@ -270,13 +270,13 @@ public class Effector extends SubsystemBase {
             motorSpeedL = velocityLeft;
         }
         else {
-            motorSpeedL = 30 * Constants.masterSpeedMultiplier; // 30
+            motorSpeedL = 30 * Constants.MASTER_SPEED_MULTIPLIER; // 30
         }
         if (velocityRight != null) {
             motorSpeedR = velocityRight;
         }
         else {
-            motorSpeedR = 10 * Constants.masterSpeedMultiplier; // 10
+            motorSpeedR = 10 * Constants.MASTER_SPEED_MULTIPLIER; // 10
         }
         effectorTimer.start();
         while (effectorTimer.get() < 1.5) {
@@ -295,8 +295,8 @@ public class Effector extends SubsystemBase {
         if (velocityRight == null) {
             velocityRight = -velocityLeft;
         }
-        effectorLeft.setControl(m_velocityVoltage.withVelocity(velocityLeft * Constants.masterSpeedMultiplier));
-        effectorRight.setControl(m_velocityVoltage.withVelocity(velocityRight * Constants.masterSpeedMultiplier));
+        effectorLeft.setControl(m_velocityVoltage.withVelocity(velocityLeft * Constants.MASTER_SPEED_MULTIPLIER));
+        effectorRight.setControl(m_velocityVoltage.withVelocity(velocityRight * Constants.MASTER_SPEED_MULTIPLIER));
 
     }
 

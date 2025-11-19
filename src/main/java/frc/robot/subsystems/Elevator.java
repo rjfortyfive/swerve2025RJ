@@ -67,7 +67,7 @@ public class Elevator extends SubsystemBase {
     public static void toBottom() {
         while (bottomlimitSwitch.get()) {
             // liftLeft.setControl(motionControl.withPosition(0));
-            liftLeft.setControl(m_velocityVoltage.withVelocity(10 * Constants.masterSpeedMultiplier));
+            liftLeft.setControl(m_velocityVoltage.withVelocity(10 * Constants.MASTER_SPEED_MULTIPLIER));
         }
         liftLeft.setControl(m_velocityVoltage.withVelocity(0));
     }
@@ -86,7 +86,7 @@ public class Elevator extends SubsystemBase {
             desiredRotationsPerSecond = velocity * -10;
         }
         liftLeft.setControl(
-                m_velocityVoltage.withVelocity(desiredRotationsPerSecond * Constants.masterSpeedMultiplier));
+                m_velocityVoltage.withVelocity(desiredRotationsPerSecond * Constants.MASTER_SPEED_MULTIPLIER));
     }
 
     public static void manualOffset(boolean direction) {
@@ -155,7 +155,7 @@ public class Elevator extends SubsystemBase {
                 .withPeakReverseVoltage(Volts.of(-12 * Constants.masterVoltageMultiplier)); // 12 and -12
 
         MotionMagicConfigs motionConfig = elevatorConfig.MotionMagic;
-        motionConfig.withMotionMagicCruiseVelocity(RotationsPerSecond.of(90 * Constants.masterSpeedMultiplier))
+        motionConfig.withMotionMagicCruiseVelocity(RotationsPerSecond.of(90 * Constants.MASTER_SPEED_MULTIPLIER))
                 .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(500)); // Should be 90 and 500
         // PID CONSTANTS
         elevatorConfig.Slot0.kP = 1.5; // 3

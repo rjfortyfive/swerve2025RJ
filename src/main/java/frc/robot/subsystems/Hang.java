@@ -17,11 +17,11 @@ public class Hang extends SubsystemBase{
     public static void activateHang(Boolean reverseDirection) {
         if (reverseDirection == false) {
             System.out.println("Moving climber up");
-            hangMotor.setControl(m_velocityVoltage.withVelocity(100 * Constants.masterSpeedMultiplier));
+            hangMotor.setControl(m_velocityVoltage.withVelocity(100 * Constants.MASTER_SPEED_MULTIPLIER));
         }
         else {
             System.out.println("Moving climber down");
-            hangMotor.setControl(m_velocityVoltage.withVelocity(-100 * Constants.masterSpeedMultiplier));
+            hangMotor.setControl(m_velocityVoltage.withVelocity(-100 * Constants.MASTER_SPEED_MULTIPLIER));
         }
     }
 
