@@ -19,15 +19,15 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class Elevator extends SubsystemBase {
-    public static TalonFX liftLeft = new TalonFX(Constants.elevator.LiftLeft);
-    public static TalonFX liftRight = new TalonFX(Constants.elevator.LiftRight);
+    public static TalonFX liftLeft = new TalonFX(Constants.elevator.LIFT_LEFT_ID);
+    public static TalonFX liftRight = new TalonFX(Constants.elevator.LIFT_RIGHT_ID);
     public static DigitalInput bottomlimitSwitch = new DigitalInput(0);
     public static DigitalInput toplimitSwitch = new DigitalInput(1);
     public final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(1);
     private final static MotionMagicVoltage motionControl = new MotionMagicVoltage(0).withSlot(0);
 
     public Elevator() {
-        System.out.println("Creating new motor with ID " + Constants.elevator.LiftLeft);
+        System.out.println("Creating new motor with ID " + Constants.elevator.LIFT_LEFT_ID);
         liftLeft.setNeutralMode(NeutralModeValue.Brake);
         liftRight.setControl(new Follower(liftLeft.getDeviceID(), true));
 

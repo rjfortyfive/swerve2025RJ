@@ -27,8 +27,8 @@ import com.revrobotics.RelativeEncoder;
 public class Effector extends SubsystemBase {
     private static LaserCan intakeSensor = new LaserCan(2);
 
-    private static TalonFX effectorLeft = new TalonFX(Constants.effector.EffectorLeftID);
-    private static TalonFX effectorRight = new TalonFX(Constants.effector.EffectorRightID);
+    private static TalonFX effectorLeft = new TalonFX(Constants.effector.EFFECTOR_LEFT_ID);
+    private static TalonFX effectorRight = new TalonFX(Constants.effector.EFFECTOR_RIGHT_ID);
 
     private static TalonFX intakeRight = new TalonFX(Constants.intake.intakeRightID);
     private static TalonFX intakeLeft = new TalonFX(Constants.intake.intakeLeftID);
@@ -56,64 +56,64 @@ public class Effector extends SubsystemBase {
         effectorTimer = new Timer();
 
         effectorLeft.getConfigurator().apply(new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Constants.effector.K_EFFECTOR_STATOR_CURRENT)
+            .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
             .withStatorCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(Constants.effector.K_EFFECTOR_SUPPLY_CURRENT)
+            .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));
 
         effectorRight.getConfigurator().apply(new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Constants.effector.K_EFFECTOR_STATOR_CURRENT)
+            .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
             .withStatorCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(Constants.effector.K_EFFECTOR_SUPPLY_CURRENT)
+            .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));
         
         intakeLeft.getConfigurator().apply(new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Constants.effector.K_EFFECTOR_STATOR_CURRENT)
+            .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
             .withStatorCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(Constants.effector.K_EFFECTOR_SUPPLY_CURRENT)
+            .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));
         
         intakeRight.getConfigurator().apply(new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Constants.effector.K_EFFECTOR_STATOR_CURRENT)
+            .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
             .withStatorCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(Constants.effector.K_EFFECTOR_SUPPLY_CURRENT)
+            .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));            
 
         effectorLeft.getConfigurator().apply( new Slot0Configs()
-            .withKP(Constants.effector.KP_EFFECTOR)
-            .withKI(Constants.effector.KI_EFFECTOR)
-            .withKD(Constants.effector.KD_EFFECTOR)
-            .withKG(Constants.effector.KG_EFFECTOR)
-            .withKS(Constants.effector.KS_EFFECTOR)
-            .withKV(Constants.effector.KV_EFFECTOR)
-            .withKA(Constants.effector.KA_EFFECTOR));
+            .withKP(Constants.effector.P_EFFECTOR)
+            .withKI(Constants.effector.I_EFFECTOR)
+            .withKD(Constants.effector.D_EFFECTOR)
+            .withKG(Constants.effector.G_EFFECTOR)
+            .withKS(Constants.effector.S_EFFECTOR)
+            .withKV(Constants.effector.V_EFFECTOR)
+            .withKA(Constants.effector.A_EFFECTOR));
             
         effectorRight.getConfigurator().apply( new Slot0Configs()
-            .withKP(Constants.effector.KP_EFFECTOR)
-            .withKI(Constants.effector.KI_EFFECTOR)
-            .withKD(Constants.effector.KD_EFFECTOR)
-            .withKG(Constants.effector.KG_EFFECTOR)
-            .withKS(Constants.effector.KS_EFFECTOR)
-            .withKV(Constants.effector.KV_EFFECTOR)
-            .withKA(Constants.effector.KA_EFFECTOR));
+            .withKP(Constants.effector.P_EFFECTOR)
+            .withKI(Constants.effector.I_EFFECTOR)
+            .withKD(Constants.effector.D_EFFECTOR)
+            .withKG(Constants.effector.G_EFFECTOR)
+            .withKS(Constants.effector.S_EFFECTOR)
+            .withKV(Constants.effector.V_EFFECTOR)
+            .withKA(Constants.effector.A_EFFECTOR));
 
         intakeLeft.getConfigurator().apply( new Slot0Configs()
-            .withKP(Constants.intake.KP_INTAKE)
-            .withKI(Constants.intake.KI_INTAKE)
-            .withKD(Constants.intake.KD_INTAKE)
-            .withKG(Constants.intake.KG_INTAKE)
-            .withKS(Constants.intake.KS_INTAKE)
-            .withKV(Constants.intake.KV_INTAKE)
-            .withKA(Constants.intake.KA_INTAKE));
+            .withKP(Constants.intake.P_INTAKE)
+            .withKI(Constants.intake.I_INTAKE)
+            .withKD(Constants.intake.D_INTAKE)
+            .withKG(Constants.intake.G_INTAKE)
+            .withKS(Constants.intake.S_INTAKE)
+            .withKV(Constants.intake.V_INTAKE)
+            .withKA(Constants.intake.A_INTAKE));
 
         intakeRight.getConfigurator().apply( new Slot0Configs()
-            .withKP(Constants.intake.KP_INTAKE)
-            .withKI(Constants.intake.KI_INTAKE)
-            .withKD(Constants.intake.KD_INTAKE)
-            .withKG(Constants.intake.KG_INTAKE)
-            .withKS(Constants.intake.KS_INTAKE)
-            .withKV(Constants.intake.KV_INTAKE)
-            .withKA(Constants.intake.KA_INTAKE));
+            .withKP(Constants.intake.P_INTAKE)
+            .withKI(Constants.intake.I_INTAKE)
+            .withKD(Constants.intake.D_INTAKE)
+            .withKG(Constants.intake.G_INTAKE)
+            .withKS(Constants.intake.S_INTAKE)
+            .withKV(Constants.intake.V_INTAKE)
+            .withKA(Constants.intake.A_INTAKE));
         
         effectorLeft.getConfigurator().apply(new VoltageConfigs()
             .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))

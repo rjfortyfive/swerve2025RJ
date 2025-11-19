@@ -156,8 +156,11 @@ public class Constants {
     }
 
     public static final class elevator {
-        public static final int LiftLeft = 10;
-        public static final int LiftRight = 11;
+        public static final int LIFT_LEFT_ID = 10;
+        public static final int LIFT_RIGHT_ID = 11;
+
+        public static final int LIFT_BOTTOM_SWITCH = 0;
+        public static final int LIFT_TOP_SWITCH = 1;
 
         public static class level {
             public static double L1 = 0.05;
@@ -176,23 +179,23 @@ public class Constants {
     }
 
     public static final class effector {
-        public static final int EffectorLeftID = 12;
-        public static final int EffectorRightID = 13;
+        public static final int EFFECTOR_LEFT_ID = 12;
+        public static final int EFFECTOR_RIGHT_ID = 13;
         public static final double defaultVelocity = 15;
         public static final double scoreRotations = 4;
         public static final double scoreVelocity = 15;
   // We are using Motion Magic position control with voltage countrol output type,
   // so the PID parameters are in volts
-        public static final double KP_EFFECTOR = 1.0; 
-        public static final double KI_EFFECTOR = 0.0;
-        public static final double KD_EFFECTOR = 0.0; 
-        public static final double KG_EFFECTOR = 0.0;
-        public static final double KS_EFFECTOR = 1.0;
-        public static final double KV_EFFECTOR = 0.123;
-        public static final double KA_EFFECTOR = 0.0;
+        public static final double P_EFFECTOR = 1.0; 
+        public static final double I_EFFECTOR = 0.0;
+        public static final double D_EFFECTOR = 0.0; 
+        public static final double G_EFFECTOR = 0.0;
+        public static final double S_EFFECTOR = 1.0;
+        public static final double V_EFFECTOR = 0.123;
+        public static final double A_EFFECTOR = 0.0;
 
-        public static final double K_EFFECTOR_STATOR_CURRENT = 80.0;
-        public static final double K_EFFECTOR_SUPPLY_CURRENT = 40.0;
+        public static final double EFFECTOR_STATOR_CURRENT = 80.0;
+        public static final double EFFECTOR_SUPPLY_CURRENT = 40.0;
 
         public static final double EFFECTOR_PEAK_VOLTAGE = 8.0 * Constants.masterVoltageMultiplier;
 
@@ -204,13 +207,13 @@ public class Constants {
         public static final double lockRotations = -2.75;
         public static final double intakeRotations = 2.5;
         public static final double lockSpeedRPS = 25;
-        public static final double KP_INTAKE = 0.3;
-        public static final double KD_INTAKE = 0.0;
-        public static final double KI_INTAKE = 0.0;
-        public static final double KA_INTAKE = 0.0;
-        public static final double KG_INTAKE = 0.0;
-        public static final double KS_INTAKE = 0.0;
-        public static final double KV_INTAKE = 0.0;
+        public static final double P_INTAKE = 0.3;
+        public static final double D_INTAKE = 0.0;
+        public static final double I_INTAKE = 0.0;
+        public static final double A_INTAKE = 0.0;
+        public static final double G_INTAKE = 0.0;
+        public static final double S_INTAKE = 0.0;
+        public static final double V_INTAKE = 0.0;
 
         public static final double kIntakeStatorCurrent = 80.0;
         public static final double kIntakeSupplyCurrent = 40.0;
