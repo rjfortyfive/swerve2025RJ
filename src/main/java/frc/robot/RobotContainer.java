@@ -479,34 +479,11 @@ public class RobotContainer {
                                 .onFalse(new InstantCommand(() -> Hang.stopHang(), drivetrain));
 
                 drivetrain.setDefaultCommand(
-                                drivetrain.applyRequest(() -> {
-                                        double rawY = -joystick.getY();
-                                        double rawX = -joystick.getX();
-                                        double rawRot = -joystick.getTwist();
+                                drivetrain.applyRequest(() -> drive
+                                                        .withVelocityX(joystick.getY() * MaxSpeed * Constants.masterDriveMultiplier)
+                                                        .withVelocityY(joystick.getX()  * MaxSpeed * Constants.masterDriveMultiplier)
+                                                        .withRotationalRate(-joystick.getTwist()  * MaxAngularRate * Constants.masterDriveMultiplier)));
 
-                                        // cubic expo
-                                        double yCub = Math.copySign(rawY * rawY * rawY, rawY);
-                                        double xCub = Math.copySign(rawX * rawX * rawX, rawX);
-                                        double rCub = Math.copySign(rawRot * rawRot * rawRot, rawRot);
-
-                                        // blend linear + cubic
-                                        double yOut = Constants.stearingMultiplier * yCub
-                                                        + (1 - Constants.stearingMultiplier) * rawY;
-                                        double xOut = Constants.stearingMultiplier * xCub
-                                                        + (1 - Constants.stearingMultiplier) * rawX;
-                                        double rotOut = Constants.stearingMultiplier * rCub
-                                                        + (1 - Constants.stearingMultiplier) * rawRot;
-
-                                        return drive
-                                                        .withVelocityX(rawY * MaxSpeed
-                                                                        * Constants.masterDriveMultiplier)
-                                                        .withVelocityY(rawX * MaxSpeed
-                                                                        * Constants.masterDriveMultiplier)
-                                                        .withRotationalRate(rawRot * MaxAngularRate
-                                                                        * Constants.masterDriveMultiplier);
-                                }));
-
-                joystick.trigger().whileTrue(drivetrain.applyRequest(() -> brake));
 
                 // reset the field-centric heading on middle button press
 
