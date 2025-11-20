@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -20,7 +21,7 @@ public class Elevator extends SubsystemBase {
     public static TalonFX elevatorLeftFX = new TalonFX(Constants.elevator.ELEVATOR_LEFT_FX_ID);
     public static TalonFX elevatorRightFX = new TalonFX(Constants.elevator.ELEVATOR_RIGHT_FX_ID);
     public static DigitalInput bottomlimitSwitch = new DigitalInput(0);
-    private final static MotionMagicVoltage motionControl = new MotionMagicVoltage(0);
+//private final static MotionMagicVoltage motionControl = new MotionMagicVoltage(0);
 
     public Elevator() {
         System.out.println("Creating new motor with ID " + Constants.elevator.ELEVATOR_LEFT_FX_ID);
@@ -64,11 +65,18 @@ public class Elevator extends SubsystemBase {
         elevatorRightFX.getConfigurator().apply(new MotionMagicConfigs()
             .withMotionMagicCruiseVelocity(RotationsPerSecond.of(Constants.elevator.ELEVATOR_CRUISE_VELOCITY * Constants.MASTER_SPEED_MULTIPLIER))
             .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(Constants.elevator.ELEVATOR_ACCEL)));
+        
+        elevatorLeftFX.getConfigurator().apply(new SoftwareLimitSwitchConfigs()
+            .withForwardSoftLimitEnable(true)
+            .withForwardSoftLimitThreshold(Constants.elevator.ELEVATOR_UPPER_LIMIT)
+            .withReverseSoftLimitEnable(true)
+            .withReverseSoftLimitThreshold(Constants.elevator.ELEVATOR_LOWER_LIMIT));
     }
 
     public static void toPosition(double rotations) {
         System.out.println("Going to " + rotations);
-        elevatorLeftFX.setControl(motionControl.withPosition(rotations));
+        //elevatorLeftFX.setControl(motionControl.withPosition(rotations));
+        elevatorLeftFX.setControl(new MotionMagicVoltage(rotations));
             if (rotations == Constants.elevator.level.L1) {
                 Constants.elevator.level.activeLevel = 1;
             } else if (rotations == Constants.elevator.level.L2) {
@@ -134,7 +142,7 @@ public class Elevator extends SubsystemBase {
 
         }
 
-        elevatorLeftFX.setControl(motionControl.withPosition(currentPos));
+        elevatorLeftFX.setControl(new MotionMagicVoltage(currentPos));
         System.out.println("New Position: " + currentPos);
         SmartDashboard.putNumber("Offset", currentPos);
         return;

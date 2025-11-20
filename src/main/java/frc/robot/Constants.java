@@ -174,6 +174,9 @@ public class Constants {
         public static final double ELEVATOR_CRUISE_VELOCITY = 90;
         public static final double ELEVATOR_ACCEL = 500;
 
+        public static final double ELEVATOR_LOWER_LIMIT = 0;
+        public static final double ELEVATOR_UPPER_LIMIT = 75;
+
         public static class level {
             public static double L1 = 0.05;
             public static double L2 = 15.5;
