@@ -38,9 +38,9 @@ public class Effector extends SubsystemBase {
     private static Timer effectorTimer = new Timer();
     private static Timer algaeTimer = new Timer();
 
-    private final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(0);
+    private final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0);
 
-    private final static PositionVoltage m_positionVoltage = new PositionVoltage(0).withSlot(0);
+    private final static PositionVoltage m_positionVoltage = new PositionVoltage(0);
 
     private volatile static boolean isAlgaeOut = false;
 

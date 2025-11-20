@@ -23,8 +23,8 @@ public class Elevator extends SubsystemBase {
     public static TalonFX elevatorLeftFX = new TalonFX(Constants.elevator.ELEVATOR_LEFT_FX_ID);
     public static TalonFX elevatorRightFX = new TalonFX(Constants.elevator.ELEVATOR_RIGHT_FX_ID);
     public static DigitalInput bottomlimitSwitch = new DigitalInput(0);
-    public final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(1);
-    private final static MotionMagicVoltage motionControl = new MotionMagicVoltage(0).withSlot(0);
+    public final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0);
+    private final static MotionMagicVoltage motionControl = new MotionMagicVoltage(0);
 
     public Elevator() {
         System.out.println("Creating new motor with ID " + Constants.elevator.ELEVATOR_LEFT_FX_ID);
