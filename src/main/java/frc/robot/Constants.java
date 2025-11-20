@@ -159,17 +159,20 @@ public class Constants {
         public static final int ELEVATOR_LEFT_FX_ID = 10;
         public static final int ELEVATOR_RIGHT_FX_ID = 11;
 
-        public static final int LIFT_BOTTOM_SWITCH = 0;
-        public static final double P_ELEVATOR = 0;
-        public static final double I_ELEVATOR = 0;
-        public static final double D_ELEVATOR = 0;
-        public static final double G_ELEVATOR = 0;
-        public static final double S_ELEVATOR = 0;
-        public static final double V_ELEVATOR = 0;
+        public static final int ELEVATOR_BOTTOM_SWITCH = 0;
+        public static final double P_ELEVATOR = 0.12;
+        public static final double I_ELEVATOR = 0.06;
+        public static final double D_ELEVATOR = 0.001;
+        public static final double G_ELEVATOR = 0.2;
+        public static final double S_ELEVATOR = 0.3;
+        public static final double V_ELEVATOR = 0.13;
         public static final double A_ELEVATOR = 0;
 
         public static final double ELEVATOR_STATOR_CURRENT = 120;
         public static final double ELEVATOR_SUPPLY_CURRENT = 60;
+
+        public static final double ELEVATOR_CRUISE_VELOCITY = 90;
+        public static final double ELEVATOR_ACCEL = 500;
 
         public static class level {
             public static double L1 = 0.05;
@@ -208,6 +211,9 @@ public class Constants {
 
         public static final double EFFECTOR_PEAK_VOLTAGE = 8.0 * Constants.masterVoltageMultiplier;
 
+        public static final double EFFECTOR_LEFT_CRUISE_VELOCITY = 30;
+        public static final double EFFECTOR_RIGHT_CRUISE_VELOCITY = 10;
+        public static final double EFFECTOR_ACCEL = 100;
     }
 
     public static final class intake {
