@@ -15,7 +15,7 @@ public class CoralIntake extends Command {
     private boolean coralHasBeenReversed = false;
 
 
-    public CoralIntake() {
+    public CoralIntake(Elevator m_Elevator, Effector m_Effector, Intake m_Intake) {
 
         addRequirements(m_intake, m_effector, m_Elevator);
 

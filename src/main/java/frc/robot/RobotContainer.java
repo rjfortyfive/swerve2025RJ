@@ -37,11 +37,9 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.*;
+import frc.robot.subsystems.*;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Effector;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Hang;
 import frc.robot.util.TagUtils;
 import frc.robot.util.tagSide;
 
@@ -109,6 +107,7 @@ public class RobotContainer {
 
         public Elevator m_elevator = new Elevator();
         public Effector m_effector = new Effector();
+        public Intake m_intake = new Intake();
         public final Hang m_hang = new Hang();
 
         public RobotContainer() {
@@ -304,43 +303,7 @@ public class RobotContainer {
 
                 // toggle intake on/off each press
                 buttonPanel.button(Constants.buttonPanel.coral.In)
-                                .onTrue(
-                                                sequence(
-                                                                // 1) move the elevator up to position 1
-                                                                new InstantCommand(() -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.intake),
-                                                                                m_elevator),
-                                                                // 2) run intake until coral arrives, 1s timeout, or
-                                                                // cancel button pressed
-                                                                new ParallelRaceGroup(
-                                                                                new StartEndCommand(
-                                                                                                m_effector::startIntake,
-                                                                                                m_effector::stopIntake,
-                                                                                                m_effector),
-                                                                                waitUntil(m_effector::isCoralDetected),
-                                                                                waitSeconds(7.0),
-                                                                                waitUntil(() -> buttonPanel.button(
-                                                                                                Constants.buttonPanel.intake.cancel)
-                                                                                                .getAsBoolean())),
-
-                                                                new ParallelRaceGroup(
-                                                                                new StartEndCommand(
-                                                                                                m_effector::startLock,
-                                                                                                m_effector::stopIntake,
-                                                                                                m_effector),
-                                                                                waitUntil(m_effector::isCoralNotDetected),
-                                                                                waitSeconds(3.0),
-                                                                                waitUntil(() -> buttonPanel.button(
-                                                                                                Constants.buttonPanel.intake.cancel)
-                                                                                                .getAsBoolean())),
-                                                                // 3) bump the wheels 3 rotations (always runs after the
-                                                                // intake group)
-                                                                m_effector.bumpSpeedRotations(
-                                                                                Constants.intake.lockRotations,
-                                                                                Constants.intake.lockSpeedRPS),
-                                                                new InstantCommand(() -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L1),
-                                                                                m_elevator)));
+                                .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
 
                 buttonPanel.button(Constants.buttonPanel.coral.Out)
                                 .onTrue(
