@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -22,6 +23,8 @@ public class Intake extends SubsystemBase {
 
     private static TalonFX intakeLeftFX = new TalonFX(Constants.intake.INTAKE_LEFT_ID);
     private static TalonFX intakeRightFX = new TalonFX(Constants.intake.INTAKE_RIGHT_ID);
+
+    private final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0);
 
 public Intake() {
     
@@ -67,4 +70,15 @@ public Intake() {
 
 }
 
+public void stopIntake() {
+    
+    intakeLeftFX.set(0);
+
+}
+
+public void startIntake() {
+        
+    intakeLeftFX.setControl(m_velocityVoltage.withVelocity(20 * Constants.MASTER_SPEED_MULTIPLIER));
+
+}
 }
