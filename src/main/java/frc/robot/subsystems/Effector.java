@@ -30,8 +30,8 @@ public class Effector extends SubsystemBase {
     private static TalonFX effectorLeftFX = new TalonFX(Constants.effector.EFFECTOR_LEFT_FX_ID);
     private static TalonFX effectorRightFX = new TalonFX(Constants.effector.EFFECTOR_RIGHT_FX_ID);
 
-    private static TalonFX intakeLeftFX = new TalonFX(Constants.intake.INTAKE_LEFT_ID);
-    private static TalonFX intakeRightFX = new TalonFX(Constants.intake.INTAKE_RIGHT_ID);
+//    private static TalonFX intakeLeftFX = new TalonFX(Constants.intake.INTAKE_LEFT_ID);
+//   private static TalonFX intakeRightFX = new TalonFX(Constants.intake.INTAKE_RIGHT_ID);
 
     private static SparkMax algaeMotor = new SparkMax(1, MotorType.kBrushed);
 
@@ -50,7 +50,7 @@ public class Effector extends SubsystemBase {
     private double m_initialLeftRot = 0.0;
 
     public Effector() {
-        intakeLeftFX.setControl(new Follower(intakeRightFX.getDeviceID(), true));
+ //       intakeLeftFX.setControl(new Follower(intakeRightFX.getDeviceID(), true));
 
         effectorLeftFX.setNeutralMode(NeutralModeValue.Brake);
         effectorRightFX.setNeutralMode(NeutralModeValue.Brake);
@@ -69,17 +69,17 @@ public class Effector extends SubsystemBase {
             .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));
         
-        intakeLeftFX.getConfigurator().apply(new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
-            .withStatorCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
-            .withSupplyCurrentLimitEnable(true));
+        // intakeLeftFX.getConfigurator().apply(new CurrentLimitsConfigs()
+        //     .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
+        //     .withStatorCurrentLimitEnable(true)
+        //     .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
+        //     .withSupplyCurrentLimitEnable(true));
         
-        intakeRightFX.getConfigurator().apply(new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
-            .withStatorCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
-            .withSupplyCurrentLimitEnable(true));            
+        // intakeRightFX.getConfigurator().apply(new CurrentLimitsConfigs()
+        //     .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
+        //     .withStatorCurrentLimitEnable(true)
+        //     .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
+        //     .withSupplyCurrentLimitEnable(true));            
 
         effectorLeftFX.getConfigurator().apply( new Slot0Configs()
             .withKP(Constants.effector.P_EFFECTOR)
@@ -99,23 +99,23 @@ public class Effector extends SubsystemBase {
             .withKV(Constants.effector.V_EFFECTOR)
             .withKA(Constants.effector.A_EFFECTOR));
 
-        intakeLeftFX.getConfigurator().apply( new Slot0Configs()
-            .withKP(Constants.intake.P_INTAKE)
-            .withKI(Constants.intake.I_INTAKE)
-            .withKD(Constants.intake.D_INTAKE)
-            .withKG(Constants.intake.G_INTAKE)
-            .withKS(Constants.intake.S_INTAKE)
-            .withKV(Constants.intake.V_INTAKE)
-            .withKA(Constants.intake.A_INTAKE));
+        // intakeLeftFX.getConfigurator().apply( new Slot0Configs()
+        //     .withKP(Constants.intake.P_INTAKE)
+        //     .withKI(Constants.intake.I_INTAKE)
+        //     .withKD(Constants.intake.D_INTAKE)
+        //     .withKG(Constants.intake.G_INTAKE)
+        //     .withKS(Constants.intake.S_INTAKE)
+        //     .withKV(Constants.intake.V_INTAKE)
+        //     .withKA(Constants.intake.A_INTAKE));
 
-        intakeRightFX.getConfigurator().apply( new Slot0Configs()
-            .withKP(Constants.intake.P_INTAKE)
-            .withKI(Constants.intake.I_INTAKE)
-            .withKD(Constants.intake.D_INTAKE)
-            .withKG(Constants.intake.G_INTAKE)
-            .withKS(Constants.intake.S_INTAKE)
-            .withKV(Constants.intake.V_INTAKE)
-            .withKA(Constants.intake.A_INTAKE));
+        // intakeRightFX.getConfigurator().apply( new Slot0Configs()
+        //     .withKP(Constants.intake.P_INTAKE)
+        //     .withKI(Constants.intake.I_INTAKE)
+        //     .withKD(Constants.intake.D_INTAKE)
+        //     .withKG(Constants.intake.G_INTAKE)
+        //     .withKS(Constants.intake.S_INTAKE)
+        //     .withKV(Constants.intake.V_INTAKE)
+        //     .withKA(Constants.intake.A_INTAKE));
         
         effectorLeftFX.getConfigurator().apply(new VoltageConfigs()
             .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
@@ -125,13 +125,13 @@ public class Effector extends SubsystemBase {
             .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
             .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
             
-        intakeLeftFX.getConfigurator().apply(new VoltageConfigs()
-            .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
-            .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+        // intakeLeftFX.getConfigurator().apply(new VoltageConfigs()
+        //     .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
+        //     .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
             
-        intakeRightFX.getConfigurator().apply(new VoltageConfigs()
-            .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
-            .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+        // intakeRightFX.getConfigurator().apply(new VoltageConfigs()
+        //     .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
+        //     .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
         
         effectorLeftFX.getConfigurator().apply(new MotionMagicConfigs()
             .withMotionMagicCruiseVelocity(RotationsPerSecond.of(30 * Constants.MASTER_SPEED_MULTIPLIER))
@@ -187,7 +187,7 @@ public class Effector extends SubsystemBase {
         effectorLeftFX.set(0);
         effectorRightFX.set(0);
   //      intakeRight.set(0);
-        intakeLeftFX.set(0);
+  //      intakeLeftFX.set(0);
         return;
 
     }
@@ -198,7 +198,7 @@ public class Effector extends SubsystemBase {
         effectorRightFX.setControl(m_velocityVoltage.withVelocity(-40 * Constants.MASTER_SPEED_MULTIPLIER));
 
     //    intakeRight.setControl(m_velocityVoltage.withVelocity(-20 * Constants.masterSpeedMultiplier));
-        intakeLeftFX.setControl(m_velocityVoltage.withVelocity(20 * Constants.MASTER_SPEED_MULTIPLIER));
+    //    intakeLeftFX.setControl(m_velocityVoltage.withVelocity(20 * Constants.MASTER_SPEED_MULTIPLIER));
         return;
     }
 
