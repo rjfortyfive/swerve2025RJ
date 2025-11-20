@@ -7,7 +7,6 @@ import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import edu.wpi.first.wpilibj2.command.Commands;
 
@@ -41,8 +40,6 @@ public class Effector extends SubsystemBase {
     private volatile static boolean isAlgaeOut = false;
 
     private final Elevator m_elevator = new Elevator();
-
-    private boolean m_haveCoral = false;
 
     // for speed-controlled bump rotations
     private double m_initialLeftRot = 0.0;
