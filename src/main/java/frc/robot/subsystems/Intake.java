@@ -2,20 +2,12 @@ package frc.robot.subsystems;
 
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import static edu.wpi.first.wpilibj2.command.Commands.sequence;
-import edu.wpi.first.wpilibj2.command.Commands;
+
 
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -28,6 +20,9 @@ public class Intake extends SubsystemBase {
 
 public Intake() {
     
+    intakeLeftFX.setNeutralMode(NeutralModeValue.Brake);
+    intakeRightFX.setNeutralMode(NeutralModeValue.Brake);
+
     intakeLeftFX.setControl(new Follower(intakeRightFX.getDeviceID(), true));
 
     intakeLeftFX.getConfigurator().apply(new CurrentLimitsConfigs()
