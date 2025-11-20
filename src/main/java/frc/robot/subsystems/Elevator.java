@@ -71,6 +71,14 @@ public class Elevator extends SubsystemBase {
             .withForwardSoftLimitThreshold(Constants.elevator.ELEVATOR_UPPER_LIMIT)
             .withReverseSoftLimitEnable(true)
             .withReverseSoftLimitThreshold(Constants.elevator.ELEVATOR_LOWER_LIMIT));
+
+        elevatorRightFX.getConfigurator().apply(new SoftwareLimitSwitchConfigs()
+            .withForwardSoftLimitEnable(true)
+            .withForwardSoftLimitThreshold(Constants.elevator.ELEVATOR_UPPER_LIMIT)
+            .withReverseSoftLimitEnable(true)
+            .withReverseSoftLimitThreshold(Constants.elevator.ELEVATOR_LOWER_LIMIT));
+
+        
     }
 
     public static void toPosition(double rotations) {
