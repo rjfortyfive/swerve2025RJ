@@ -42,6 +42,8 @@ public class Effector extends SubsystemBase {
 
     private final Elevator m_elevator = new Elevator();
 
+    private boolean m_haveCoral = false;
+
     // for speed-controlled bump rotations
     private double m_initialLeftRot = 0.0;
 
@@ -97,6 +99,11 @@ public class Effector extends SubsystemBase {
         effectorRightFX.getConfigurator().apply(new MotionMagicConfigs()
             .withMotionMagicCruiseVelocity(RotationsPerSecond.of(10 * Constants.MASTER_SPEED_MULTIPLIER))
             .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.MASTER_SPEED_MULTIPLIER)));
+    }
+
+    @Override
+    public void periodic() {
+
     }
 
     public void bumpRotations(double rotations) {
@@ -157,6 +164,12 @@ public class Effector extends SubsystemBase {
         // Turn on intake
         effectorLeftFX.setControl(m_velocityVoltage.withVelocity(15 * Constants.MASTER_SPEED_MULTIPLIER));
         effectorRightFX.setControl(m_velocityVoltage.withVelocity(-15 * Constants.MASTER_SPEED_MULTIPLIER));
+    }
+
+    public void reverseLock() {
+
+        effectorLeftFX.setControl(m_velocityVoltage.withVelocity(-15 * Constants.MASTER_SPEED_MULTIPLIER));
+        effectorRightFX.setControl(m_velocityVoltage.withVelocity(15 * Constants.MASTER_SPEED_MULTIPLIER));
     }
 
     public void startOutTake() {
