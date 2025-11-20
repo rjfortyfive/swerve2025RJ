@@ -18,9 +18,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class Elevator extends SubsystemBase {
-    public static TalonFX elevatorLeftFX = new TalonFX(Constants.elevator.ELEVATOR_LEFT_FX_ID);
-    public static TalonFX elevatorRightFX = new TalonFX(Constants.elevator.ELEVATOR_RIGHT_FX_ID);
-    public static DigitalInput bottomlimitSwitch = new DigitalInput(0);
+    public final static TalonFX elevatorLeftFX = new TalonFX(Constants.elevator.ELEVATOR_LEFT_FX_ID);
+    public final static TalonFX elevatorRightFX = new TalonFX(Constants.elevator.ELEVATOR_RIGHT_FX_ID);
+    public final static DigitalInput bottomlimitSwitch = new DigitalInput(0);
+    private boolean hasZeroed = false;
 //private final static MotionMagicVoltage motionControl = new MotionMagicVoltage(0);
 
     public Elevator() {
@@ -80,8 +81,30 @@ public class Elevator extends SubsystemBase {
 
         
     }
+    
+    @Override
+    public void periodic() {
+        checkBottomLimitAndZero();
+    }
 
-    public static void toPosition(double rotations) {
+    public void checkBottomLimitAndZero(){
+        boolean bottomPressed = !bottomlimitSwitch.get();
+
+        if (bottomPressed && !hasZeroed) {
+            System.out.println("BOTTOM LIMIT SWITCH PRESSED > ZEROING ELEVATOR");
+
+            elevatorLeftFX.setPosition(0);
+            elevatorRightFX.setPosition(0);
+
+            hasZeroed = true;
+        }
+
+        if(!bottomPressed) {
+            hasZeroed = false;
+        }
+    }
+
+    public void toPosition(double rotations) {
         System.out.println("Going to " + rotations);
         //elevatorLeftFX.setControl(motionControl.withPosition(rotations));
         elevatorLeftFX.setControl(new MotionMagicVoltage(rotations));
@@ -102,7 +125,7 @@ public class Elevator extends SubsystemBase {
     }
 
 
-    public static void manualOffset(boolean direction) {
+    public void manualOffset(boolean direction) {
         var currentPos = elevatorLeftFX.getPosition().getValueAsDouble();
         if (direction == false) {
             if (Constants.elevator.level.activeLevel == 1) {
@@ -153,11 +176,11 @@ public class Elevator extends SubsystemBase {
         elevatorLeftFX.setControl(new MotionMagicVoltage(currentPos));
         System.out.println("New Position: " + currentPos);
         SmartDashboard.putNumber("Offset", currentPos);
-        return;
     }
 
 
-    public static double getPosition() {
+    public double getPosition() {
         return elevatorLeftFX.getPosition().getValueAsDouble();
     }
+
 }

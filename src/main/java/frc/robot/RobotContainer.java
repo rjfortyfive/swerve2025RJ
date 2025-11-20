@@ -119,19 +119,19 @@ public class RobotContainer {
                 NamedCommands.registerCommand("scoreL1Coral",
                                 new SequentialCommandGroup(
                                                 new InstantCommand(
-                                                                () -> Elevator.toPosition(
+                                                                () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.L1 + 2.0),
                                                                 m_elevator),
                                                 new InstantCommand(() -> Effector.asymmetricalOuttake(null, null),
                                                                 m_effector),
                                                 new InstantCommand(
-                                                                () -> Elevator.toPosition(Constants.elevator.level.L1),
+                                                                () -> m_elevator.toPosition(Constants.elevator.level.L1),
                                                                 m_elevator)));
 
                 NamedCommands.registerCommand("scoreL4Coral",
                                 new SequentialCommandGroup(
                                                 new InstantCommand(
-                                                                () -> Elevator.toPosition(
+                                                                () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.L4 - 0.5),
                                                                 m_elevator),
 
@@ -149,14 +149,14 @@ public class RobotContainer {
                                                                 Constants.effector.scoreRotations,
                                                                 Constants.effector.scoreVelocity),
                                                 new InstantCommand(
-                                                                () -> Elevator.toPosition(
+                                                                () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.L1))));
 
                 NamedCommands.registerCommand("startIntakeCoral",
                                 sequence(
                                                 // 1) move the elevator up to position intake
                                                 new InstantCommand(
-                                                                () -> Elevator.toPosition(
+                                                                () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.intake),
                                                                 m_elevator),
 
@@ -170,7 +170,7 @@ public class RobotContainer {
                                 sequence(
                                                 // 1) move the elevator up to L2
                                                 new InstantCommand(
-                                                                () -> Elevator.toPosition(
+                                                                () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.L2 + 5),
                                                                 m_elevator)
 
@@ -179,7 +179,7 @@ public class RobotContainer {
                                 sequence(
                                                 // 1) move the elevator up to position intake
                                                 new InstantCommand(
-                                                                () -> Elevator.toPosition(
+                                                                () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.intake),
                                                                 m_elevator),
                                                 // 2) run intake until coral arrives, 3s timeout
@@ -209,7 +209,7 @@ public class RobotContainer {
                                                                 Constants.intake.lockSpeedRPS),
                                                 // 4) move the elevator up to L2
                                                 new InstantCommand(
-                                                                () -> Elevator.toPosition(
+                                                                () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.L2 + 5),
                                                                 m_elevator)
 
@@ -289,14 +289,14 @@ public class RobotContainer {
         private void configureBindings() {
                 buttonPanel.button(Constants.buttonPanel.lift.L1)
                                 .onTrue(new SequentialCommandGroup(
-                                                new InstantCommand(() -> Elevator
+                                                new InstantCommand(() -> m_elevator
                                                                 .toPosition(Constants.elevator.level.L1))));
                 buttonPanel.button(Constants.buttonPanel.lift.L2)
-                                .onTrue(new InstantCommand(() -> Elevator.toPosition(Constants.elevator.level.L2)));
+                                .onTrue(new InstantCommand(() -> m_elevator.toPosition(Constants.elevator.level.L2)));
                 buttonPanel.button(Constants.buttonPanel.lift.L3)
-                                .onTrue(new InstantCommand(() -> Elevator.toPosition(Constants.elevator.level.L3)));
+                                .onTrue(new InstantCommand(() -> m_elevator.toPosition(Constants.elevator.level.L3)));
                 buttonPanel.button(Constants.buttonPanel.lift.L4)
-                                .onTrue(new InstantCommand(() -> Elevator.toPosition(Constants.elevator.level.L4)));
+                                .onTrue(new InstantCommand(() -> m_elevator.toPosition(Constants.elevator.level.L4)));
                 buttonPanel.button(Constants.buttonPanel.algae.Lower)
                                 .onTrue(new InstantCommand(() -> Sequences.removeL2Algae()));
                 buttonPanel.button(Constants.buttonPanel.algae.Upper)
@@ -307,7 +307,7 @@ public class RobotContainer {
                                 .onTrue(
                                                 sequence(
                                                                 // 1) move the elevator up to position 1
-                                                                new InstantCommand(() -> Elevator.toPosition(
+                                                                new InstantCommand(() -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.intake),
                                                                                 m_elevator),
                                                                 // 2) run intake until coral arrives, 1s timeout, or
@@ -338,7 +338,7 @@ public class RobotContainer {
                                                                 m_effector.bumpSpeedRotations(
                                                                                 Constants.intake.lockRotations,
                                                                                 Constants.intake.lockSpeedRPS),
-                                                                new InstantCommand(() -> Elevator.toPosition(
+                                                                new InstantCommand(() -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.L1),
                                                                                 m_elevator)));
 
@@ -366,7 +366,7 @@ public class RobotContainer {
 
                 XboxController.button(Constants.XboxController.button.A).onTrue(
                                 new SequentialCommandGroup(
-                                                new InstantCommand(() -> Elevator
+                                                new InstantCommand(() -> m_elevator
                                                                 .toPosition(Constants.elevator.level.L1 + 2))));
 
                 // XboxController.button(Constants.XboxController.button.B)
@@ -390,7 +390,7 @@ public class RobotContainer {
                                 .onTrue(
                                                 sequence(
                                                                 // 1) move the elevator up to position 1
-                                                                new InstantCommand(() -> Elevator.toPosition(
+                                                                new InstantCommand(() -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.intake),
                                                                                 m_elevator),
                                                                 // 2) run intake until coral arrives, 1s timeout, or
@@ -421,7 +421,7 @@ public class RobotContainer {
                                                                 m_effector.bumpSpeedRotations(
                                                                                 Constants.intake.lockRotations,
                                                                                 Constants.intake.lockSpeedRPS),
-                                                                new InstantCommand(() -> Elevator.toPosition(
+                                                                new InstantCommand(() -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.L1),
                                                                                 m_elevator))
                                                                                 
@@ -430,7 +430,7 @@ public class RobotContainer {
                                                                 );
 
                 XboxController.button(Constants.XboxController.button.Y)
-                                .onTrue(new InstantCommand(() -> Elevator.toPosition(0)));
+                                .onTrue(new InstantCommand(() -> m_elevator.toPosition(0)));
 
                 XboxController.pov(Constants.XboxController.dpad.Up)
                                 .onTrue(new InstantCommand(() -> Effector.algaeEffectorUp(null), m_effector));

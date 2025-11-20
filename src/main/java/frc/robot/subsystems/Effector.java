@@ -44,6 +44,8 @@ public class Effector extends SubsystemBase {
 
     private volatile static boolean isAlgaeOut = false;
 
+    private final Elevator m_elevator = new Elevator();
+
     // for speed-controlled bump rotations
     private double m_initialLeftRot = 0.0;
 
@@ -225,8 +227,8 @@ public class Effector extends SubsystemBase {
     }
 
 
-    public static void outtakeUntilDetected() {
-        if (Elevator.getPosition() < 5) {
+    public void outtakeUntilDetected() {
+        if (m_elevator.getPosition() < 5) {
             asymmetricalOuttake(null, null);
         }
         else {
