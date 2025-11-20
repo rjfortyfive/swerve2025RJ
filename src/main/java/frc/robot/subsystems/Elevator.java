@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
@@ -19,26 +20,35 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class Elevator extends SubsystemBase {
-    public static TalonFX liftLeft = new TalonFX(Constants.elevator.LIFT_LEFT_ID);
-    public static TalonFX liftRight = new TalonFX(Constants.elevator.LIFT_RIGHT_ID);
+    public static TalonFX elevatorLeftFX = new TalonFX(Constants.elevator.ELEVATOR_LEFT_FX_ID);
+    public static TalonFX elevatorRightFX = new TalonFX(Constants.elevator.ELEVATOR_RIGHT_FX_ID);
     public static DigitalInput bottomlimitSwitch = new DigitalInput(0);
-    public static DigitalInput toplimitSwitch = new DigitalInput(1);
     public final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(1);
     private final static MotionMagicVoltage motionControl = new MotionMagicVoltage(0).withSlot(0);
 
     public Elevator() {
-        System.out.println("Creating new motor with ID " + Constants.elevator.LIFT_LEFT_ID);
-        liftLeft.setNeutralMode(NeutralModeValue.Brake);
-        liftRight.setControl(new Follower(liftLeft.getDeviceID(), true));
+        System.out.println("Creating new motor with ID " + Constants.elevator.ELEVATOR_LEFT_FX_ID);
+        elevatorLeftFX.setNeutralMode(NeutralModeValue.Brake);
+        elevatorRightFX.setControl(new Follower(elevatorLeftFX.getDeviceID(), true));
+
+        elevatorLeftFX.getConfigurator().apply(new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(Constants.elevator.ELEVATOR_STATOR_CURRENT)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(Constants.elevator.ELEVATOR_SUPPLY_CURRENT)
+            .withSupplyCurrentLimitEnable(true));
+
+        elevatorRightFX.getConfigurator().apply(new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(Constants.elevator.ELEVATOR_STATOR_CURRENT)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(Constants.elevator.ELEVATOR_SUPPLY_CURRENT)
+            .withSupplyCurrentLimitEnable(true));            
 
         configureElevator();
     }
 
     public static void toPosition(double rotations) {
         System.out.println("Going to " + rotations);
-        if (toplimitSwitch.get()) {
-            // System.out.println(motionControl.withPosition(rotations));
-            liftLeft.setControl(motionControl.withPosition(rotations));
+        elevatorLeftFX.setControl(motionControl.withPosition(rotations));
             if (rotations == Constants.elevator.level.L1) {
                 Constants.elevator.level.activeLevel = 1;
             } else if (rotations == Constants.elevator.level.L2) {
@@ -57,24 +67,20 @@ public class Elevator extends SubsystemBase {
 
             // liftLeft.set(5);
             // System.out.println(liftLeft.getPosition() + " rotations reached.");
-        } else {
-            liftLeft.set(0);
-            liftLeft.setControl(m_velocityVoltage.withVelocity(0));
-        }
-        return;
+
     }
 
     public static void toBottom() {
         while (bottomlimitSwitch.get()) {
             // liftLeft.setControl(motionControl.withPosition(0));
-            liftLeft.setControl(m_velocityVoltage.withVelocity(10 * Constants.MASTER_SPEED_MULTIPLIER));
+            elevatorLeftFX.setControl(m_velocityVoltage.withVelocity(10 * Constants.MASTER_SPEED_MULTIPLIER));
         }
-        liftLeft.setControl(m_velocityVoltage.withVelocity(0));
+        elevatorLeftFX.setControl(m_velocityVoltage.withVelocity(0));
     }
 
     public static void manualControl(double velocity) {
         double desiredRotationsPerSecond;
-        double liftPosition = liftLeft.getPosition().getValueAsDouble();
+        double liftPosition = elevatorLeftFX.getPosition().getValueAsDouble();
 
         if ((liftPosition < 0.2) && (velocity < 0)) {
             desiredRotationsPerSecond = 0;
@@ -85,12 +91,12 @@ public class Elevator extends SubsystemBase {
         } else {
             desiredRotationsPerSecond = velocity * -10;
         }
-        liftLeft.setControl(
+        elevatorLeftFX.setControl(
                 m_velocityVoltage.withVelocity(desiredRotationsPerSecond * Constants.MASTER_SPEED_MULTIPLIER));
     }
 
     public static void manualOffset(boolean direction) {
-        var currentPos = liftLeft.getPosition().getValueAsDouble();
+        var currentPos = elevatorLeftFX.getPosition().getValueAsDouble();
         if (direction == false) {
             if (Constants.elevator.level.activeLevel == 1) {
                 Constants.elevator.level.L1 = Constants.elevator.level.L1 - 0.3;
@@ -137,7 +143,7 @@ public class Elevator extends SubsystemBase {
 
         }
 
-        liftLeft.setControl(motionControl.withPosition(currentPos));
+        elevatorLeftFX.setControl(motionControl.withPosition(currentPos));
         System.out.println("New Position: " + currentPos);
         SmartDashboard.putNumber("Offset", currentPos);
         return;
@@ -145,14 +151,6 @@ public class Elevator extends SubsystemBase {
 
     public static void configureElevator() {
         TalonFXConfiguration elevatorConfig = new TalonFXConfiguration();
-        var limitConfigs = elevatorConfig.CurrentLimits;
-
-        limitConfigs.SupplyCurrentLimit = 60;
-        limitConfigs.StatorCurrentLimit = 120;
-        limitConfigs.StatorCurrentLimitEnable = true;
-
-        elevatorConfig.Voltage.withPeakForwardVoltage(Volts.of(12 * Constants.masterVoltageMultiplier))
-                .withPeakReverseVoltage(Volts.of(-12 * Constants.masterVoltageMultiplier)); // 12 and -12
 
         MotionMagicConfigs motionConfig = elevatorConfig.MotionMagic;
         motionConfig.withMotionMagicCruiseVelocity(RotationsPerSecond.of(90 * Constants.MASTER_SPEED_MULTIPLIER))
@@ -176,7 +174,7 @@ public class Elevator extends SubsystemBase {
 
         StatusCode status = StatusCode.StatusCodeNotInitialized;
         for (int i = 0; i < 5; ++i) {
-            status = liftLeft.getConfigurator().apply(elevatorConfig);
+            status = elevatorLeftFX.getConfigurator().apply(elevatorConfig);
             System.out.println("Elevator configs applied successfully");
             if (status.isOK())
                 break;
@@ -185,14 +183,14 @@ public class Elevator extends SubsystemBase {
             System.out.println("Could not apply configs, error code: " + status.toString());
         }
 
-        System.out.println("Left elevator: " + liftLeft.getDeviceID());
-        System.out.println("Right elevator: " + liftRight.getDeviceID());
+        System.out.println("Left elevator: " + elevatorLeftFX.getDeviceID());
+        System.out.println("Right elevator: " + elevatorRightFX.getDeviceID());
 
-        liftLeft.setPosition(0);
+        elevatorLeftFX.setPosition(0);
 
     }
 
     public static double getPosition() {
-        return liftLeft.getPosition().getValueAsDouble();
+        return elevatorLeftFX.getPosition().getValueAsDouble();
     }
 }

@@ -156,11 +156,20 @@ public class Constants {
     }
 
     public static final class elevator {
-        public static final int LIFT_LEFT_ID = 10;
-        public static final int LIFT_RIGHT_ID = 11;
+        public static final int ELEVATOR_LEFT_FX_ID = 10;
+        public static final int ELEVATOR_RIGHT_FX_ID = 11;
 
         public static final int LIFT_BOTTOM_SWITCH = 0;
-        public static final int LIFT_TOP_SWITCH = 1;
+        public static final double P_ELEVATOR = 0;
+        public static final double I_ELEVATOR = 0;
+        public static final double D_ELEVATOR = 0;
+        public static final double G_ELEVATOR = 0;
+        public static final double S_ELEVATOR = 0;
+        public static final double V_ELEVATOR = 0;
+        public static final double A_ELEVATOR = 0;
+
+        public static final double ELEVATOR_STATOR_CURRENT = 120;
+        public static final double ELEVATOR_SUPPLY_CURRENT = 60;
 
         public static class level {
             public static double L1 = 0.05;
@@ -179,19 +188,19 @@ public class Constants {
     }
 
     public static final class effector {
-        public static final int EFFECTOR_LEFT_ID = 12;
-        public static final int EFFECTOR_RIGHT_ID = 13;
+        public static final int EFFECTOR_LEFT_FX_ID = 12;
+        public static final int EFFECTOR_RIGHT_FX_ID = 13;
         public static final double defaultVelocity = 15;
         public static final double scoreRotations = 4;
         public static final double scoreVelocity = 15;
-  // We are using Motion Magic position control with voltage countrol output type,
+  // We are using Motion Magic position control with voltage control output type,
   // so the PID parameters are in volts
         public static final double P_EFFECTOR = 1.0; 
         public static final double I_EFFECTOR = 0.0;
         public static final double D_EFFECTOR = 0.0; 
         public static final double G_EFFECTOR = 0.0;
         public static final double S_EFFECTOR = 1.0;
-        public static final double V_EFFECTOR = 0.123;
+        public static final double V_EFFECTOR = 0.0;
         public static final double A_EFFECTOR = 0.0;
 
         public static final double EFFECTOR_STATOR_CURRENT = 80.0;
