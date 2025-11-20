@@ -297,10 +297,10 @@ public class RobotContainer {
                                 .onTrue(new InstantCommand(() -> m_elevator.toPosition(Constants.elevator.level.L3)));
                 buttonPanel.button(Constants.buttonPanel.lift.L4)
                                 .onTrue(new InstantCommand(() -> m_elevator.toPosition(Constants.elevator.level.L4)));
-                buttonPanel.button(Constants.buttonPanel.algae.Lower)
-                                .onTrue(new InstantCommand(() -> Sequences.removeL2Algae()));
-                buttonPanel.button(Constants.buttonPanel.algae.Upper)
-                                .onTrue(new InstantCommand(() -> Sequences.removeL3Algae()));
+                // buttonPanel.button(Constants.buttonPanel.algae.Lower)
+                //                 .onTrue(new InstantCommand(() -> Sequences.removeL2Algae()));
+                // buttonPanel.button(Constants.buttonPanel.algae.Upper)
+                //                 .onTrue(new InstantCommand(() -> Sequences.removeL3Algae()));
 
                 // toggle intake on/off each press
                 buttonPanel.button(Constants.buttonPanel.coral.In)
