@@ -160,10 +160,10 @@ public class Constants {
         public static final int ELEVATOR_RIGHT_FX_ID = 11;
 
         public static final int ELEVATOR_BOTTOM_SWITCH = 0;
-        public static final double P_ELEVATOR = 0.12;
+        public static final double P_ELEVATOR = 1.5;
         public static final double I_ELEVATOR = 0.06;
-        public static final double D_ELEVATOR = 0.001;
-        public static final double G_ELEVATOR = 0.2;
+        public static final double D_ELEVATOR = 0.01;
+        public static final double G_ELEVATOR = 0.42;
         public static final double S_ELEVATOR = 0.3;
         public static final double V_ELEVATOR = 0.13;
         public static final double A_ELEVATOR = 0;

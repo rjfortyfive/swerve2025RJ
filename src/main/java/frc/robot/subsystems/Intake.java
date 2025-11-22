@@ -23,7 +23,7 @@ public Intake() {
     intakeLeftFX.setNeutralMode(NeutralModeValue.Brake);
     intakeRightFX.setNeutralMode(NeutralModeValue.Brake);
 
-    intakeLeftFX.setControl(new Follower(intakeRightFX.getDeviceID(), true));
+    intakeRightFX.setControl(new Follower(intakeLeftFX.getDeviceID(), true));
 
     intakeLeftFX.getConfigurator().apply(new CurrentLimitsConfigs()
         .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
