@@ -97,9 +97,25 @@ public class Effector extends SubsystemBase {
 
     }
 
-    /**
-     * Stops all intake and effector motors immediately.
-     */
+    public double getLeftPosition() {
+        return effectorLeftFX.getPosition().getValueAsDouble();
+    }
+
+    public double getRightPosition() {
+        return effectorRightFX.getPosition().getValueAsDouble();
+    }
+
+    public void moveToPositions(double leftPos, double rightPos) {
+        effectorLeftFX.setControl(m_positionVoltage.withPosition(leftPos));
+        effectorRightFX.setControl(m_positionVoltage.withPosition(rightPos));
+    }
+// Check if both motors are at position
+    public boolean atPosition(double leftTarget, double rightTarget) {
+        double leftErr  = Math.abs(getLeftPosition()  - leftTarget);
+        double rightErr = Math.abs(getRightPosition() - rightTarget);
+        return leftErr < 0.02 && rightErr < 0.02;   // tweak threshold if needed
+}
+
     public void stopIntake() {
         effectorLeftFX.set(0);
         effectorRightFX.set(0);
@@ -144,24 +160,6 @@ public class Effector extends SubsystemBase {
 
     public boolean isCoralNotDetected() {
         return intakeSensor.getMeasurement().distance_mm > 10;
-    }
-
-
-    public void outtakeUntilDetected() {
-        if (m_elevator.getPosition() < 5) {
-            asymmetricalOuttake(null, null);
-        }
-        else {
-            while (intakeSensor.getMeasurement().distance_mm < 10) {
-            symmetricalOuttake(null);
-            }
-        }
-        effectorLeftFX.set(0);
-        effectorRightFX.set(0);
-        effectorTimer.stop();
-        effectorTimer.reset();
-
-
     }
 
     public static void symmetricalOuttake(Double velocity) {

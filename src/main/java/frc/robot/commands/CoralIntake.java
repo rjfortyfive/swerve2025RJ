@@ -8,23 +8,31 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 
 public class CoralIntake extends Command {
-    private final Intake m_intake = new Intake();
-    private final Effector m_effector = new Effector();
-    private final Elevator m_Elevator = new Elevator();
+    private final Intake m_intake;
+    private final Effector m_effector;
+    private final Elevator m_elevator;
     private boolean coralHasBeenSeen = false;
     private boolean coralHasBeenReversed = false;
 
 
-    public CoralIntake(Elevator m_Elevator, Effector m_Effector, Intake m_Intake) {
+    public CoralIntake(Elevator m_elevator, Effector m_effector, Intake m_intake) {
 
-        addRequirements(m_intake, m_effector, m_Elevator);
-
+        addRequirements(m_intake, m_effector, m_elevator);
+        this.m_elevator = m_elevator;
+        this.m_effector = m_effector;
+        this.m_intake = m_intake;
 
     }
 
     @Override
+    public void initialize() {
+        coralHasBeenSeen = false;
+        coralHasBeenReversed = false;
+        m_elevator.toPosition(Constants.elevator.level.intake);
+    }
+
+    @Override
     public void execute() {
-        m_Elevator.toPosition(Constants.elevator.level.intake);
         if (!m_effector.isCoralDetected() && !coralHasBeenSeen) // no coral, never been seen = passive intake
         {
             m_intake.startIntake();
@@ -54,6 +62,6 @@ public class CoralIntake extends Command {
     public void end(boolean interrupted) {
         m_intake.stopIntake();
         m_effector.stopIntake();
-        m_Elevator.toPosition(Constants.elevator.level.L1);
+        m_elevator.toPosition(Constants.elevator.level.L1);
     }
 }

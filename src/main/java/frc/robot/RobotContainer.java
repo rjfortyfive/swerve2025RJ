@@ -136,17 +136,7 @@ public class RobotContainer {
 
                                                 new WaitCommand(.9),
 
-                                                new ParallelRaceGroup(
-                                                                new StartEndCommand(
-                                                                                m_effector::startOutTake,
-                                                                                m_effector::stopIntake,
-                                                                                m_effector),
-                                                                waitUntil(m_effector::isCoralNotDetected),
-                                                                waitSeconds(2.0)),
-
-                                                m_effector.bumpSpeedRotations(
-                                                                Constants.effector.scoreRotations,
-                                                                Constants.effector.scoreVelocity),
+                                                new ScoreL4(m_effector),
                                                 new InstantCommand(
                                                                 () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.L1))));
@@ -269,20 +259,7 @@ public class RobotContainer {
                                 .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
 
                 buttonPanel.button(Constants.buttonPanel.coral.Out)
-                                .onTrue(
-                                                sequence(new ParallelRaceGroup(
-                                                                new StartEndCommand(
-                                                                                m_effector::startOutTake,
-                                                                                m_effector::stopIntake,
-                                                                                m_effector),
-                                                                waitUntil(m_effector::isCoralNotDetected),
-                                                                waitSeconds(2.0)),
-
-                                                                m_effector.bumpSpeedRotations(
-                                                                                Constants.effector.scoreRotations,
-                                                                                Constants.effector.scoreVelocity))
-
-                                );
+                                .onTrue(new ScoreL4(m_effector));
 
 
                 // joystick.button(Constants.Joystick.Function2).onTrue(new InstantCommand(() ->
