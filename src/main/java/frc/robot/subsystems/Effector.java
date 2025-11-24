@@ -36,8 +36,6 @@ public class Effector extends SubsystemBase {
 
     private volatile static boolean isAlgaeOut = false;
 
-    private final Elevator m_elevator = new Elevator();
-
     public Effector() {
 
         effectorLeftFX.setNeutralMode(NeutralModeValue.Brake);
