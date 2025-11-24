@@ -6,9 +6,6 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
-import static edu.wpi.first.wpilibj2.command.Commands.sequence;
-import edu.wpi.first.wpilibj2.command.Commands;
 
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -40,9 +37,6 @@ public class Effector extends SubsystemBase {
     private volatile static boolean isAlgaeOut = false;
 
     private final Elevator m_elevator = new Elevator();
-
-    // for speed-controlled bump rotations
-    private double m_initialLeftRot = 0.0;
 
     public Effector() {
 
@@ -94,51 +88,13 @@ public class Effector extends SubsystemBase {
             .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.MASTER_SPEED_MULTIPLIER)));
 
         effectorRightFX.getConfigurator().apply(new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(RotationsPerSecond.of(10 * Constants.MASTER_SPEED_MULTIPLIER))
+            .withMotionMagicCruiseVelocity(RotationsPerSecond.of(30 * Constants.MASTER_SPEED_MULTIPLIER))
             .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.MASTER_SPEED_MULTIPLIER)));
     }
 
     @Override
     public void periodic() {
 
-    }
-
-    public void bumpRotations(double rotations) {
-        double currentRotL = effectorLeftFX.getPosition().getValueAsDouble();
-        double currentRotR = effectorRightFX.getPosition().getValueAsDouble();
-
-        effectorLeftFX.setControl(m_positionVoltage.withPosition(currentRotL + rotations));
-        effectorRightFX.setControl(m_positionVoltage.withPosition(currentRotR - rotations));
-    }
-
-    /**
-     * Returns a Command that spins both wheels at a constant speed (in RPS)
-     * until the left wheel has turned the given number of rotations.
-     *
-     * @param rotations How many rotations to spin
-     * @param speedRPS Speed in rotations-per-second
-     */
-    public Command bumpSpeedRotations(double rotations, double speedRPS) {
-        final double target = Math.abs(rotations);
-        final double direction = Math.signum(rotations);
-        return sequence(
-            // 1) capture starting position
-            Commands.runOnce(() -> m_initialLeftRot = effectorLeftFX.getPosition().getValueAsDouble(), this),
-            // 2) spin at constant speed until we've turned enough
-            Commands.run(() -> {
-                double vel = direction * speedRPS * Constants.MASTER_SPEED_MULTIPLIER;
-                effectorLeftFX.setControl(m_velocityVoltage.withVelocity(vel));
-                effectorRightFX.setControl(m_velocityVoltage.withVelocity(-vel));
-            }, this)
-            .until(() ->
-                Math.abs(effectorLeftFX.getPosition().getValueAsDouble() - m_initialLeftRot) >= target
-            ),
-            // 3) stop motors
-            Commands.runOnce(() -> {
-                effectorLeftFX.set(0);
-                effectorRightFX.set(0);
-            }, this)
-        );
     }
 
     /**
@@ -159,8 +115,14 @@ public class Effector extends SubsystemBase {
 
     public void startLock() {
         // Turn on intake
-        effectorLeftFX.setControl(m_velocityVoltage.withVelocity(15 * Constants.MASTER_SPEED_MULTIPLIER));
-        effectorRightFX.setControl(m_velocityVoltage.withVelocity(-15 * Constants.MASTER_SPEED_MULTIPLIER));
+        double leftCurrentPos = effectorLeftFX.getPosition().getValueAsDouble();
+        double rightCurrentPos = effectorRightFX.getPosition().getValueAsDouble();
+
+        double leftTarget = leftCurrentPos + Constants.intake.lockRotations;
+        double rightTarget = rightCurrentPos - Constants.intake.lockRotations; 
+
+        effectorLeftFX.setControl(m_positionVoltage.withPosition(leftTarget));
+        effectorRightFX.setControl(m_positionVoltage.withPosition(rightTarget));
     }
 
     public void reverseLock() {

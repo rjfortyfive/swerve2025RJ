@@ -175,44 +175,7 @@ public class RobotContainer {
 
                                 ));
                 NamedCommands.registerCommand("intakeCoral",
-                                sequence(
-                                                // 1) move the elevator up to position intake
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.intake),
-                                                                m_elevator),
-                                                // 2) run intake until coral arrives, 3s timeout
-
-                                                new ParallelRaceGroup(
-                                                                new StartEndCommand(
-                                                                                m_effector::startIntake,
-                                                                                m_effector::stopIntake,
-                                                                                m_effector),
-                                                                waitUntil(m_effector::isCoralDetected),
-                                                                waitSeconds(2.0)),
-
-                                                new ParallelRaceGroup(
-                                                                new StartEndCommand(
-                                                                                m_effector::startLock,
-                                                                                m_effector::stopIntake,
-                                                                                m_effector),
-                                                                waitUntil(m_effector::isCoralNotDetected),
-                                                                waitSeconds(3.0),
-                                                                waitUntil(() -> buttonPanel.button(
-                                                                                Constants.buttonPanel.intake.cancel)
-                                                                                .getAsBoolean())),
-                                                // 3) bump the wheels 3 rotations (always runs after the
-                                                // intake group)
-                                                m_effector.bumpSpeedRotations(
-                                                                Constants.intake.lockRotations,
-                                                                Constants.intake.lockSpeedRPS),
-                                                // 4) move the elevator up to L2
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L2 + 5),
-                                                                m_elevator)
-
-                                ));
+                                sequence(new CoralIntake(m_elevator, m_effector, m_intake)));
 
                 autoChooser = AutoBuilder.buildAutoChooser("");
                 SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -350,47 +313,7 @@ public class RobotContainer {
                                                 null)));
 
                 XboxController.button(Constants.XboxController.button.X)
-                                .onTrue(
-                                                sequence(
-                                                                // 1) move the elevator up to position 1
-                                                                new InstantCommand(() -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.intake),
-                                                                                m_elevator),
-                                                                // 2) run intake until coral arrives, 1s timeout, or
-                                                                // cancel button pressed
-                                                                new ParallelRaceGroup(
-                                                                                new StartEndCommand(
-                                                                                                m_effector::startIntake,
-                                                                                                m_effector::stopIntake,
-                                                                                                m_effector),
-                                                                                waitUntil(m_effector::isCoralDetected),
-                                                                                waitSeconds(7.0),
-                                                                                waitUntil(() -> buttonPanel.button(
-                                                                                                Constants.buttonPanel.intake.cancel)
-                                                                                                .getAsBoolean())),
-
-                                                                new ParallelRaceGroup(
-                                                                                new StartEndCommand(
-                                                                                                m_effector::startLock,
-                                                                                                m_effector::stopIntake,
-                                                                                                m_effector),
-                                                                                waitUntil(m_effector::isCoralNotDetected),
-                                                                                waitSeconds(3.0),
-                                                                                waitUntil(() -> buttonPanel.button(
-                                                                                                Constants.buttonPanel.intake.cancel)
-                                                                                                .getAsBoolean())),
-                                                                // 3) bump the wheels 3 rotations (always runs after the
-                                                                // intake group)
-                                                                m_effector.bumpSpeedRotations(
-                                                                                Constants.intake.lockRotations,
-                                                                                Constants.intake.lockSpeedRPS),
-                                                                new InstantCommand(() -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L1),
-                                                                                m_elevator))
-                                                                                
-
-                                                                                
-                                                                );
+                                .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
 
                 XboxController.button(Constants.XboxController.button.Y)
                                 .onTrue(new InstantCommand(() -> m_elevator.toPosition(0)));
