@@ -17,7 +17,13 @@ import au.grapplerobotics.LaserCan;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.config.AbsoluteEncoderConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.AbsoluteEncoder;
+
 
 public class Effector extends SubsystemBase {
     private static LaserCan intakeSensor = new LaserCan(2);
@@ -37,9 +43,11 @@ public class Effector extends SubsystemBase {
     private volatile static boolean isAlgaeOut = false;
 
     public Effector() {
+        SparkMaxConfig algaeConfig = new SparkMaxConfig();
 
         effectorLeftFX.setNeutralMode(NeutralModeValue.Brake);
         effectorRightFX.setNeutralMode(NeutralModeValue.Brake);
+        algaeConfig.idleMode(IdleMode.kBrake);
 
         effectorTimer = new Timer();
 
@@ -55,6 +63,8 @@ public class Effector extends SubsystemBase {
             .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));
         
+        algaeConfig.smartCurrentLimit(20);
+
         effectorLeftFX.getConfigurator().apply( new Slot0Configs()
             .withKP(Constants.effector.P_EFFECTOR)
             .withKI(Constants.effector.I_EFFECTOR)
@@ -88,6 +98,17 @@ public class Effector extends SubsystemBase {
         effectorRightFX.getConfigurator().apply(new MotionMagicConfigs()
             .withMotionMagicCruiseVelocity(RotationsPerSecond.of(30 * Constants.MASTER_SPEED_MULTIPLIER))
             .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.MASTER_SPEED_MULTIPLIER)));
+    
+        AbsoluteEncoderConfig algaeEncoder = algaeConfig.absoluteEncoder;
+        algaeEncoder.positionConversionFactor(1.0);
+        algaeEncoder.velocityConversionFactor(1.0);
+        algaeEncoder.zeroOffset(0.0);
+        algaeMotor.configure(
+            algaeConfig,
+            SparkBase.ResetMode.kResetSafeParameters, 
+            SparkBase.PersistMode.kPersistParameters
+        );
+
     }
 
     @Override

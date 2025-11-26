@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.wpilibj2.command.Commands.race;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
-import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import java.util.ArrayList;
@@ -25,15 +24,12 @@ import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -179,34 +175,6 @@ public class RobotContainer {
 
                 SmartDashboard.putData("Pose start", positionChooser);
 
-        }
-
-        public Command pathToClosestStation() {
-                Pose2d robotPose = drivetrain.getPose();
-                Pose2d closestStationPose = TagUtils.getClosestStationPose(
-                                List.of(1, 2, 12, 13), // Station tag IDs
-                                robotPose,
-                                0.41, // Front offset (meters)
-                                0.25 // Lateral offset (meters)
-                );
-
-                Logger.debug("Pathing to closest station pose: {}", closestStationPose);
-
-                PathConstraints constraints = kPathConstraints;
-
-                // Build the path-following command
-                Command pathCmd = AutoBuilder.pathfindToPose(closestStationPose, constraints, 0.0);
-
-                // Canceller: finishes as soon as any joystick movement > 20%
-                Command cancelOnStick = waitUntil(() -> Math.abs(joystick.getY()) > 0.2 ||
-                                Math.abs(joystick.getX()) > 0.2 ||
-                                Math.abs(joystick.getTwist()) > 0.2);
-
-                // Race them: whichever ends first wins and cancels the other, then null out mCurrentAutoAlignCommand
-                return race(pathCmd, cancelOnStick)
-                    .andThen(new InstantCommand(() -> {
-                        mCurrentAutoAlignCommand = null;
-                    }));
         }
 
         private Command makeGoToTag(
