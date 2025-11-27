@@ -24,6 +24,7 @@ import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -95,7 +97,7 @@ public class RobotContainer {
         public final Vision vision;
 
         public static final CommandJoystick joystick = new CommandJoystick(0);
-        public static final CommandJoystick XboxController = new CommandJoystick(1);
+        public static final CommandXboxController XboxController = new CommandXboxController(1);
         public static final CommandJoystick buttonPanel = new CommandJoystick(2);
 
         final DutyCycleOut m_leftRequest = new DutyCycleOut(0.0);
@@ -227,53 +229,29 @@ public class RobotContainer {
                 buttonPanel.button(Constants.buttonPanel.coral.Out)
                                 .onTrue(new ScoreL4L3L2(m_effector));
 
-                XboxController.button(Constants.XboxController.button.A).onTrue(
+                XboxController.a().onTrue(
                                 new SequentialCommandGroup(
                                                 new InstantCommand(() -> m_elevator
                                                                 .toPosition(Constants.elevator.level.L1 + 2))));
 
-                XboxController.button(Constants.XboxController.bumper.Right).whileTrue(new RunCommand(
+                XboxController.rightBumper().whileTrue(new RunCommand(
                                 () -> m_effector.start(
                                                 XboxController.getRawAxis(Constants.XboxController.axis.RightYAxis)
                                                                 * 10)));
 
-                XboxController.button(Constants.XboxController.button.X)
+                XboxController.x()
                                 .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
 
-                XboxController.button(Constants.XboxController.button.Y)
+                XboxController.y()
                                 .onTrue(new InstantCommand(() -> m_elevator.toPosition(0)));
 
-                XboxController.pov(Constants.XboxController.dpad.Up)
+                XboxController.povUp()
                                 .whileTrue(new InstantCommand(() -> m_effector.algaeEffectorUp(1), m_effector));
 
-                XboxController.pov(Constants.XboxController.dpad.Down)
+                XboxController.povDown()
                                 .whileTrue(new InstantCommand(() -> m_effector.algaeEffectorDown(1), m_effector));
 
-                // only manual intake when triggers pressed and NOT holding left bumper (shift
-                // key)
-                Trigger intakeTrigger = new Trigger(
-                                () -> (XboxController.getRawAxis(Constants.XboxController.axis.LeftTrigger) > 0 ||
-                                                XboxController.getRawAxis(
-                                                                Constants.XboxController.axis.RightTrigger) > 0)
-                                                && !XboxController.button(Constants.XboxController.bumper.Left)
-                                                                .getAsBoolean());
-
-                intakeTrigger.whileTrue(new RunCommand(() -> {
-                        double lt = XboxController.getRawAxis(Constants.XboxController.axis.LeftTrigger);
-                        double rt = XboxController.getRawAxis(Constants.XboxController.axis.RightTrigger);
-                        if (lt > 0) {
-                                m_effector.manualEffectorOut(-0.5 * 70 * lt);
-                        } else {
-                                m_effector.manualEffectorOut(0.5 * 70 * rt);
-                        }
-                }, m_effector))
-
-                                // …and when false, immediately zero the motors
-                                .onFalse(new InstantCommand(() -> {
-                                        m_effector.manualEffectorOut(0);
-                                }, m_effector));
-
-                XboxController.button(Constants.XboxController.button.A)
+                XboxController.a()
                                 .whileTrue(new InstantCommand(() -> {
                                         m_effector.start(20.0, 6.0);
                                 }, m_effector));
@@ -294,6 +272,20 @@ public class RobotContainer {
                                                         .withVelocityX(joystick.getY() * MaxSpeed * Constants.masterDriveMultiplier)
                                                         .withVelocityY(joystick.getX()  * MaxSpeed * Constants.masterDriveMultiplier)
                                                         .withRotationalRate(-joystick.getTwist()  * MaxAngularRate * Constants.masterDriveMultiplier)));
+                
+                m_effector.setDefaultCommand(new RunCommand(() -> {
+                                double lt = XboxController.getLeftTriggerAxis();
+                                double rt = XboxController.getRightTriggerAxis();
+                                                            
+                                        if (lt > 0.1) {
+                                                m_effector.start(-0.5 * 70 * lt);
+                                        } else if (rt > 0.1) {
+                                                m_effector.start(0.5 * 70 * rt);
+                                        } else {
+                                                m_effector.start(0);
+                                        }
+                                        }, m_effector));
+                                                                            
 
 
                 // reset the field-centric heading on middle button press

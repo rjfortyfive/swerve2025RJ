@@ -166,12 +166,6 @@ public class Effector extends SubsystemBase {
         return intakeSensor.getMeasurement().distance_mm < 10;
     }
 
-    public void manualEffectorOut(double velocity) {
-
-        start(velocity);
-
-    }
-
     public void algaeEffectorUp(double percent) {
         algaeMotor.set(-percent);
     }
