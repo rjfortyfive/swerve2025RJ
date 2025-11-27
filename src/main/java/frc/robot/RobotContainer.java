@@ -235,8 +235,6 @@ public class RobotContainer {
                 XboxController.button(Constants.XboxController.bumper.Right).whileTrue(new RunCommand(
                                 () -> m_effector.start(
                                                 XboxController.getRawAxis(Constants.XboxController.axis.RightYAxis)
-                                                                * 10,
-                                                XboxController.getRawAxis(Constants.XboxController.axis.RightYAxis)
                                                                 * 10)));
 
                 XboxController.button(Constants.XboxController.button.X)
@@ -264,20 +262,20 @@ public class RobotContainer {
                         double lt = XboxController.getRawAxis(Constants.XboxController.axis.LeftTrigger);
                         double rt = XboxController.getRawAxis(Constants.XboxController.axis.RightTrigger);
                         if (lt > 0) {
-                                m_effector.manualEffectorOut(-0.5 * 70 * lt, null);
+                                m_effector.manualEffectorOut(-0.5 * 70 * lt);
                         } else {
-                                m_effector.manualEffectorOut(0.5 * 70 * rt, null);
+                                m_effector.manualEffectorOut(0.5 * 70 * rt);
                         }
                 }, m_effector))
 
                                 // …and when false, immediately zero the motors
                                 .onFalse(new InstantCommand(() -> {
-                                        m_effector.manualEffectorOut(0, null);
+                                        m_effector.manualEffectorOut(0);
                                 }, m_effector));
 
                 XboxController.button(Constants.XboxController.button.A)
                                 .whileTrue(new InstantCommand(() -> {
-                                        m_effector.start(20.0,  -6.0);
+                                        m_effector.start(20.0, 6.0);
                                 }, m_effector));
 
                 // Hang control triggers: Only when left bumper is held and a trigger is pressed

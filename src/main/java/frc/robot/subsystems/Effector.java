@@ -162,31 +162,13 @@ public class Effector extends SubsystemBase {
         effectorRightFX.setControl(m_positionVoltage.withPosition(rightTarget));
     }
 
-    public void reverseLock() {
-
-        effectorLeftFX.setControl(m_velocityVoltage.withVelocity(-15 * Constants.MASTER_SPEED_MULTIPLIER));
-        effectorRightFX.setControl(m_velocityVoltage.withVelocity(15 * Constants.MASTER_SPEED_MULTIPLIER));
-    }
-
-    // public void startOut(double velocityLeft, double velocityRight) {
-    //     // Turn on intake
-    //     effectorLeftFX.setControl(m_velocityVoltage.withVelocity(velocityLeft * Constants.MASTER_SPEED_MULTIPLIER));
-    //     effectorRightFX.setControl(m_velocityVoltage.withVelocity(-velocityRight * Constants.MASTER_SPEED_MULTIPLIER));
-
-    // }
-
     public boolean isCoralDetected() {
         return intakeSensor.getMeasurement().distance_mm < 10;
     }
 
-    public boolean isCoralNotDetected() {
-        return intakeSensor.getMeasurement().distance_mm > 10;
-    }
+    public void manualEffectorOut(double velocity) {
 
-    public void manualEffectorOut(double velocityLeft, Double velocityRight) {
-
-        effectorLeftFX.setControl(m_velocityVoltage.withVelocity(velocityLeft * Constants.MASTER_SPEED_MULTIPLIER));
-        effectorRightFX.setControl(m_velocityVoltage.withVelocity(-velocityRight * Constants.MASTER_SPEED_MULTIPLIER));
+        start(velocity);
 
     }
 

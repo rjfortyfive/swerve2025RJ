@@ -36,7 +36,7 @@ public class CoralIntake extends Command {
         if (!m_effector.isCoralDetected() && !coralHasBeenSeen) // no coral, never been seen = passive intake
         {
             m_intake.start(20);
-            m_effector.start(40.0,40.0);
+            m_effector.start(40.0);
         }
         else if (m_effector.isCoralDetected() && !coralHasBeenReversed)  // yes coral, and not reversed yet = slow intake
         {
@@ -48,7 +48,7 @@ public class CoralIntake extends Command {
         else if (!m_effector.isCoralDetected() && coralHasBeenSeen) // no coral, was seen = reverse
         {
             coralHasBeenReversed = true;
-            m_effector.reverseLock();
+            m_effector.start(-15);
         }
 
     }
