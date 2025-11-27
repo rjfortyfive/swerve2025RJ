@@ -71,9 +71,9 @@ public void stop() {
 
 }
 
-public void start(double velocityIntake) {
+public void start(double velocity) {
         
-    intakeLeftFX.setControl(m_velocityVoltage.withVelocity(velocityIntake * Constants.MASTER_SPEED_MULTIPLIER));
+    intakeLeftFX.setControl(m_velocityVoltage.withVelocity(velocity * Constants.MASTER_SPEED_MULTIPLIER));
 
 }
 }
