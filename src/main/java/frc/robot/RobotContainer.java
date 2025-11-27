@@ -132,7 +132,7 @@ public class RobotContainer {
 
                                                 new WaitCommand(.9),
 
-                                                new ScoreL4(m_effector),
+                                                new ScoreL4L3L2(m_effector),
                                                 new InstantCommand(
                                                                 () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.L1))));
@@ -146,7 +146,7 @@ public class RobotContainer {
                                                                 m_elevator),
 
                                                 new InstantCommand(
-                                                                () -> m_effector.start(40,40),
+                                                                () -> m_effector.start(40),
                                                                 m_effector
 
                                                 )));
@@ -225,7 +225,7 @@ public class RobotContainer {
                                 .whileTrue(new CoralIntake(m_elevator, m_effector, m_intake));
 
                 buttonPanel.button(Constants.buttonPanel.coral.Out)
-                                .onTrue(new ScoreL4(m_effector));
+                                .onTrue(new ScoreL4L3L2(m_effector));
 
                 XboxController.button(Constants.XboxController.button.A).onTrue(
                                 new SequentialCommandGroup(
@@ -276,8 +276,8 @@ public class RobotContainer {
                                 }, m_effector));
 
                 XboxController.button(Constants.XboxController.button.A)
-                                .onTrue(new InstantCommand(() -> {
-                                        m_effector.manualEffectorOut(20.0, -6.0);
+                                .whileTrue(new InstantCommand(() -> {
+                                        m_effector.start(20.0,  -6.0);
                                 }, m_effector));
 
                 // Hang control triggers: Only when left bumper is held and a trigger is pressed

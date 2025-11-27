@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import edu.wpi.first.wpilibj.Timer;
 
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -137,10 +136,17 @@ public class Effector extends SubsystemBase {
 
     }
 
+    public void start(double velocity) {
+
+        effectorLeftFX.setControl(m_velocityVoltage.withVelocity(velocity * Constants.MASTER_SPEED_MULTIPLIER));
+        effectorRightFX.setControl(m_velocityVoltage.withVelocity(velocity * Constants.MASTER_SPEED_MULTIPLIER));
+
+    }
+
     public void start(double velocityLeft, double velocityRight) {
         // Turn on intake and effector wheels
         effectorLeftFX.setControl(m_velocityVoltage.withVelocity(velocityLeft * Constants.MASTER_SPEED_MULTIPLIER));
-        effectorRightFX.setControl(m_velocityVoltage.withVelocity(-velocityRight * Constants.MASTER_SPEED_MULTIPLIER));
+        effectorRightFX.setControl(m_velocityVoltage.withVelocity(velocityRight * Constants.MASTER_SPEED_MULTIPLIER));
 
     }
 

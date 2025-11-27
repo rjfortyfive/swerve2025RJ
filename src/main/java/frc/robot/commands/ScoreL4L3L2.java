@@ -4,14 +4,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Effector;
 
-public class ScoreL4 extends Command {
+public class ScoreL4L3L2 extends Command {
     private final Effector m_effector;
 
     private boolean coralGone = false;
     private double targetPositionLeft;
     private double targetPositionRight;
     
-    public ScoreL4(Effector m_effector) {
+    public ScoreL4L3L2(Effector m_effector) {
 
         this.m_effector = m_effector;
         addRequirements(m_effector);
@@ -23,7 +23,7 @@ public class ScoreL4 extends Command {
         coralGone = false;
 
         // Begin normal outtake
-        m_effector.start(40,40);
+        m_effector.start(40);
     }
     @Override
     public void execute() {
