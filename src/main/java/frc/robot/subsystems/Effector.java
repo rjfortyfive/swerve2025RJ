@@ -129,7 +129,7 @@ public class Effector extends SubsystemBase {
         effectorRightFX.setControl(m_positionVoltage.withPosition(rightPos));
     }
 // Check if both motors are at position
-    public boolean atPosition(double leftTarget, double rightTarget) {
+    public boolean coralAtPosition(double leftTarget, double rightTarget) {
         double leftErr  = Math.abs(getLeftPosition()  - leftTarget);
         double rightErr = Math.abs(getRightPosition() - rightTarget);
         return leftErr < 0.02 && rightErr < 0.02;   // tweak threshold if needed
@@ -181,7 +181,7 @@ public class Effector extends SubsystemBase {
         return intakeSensor.getMeasurement().distance_mm > 10;
     }
 
-    public static void symmetricalOuttake(Double velocity) {
+    public void symmetricalOuttake(Double velocity) {
         double motorSpeed;
         if (velocity != null) {
             motorSpeed = velocity;
@@ -201,7 +201,7 @@ public class Effector extends SubsystemBase {
 
     }
 
-    public static void asymmetricalOuttake(Double velocityLeft, Double velocityRight) {
+    public void asymmetricalOuttake(Double velocityLeft, Double velocityRight) {
         System.out.println(effectorLeftFX.getPosition().getValueAsDouble());
         double motorSpeedL;
         double motorSpeedR;
@@ -229,7 +229,7 @@ public class Effector extends SubsystemBase {
         effectorTimer.reset();
     }
 
-    public static void manualControl(double velocityLeft, Double velocityRight) {
+    public void manualEffectorControl(double velocityLeft, Double velocityRight) {
         if (velocityRight == null) {
             velocityRight = -velocityLeft;
         }
@@ -238,7 +238,7 @@ public class Effector extends SubsystemBase {
 
     }
 
-    public static void algaeEffectorUp(Double time) {
+    public void algaeEffectorUp(Double time) {
         algaeTimer.start();
 
         if (time == null) {
@@ -258,7 +258,7 @@ public class Effector extends SubsystemBase {
 
     }
 
-    public static void algaeEffectorDown() {
+    public void algaeEffectorDown() {
         algaeTimer.start();
 
         while (algaeTimer.get() < 0.1) { //0.08
@@ -272,7 +272,7 @@ public class Effector extends SubsystemBase {
 
     }
 
-    public static void toggleAlgae() {
+    public void toggleAlgae() {
         if (isAlgaeOut) {
             algaeEffectorDown();
         }

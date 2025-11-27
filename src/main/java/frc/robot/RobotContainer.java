@@ -117,7 +117,7 @@ public class RobotContainer {
                                                                 () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.L1 + 2.0),
                                                                 m_elevator),
-                                                new InstantCommand(() -> Effector.asymmetricalOuttake(null, null),
+                                                new InstantCommand(() -> m_effector.asymmetricalOuttake(null, null),
                                                                 m_effector),
                                                 new InstantCommand(
                                                                 () -> m_elevator.toPosition(Constants.elevator.level.L1),
@@ -252,7 +252,7 @@ public class RobotContainer {
                 //                                                 m_elevator)));
 
                 XboxController.button(Constants.XboxController.bumper.Right).whileTrue(new RunCommand(
-                                () -> Effector.manualControl(
+                                () -> m_effector.manualEffectorControl(
                                                 XboxController.getRawAxis(Constants.XboxController.axis.RightYAxis)
                                                                 * 10,
                                                 null)));
@@ -264,10 +264,10 @@ public class RobotContainer {
                                 .onTrue(new InstantCommand(() -> m_elevator.toPosition(0)));
 
                 XboxController.pov(Constants.XboxController.dpad.Up)
-                                .onTrue(new InstantCommand(() -> Effector.algaeEffectorUp(null), m_effector));
+                                .onTrue(new InstantCommand(() -> m_effector.algaeEffectorUp(null), m_effector));
 
                 XboxController.pov(Constants.XboxController.dpad.Down)
-                                .onTrue(new InstantCommand(() -> Effector.algaeEffectorDown(), m_effector));
+                                .onTrue(new InstantCommand(() -> m_effector.algaeEffectorDown(), m_effector));
 
                 // only manual intake when triggers pressed and NOT holding left bumper (shift
                 // key)
@@ -282,20 +282,20 @@ public class RobotContainer {
                         double lt = XboxController.getRawAxis(Constants.XboxController.axis.LeftTrigger);
                         double rt = XboxController.getRawAxis(Constants.XboxController.axis.RightTrigger);
                         if (lt > 0) {
-                                Effector.manualControl(-0.5 * 70 * lt, null);
+                                m_effector.manualEffectorControl(-0.5 * 70 * lt, null);
                         } else {
-                                Effector.manualControl(0.5 * 70 * rt, null);
+                                m_effector.manualEffectorControl(0.5 * 70 * rt, null);
                         }
                 }, m_effector))
 
                                 // …and when false, immediately zero the motors
                                 .onFalse(new InstantCommand(() -> {
-                                        Effector.manualControl(0, null);
+                                        m_effector.manualEffectorControl(0, null);
                                 }, m_effector));
 
                 XboxController.button(Constants.XboxController.button.A)
                                 .onTrue(new InstantCommand(() -> {
-                                        Effector.manualControl(20.0, -6.0);
+                                        m_effector.manualEffectorControl(20.0, -6.0);
                                 }, m_effector));
 
                 // Hang control triggers: Only when left bumper is held and a trigger is pressed

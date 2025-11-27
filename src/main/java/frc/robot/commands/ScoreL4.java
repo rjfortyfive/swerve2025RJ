@@ -49,7 +49,7 @@ public class ScoreL4 extends Command {
          if (!coralGone) return false;
 
          // Check if both motors are at or near their target
-         return m_effector.atPosition(targetPositionLeft, targetPositionRight);
+         return m_effector.coralAtPosition(targetPositionLeft, targetPositionRight);
     }
 
     @Override
