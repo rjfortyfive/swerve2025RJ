@@ -35,13 +35,13 @@ public class CoralIntake extends Command {
     public void execute() {
         if (!m_effector.isCoralDetected() && !coralHasBeenSeen) // no coral, never been seen = passive intake
         {
-            m_intake.startIntake();
-            m_effector.startIntake();
+            m_intake.start(20);
+            m_effector.start(40.0,40.0);
         }
         else if (m_effector.isCoralDetected() && !coralHasBeenReversed)  // yes coral, and not reversed yet = slow intake
         {
             coralHasBeenSeen = true;
-            m_intake.stopIntake();
+            m_intake.stop();
             m_effector.startLock();
 
         }
@@ -60,8 +60,8 @@ public class CoralIntake extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        m_intake.stopIntake();
-        m_effector.stopIntake();
+        m_intake.stop();
+        m_effector.stop();
         m_elevator.toPosition(Constants.elevator.level.L1);
     }
 }

@@ -23,7 +23,7 @@ public class ScoreL4 extends Command {
         coralGone = false;
 
         // Begin normal outtake
-        m_effector.startIntake();
+        m_effector.start(40,40);
     }
     @Override
     public void execute() {
@@ -54,7 +54,7 @@ public class ScoreL4 extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        m_effector.stopIntake();
+        m_effector.stop();
     }
     
 }

@@ -65,15 +65,15 @@ public Intake() {
 
 }
 
-public void stopIntake() {
+public void stop() {
     
     intakeLeftFX.set(0);
 
 }
 
-public void startIntake() {
+public void start(double velocityIntake) {
         
-    intakeLeftFX.setControl(m_velocityVoltage.withVelocity(20 * Constants.MASTER_SPEED_MULTIPLIER));
+    intakeLeftFX.setControl(m_velocityVoltage.withVelocity(velocityIntake * Constants.MASTER_SPEED_MULTIPLIER));
 
 }
 }

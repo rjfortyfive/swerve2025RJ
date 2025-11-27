@@ -117,7 +117,7 @@ public class RobotContainer {
                                                                 () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.L1 + 2.0),
                                                                 m_elevator),
-                                                new InstantCommand(() -> m_effector.asymmetricalOuttake(null, null),
+                                                new InstantCommand(() -> m_effector.start(30, 10),
                                                                 m_effector),
                                                 new InstantCommand(
                                                                 () -> m_elevator.toPosition(Constants.elevator.level.L1),
@@ -146,7 +146,7 @@ public class RobotContainer {
                                                                 m_elevator),
 
                                                 new InstantCommand(
-                                                                m_effector::startIntake,
+                                                                () -> m_effector.start(40,40),
                                                                 m_effector
 
                                                 )));
@@ -208,9 +208,7 @@ public class RobotContainer {
 
         private void configureBindings() {
                 buttonPanel.button(Constants.buttonPanel.lift.L1)
-                                .onTrue(new SequentialCommandGroup(
-                                                new InstantCommand(() -> m_elevator
-                                                                .toPosition(Constants.elevator.level.L1))));
+                                .onTrue(new InstantCommand(() -> m_elevator.toPosition(Constants.elevator.level.L1)));
                 buttonPanel.button(Constants.buttonPanel.lift.L2)
                                 .onTrue(new InstantCommand(() -> m_elevator.toPosition(Constants.elevator.level.L2)));
                 buttonPanel.button(Constants.buttonPanel.lift.L3)
@@ -224,38 +222,22 @@ public class RobotContainer {
 
                 // toggle intake on/off each press
                 buttonPanel.button(Constants.buttonPanel.coral.In)
-                                .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
+                                .whileTrue(new CoralIntake(m_elevator, m_effector, m_intake));
 
                 buttonPanel.button(Constants.buttonPanel.coral.Out)
                                 .onTrue(new ScoreL4(m_effector));
-
-
-                // joystick.button(Constants.Joystick.Function2).onTrue(new InstantCommand(() ->
-                // Effector.algaeEffectorUp(null)));
-
-                joystick.button(Constants.Joystick.servoControl).onTrue(new InstantCommand(() -> Hang.brakeHang()));
 
                 XboxController.button(Constants.XboxController.button.A).onTrue(
                                 new SequentialCommandGroup(
                                                 new InstantCommand(() -> m_elevator
                                                                 .toPosition(Constants.elevator.level.L1 + 2))));
 
-                // XboxController.button(Constants.XboxController.button.B)
-                //                 .onTrue(sequence(
-                //                                 new InstantCommand(
-                //                                                 () -> Elevator.toPosition(Constants.elevator.level.L3),
-                //                                                 m_elevator),
-                //                                 new WaitCommand(.5),
-                //                                 m_effector.bumpSpeedRotations(10, -150),
-                //                                 new InstantCommand(
-                //                                                 () -> Elevator.toPosition(Constants.elevator.level.L1),
-                //                                                 m_elevator)));
-
                 XboxController.button(Constants.XboxController.bumper.Right).whileTrue(new RunCommand(
-                                () -> m_effector.manualEffectorControl(
+                                () -> m_effector.start(
                                                 XboxController.getRawAxis(Constants.XboxController.axis.RightYAxis)
                                                                 * 10,
-                                                null)));
+                                                XboxController.getRawAxis(Constants.XboxController.axis.RightYAxis)
+                                                                * 10)));
 
                 XboxController.button(Constants.XboxController.button.X)
                                 .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
@@ -264,10 +246,10 @@ public class RobotContainer {
                                 .onTrue(new InstantCommand(() -> m_elevator.toPosition(0)));
 
                 XboxController.pov(Constants.XboxController.dpad.Up)
-                                .onTrue(new InstantCommand(() -> m_effector.algaeEffectorUp(null), m_effector));
+                                .whileTrue(new InstantCommand(() -> m_effector.algaeEffectorUp(1), m_effector));
 
                 XboxController.pov(Constants.XboxController.dpad.Down)
-                                .onTrue(new InstantCommand(() -> m_effector.algaeEffectorDown(), m_effector));
+                                .whileTrue(new InstantCommand(() -> m_effector.algaeEffectorDown(1), m_effector));
 
                 // only manual intake when triggers pressed and NOT holding left bumper (shift
                 // key)
@@ -282,20 +264,20 @@ public class RobotContainer {
                         double lt = XboxController.getRawAxis(Constants.XboxController.axis.LeftTrigger);
                         double rt = XboxController.getRawAxis(Constants.XboxController.axis.RightTrigger);
                         if (lt > 0) {
-                                m_effector.manualEffectorControl(-0.5 * 70 * lt, null);
+                                m_effector.manualEffectorOut(-0.5 * 70 * lt, null);
                         } else {
-                                m_effector.manualEffectorControl(0.5 * 70 * rt, null);
+                                m_effector.manualEffectorOut(0.5 * 70 * rt, null);
                         }
                 }, m_effector))
 
                                 // …and when false, immediately zero the motors
                                 .onFalse(new InstantCommand(() -> {
-                                        m_effector.manualEffectorControl(0, null);
+                                        m_effector.manualEffectorOut(0, null);
                                 }, m_effector));
 
                 XboxController.button(Constants.XboxController.button.A)
                                 .onTrue(new InstantCommand(() -> {
-                                        m_effector.manualEffectorControl(20.0, -6.0);
+                                        m_effector.manualEffectorOut(20.0, -6.0);
                                 }, m_effector));
 
                 // Hang control triggers: Only when left bumper is held and a trigger is pressed

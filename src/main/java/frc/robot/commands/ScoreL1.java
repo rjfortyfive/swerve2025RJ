@@ -24,7 +24,7 @@ public class ScoreL1 extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        m_effector.stopIntake();
+        m_effector.stop();
     }
     
 }
