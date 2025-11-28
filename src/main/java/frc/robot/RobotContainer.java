@@ -259,13 +259,11 @@ public class RobotContainer {
                 // Hang control triggers: Only when left bumper is held and a trigger is pressed
                 new Trigger(() -> XboxController.button(Constants.XboxController.bumper.Left).getAsBoolean()
                                 && XboxController.getRawAxis(Constants.XboxController.axis.RightTrigger) > 0.25)
-                                .whileTrue(new InstantCommand(() -> Hang.activateHang(false), drivetrain))
-                                .onFalse(new InstantCommand(() -> Hang.stopHang(), drivetrain));
+                                .whileTrue(new InstantCommand(() -> m_hang.start(100), m_hang, drivetrain));
 
                 new Trigger(() -> XboxController.button(Constants.XboxController.bumper.Left).getAsBoolean()
                                 && XboxController.getRawAxis(Constants.XboxController.axis.LeftTrigger) > 0.25)
-                                .whileTrue(new InstantCommand(() -> Hang.activateHang(true), drivetrain))
-                                .onFalse(new InstantCommand(() -> Hang.stopHang(), drivetrain));
+                                .whileTrue(new InstantCommand(() -> m_hang.start(-100), m_hang, drivetrain));
 
                 drivetrain.setDefaultCommand(
                                 drivetrain.applyRequest(() -> drive

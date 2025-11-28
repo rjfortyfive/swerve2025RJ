@@ -98,7 +98,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledInit() {
-        Hang.brakeHang();
+
     }
 
     public void resetPose() {

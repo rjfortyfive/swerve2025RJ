@@ -220,27 +220,38 @@ public class Constants {
     }
 
     public static final class intake {
-        public static final int INTAKE_RIGHT_ID = 15;
-        public static final int INTAKE_LEFT_ID = 16;
+        public static final int INTAKE_RIGHT_FX_ID = 15;
+        public static final int INTAKE_LEFT_FX_ID = 16;
         public static final double lockRotations = -2.75;
         public static final double intakeRotations = 2.5;
         public static final double lockSpeedRPS = 25;
         public static final double P_INTAKE = 0.3;
-        public static final double D_INTAKE = 0.0;
         public static final double I_INTAKE = 0.0;
+        public static final double D_INTAKE = 0.0;
         public static final double A_INTAKE = 0.0;
         public static final double G_INTAKE = 0.0;
         public static final double S_INTAKE = 0.0;
         public static final double V_INTAKE = 0.0;
 
-        public static final double kIntakeStatorCurrent = 80.0;
-        public static final double kIntakeSupplyCurrent = 40.0;
+        public static final double INTAKE_STATOR_CURRENT = 80.0;
+        public static final double INTAKE_SUPPLY_CURRENT = 40.0;
 
         public static final double INTAKE_PEAK_VOLTAGE = 8.0 * Constants.masterVoltageMultiplier;
     }
 
     public static final class hang {
-        public static final int hangMotor = 14;
+        public static final int HANG_FX_ID = 14;
+        public static final double P_HANG = 1;
+        public static final double I_HANG = 0;
+        public static final double D_HANG = 0;
+        public static final double S_HANG = 5;
+
+        public static final double HANG_STATOR_CURRENT = 80.0;
+        public static final double HANG_SUPPLY_CURRENT = 40.0; 
+
+        public static final double HANG_PEAK_FORWARD_VOLTAGE = 12.0 * Constants.masterVoltageMultiplier;
+        public static final double HANG_PEAK_REVERSE_VOLTAGE = 8.0 * Constants.masterVoltageMultiplier;
+
     }
 
     public static void setL4() {
