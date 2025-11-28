@@ -17,8 +17,6 @@ import au.grapplerobotics.CanBridge;
 
 import com.ctre.phoenix6.controls.NeutralOut;
 
-import frc.robot.subsystems.Hang;
-
 
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;

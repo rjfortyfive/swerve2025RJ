@@ -24,7 +24,6 @@ import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -99,9 +98,6 @@ public class RobotContainer {
         public static final CommandJoystick joystick = new CommandJoystick(0);
         public static final CommandXboxController XboxController = new CommandXboxController(1);
         public static final CommandJoystick buttonPanel = new CommandJoystick(2);
-
-        final DutyCycleOut m_leftRequest = new DutyCycleOut(0.0);
-        final DutyCycleOut m_rightRequest = new DutyCycleOut(0.0);
 
         public Elevator m_elevator = new Elevator();
         public Effector m_effector = new Effector();
