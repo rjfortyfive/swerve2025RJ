@@ -233,7 +233,7 @@ public class Constants {
         public static final double S_INTAKE = 0.0;
         public static final double V_INTAKE = 0.0;
 
-        public static final double INTAKE_STATOR_CURRENT = 80.0;
+        public static final double INTAKE_STATOR_CURRENT = 65.0;
         public static final double INTAKE_SUPPLY_CURRENT = 40.0;
 
         public static final double INTAKE_PEAK_VOLTAGE = 8.0 * Constants.masterVoltageMultiplier;
