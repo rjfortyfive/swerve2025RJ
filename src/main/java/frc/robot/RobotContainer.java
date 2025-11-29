@@ -11,8 +11,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.race;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
-import java.util.List;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -38,19 +36,9 @@ import frc.robot.util.TagUtils;
 import frc.robot.util.tagSide;
 
 public class RobotContainer {
-        // Tracks the currently targeted AprilTag ID for stick-based rotation commands
-        private int mCurrentTargetTag = -1;
-        // Timestamp of the last strafe button press
-        private double mLastStrafeButtonTime = 0;
-        // Tracks which side was chosen on the last strafe button press
-        private tagSide mCurrentTargetSide = tagSide.LEFT;
         // Tracks the currently scheduled auto-align command for cancellation
         private Command mCurrentAutoAlignCommand = null;
-
-        // 1) Separate tag IDs into upper and lower groups
-        private static final List<Integer> kStation = List.of(1, 2, 12, 13);
-
-        public final static CommandSwerveDrivetrain m_drivetrain = TunerConstants.createDrivetrain();
+        
         private final SendableChooser<Command> autoChooser;
         public static SendableChooser<Integer> positionChooser;
 
@@ -83,6 +71,7 @@ public class RobotContainer {
         public static final CommandXboxController XboxController = new CommandXboxController(1);
         public static final CommandJoystick buttonPanel = new CommandJoystick(2);
 
+        public final static CommandSwerveDrivetrain m_drivetrain = TunerConstants.createDrivetrain();
         public Elevator m_elevator = new Elevator();
         public Effector m_effector = new Effector();
         public Intake m_intake = new Intake();
@@ -216,8 +205,6 @@ public class RobotContainer {
 
                                                 int closest = m_vision.getClosestTagId();
 
-                                                mCurrentTargetSide = tagSide.RIGHT;
-
                                                 if (mCurrentAutoAlignCommand != null) {
                                                         mCurrentAutoAlignCommand.cancel();
                                                         mCurrentAutoAlignCommand = null;
@@ -236,8 +223,7 @@ public class RobotContainer {
                         joystick.button(Constants.Joystick.strafeLeft)
                                         .whileTrue(new RunCommand(() -> {
                                                 int closest = m_vision.getClosestTagId();
-                                                mCurrentTargetTag = closest;
-                                                mCurrentTargetSide = tagSide.LEFT;
+
                                                 if (mCurrentAutoAlignCommand != null) {
                                                         mCurrentAutoAlignCommand.cancel();
                                                         mCurrentAutoAlignCommand = null;
@@ -259,11 +245,7 @@ public class RobotContainer {
                                 }
                         }));
 
-                        // Path to the closest station
-                        // joystick.button(2)
-                        //                 .onTrue(new InstantCommand(() -> {
-                        //                         pathToClosestStation().schedule();
-                        //                 }, drivetrain));
+
                 }
         }
 
