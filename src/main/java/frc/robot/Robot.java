@@ -21,8 +21,8 @@ import com.ctre.phoenix6.controls.NeutralOut;
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer;
-    private Vision vision;
-    private CommandSwerveDrivetrain drivetrain;
+    //private Vision vision;
+    private CommandSwerveDrivetrain m_drivetrain;
     private final Lights lights = new Lights();
 
     private final NeutralOut m_brake = new NeutralOut();
@@ -47,15 +47,15 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         // Runs the scheduler for commands
         CommandScheduler.getInstance().run();
-        vision.periodic();
-        drivetrain.periodic();
+        //vision.periodic();
+        m_drivetrain.periodic();
         
     }
     @Override
     public void robotInit() {
         m_robotContainer = new RobotContainer();
-        drivetrain = m_robotContainer.drivetrain;
-        vision = m_robotContainer.vision;
+        m_drivetrain = m_robotContainer.m_drivetrain;
+     //   vision = m_robotContainer.vision;
     }
 
     
@@ -105,7 +105,7 @@ public class Robot extends TimedRobot {
         Pose2d startPose = new Pose2d(14, 6, Rotation2d.fromDegrees(60)); // Add your third pose here
 
 
-        drivetrain.resetPose(startPose);
+        m_drivetrain.resetPose(startPose);
         System.out.println("Resetting pose to " + startPose);
     }
 

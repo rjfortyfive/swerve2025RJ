@@ -103,7 +103,7 @@ public class TagUtils {
 
     for (int tagId : tagIds) {
       Pose2d tagPose = getTagPose2d(tagId)
-          .orElse(RobotContainer.drivetrain.getPose());
+          .orElse(RobotContainer.m_drivetrain.getPose());
 
       TagOffsetConfig cfg = kTagConfigs.get(tagId);
       if (cfg == null) {
@@ -147,7 +147,7 @@ public class TagUtils {
 
   public static Pose2d computeTagAdjacencyPose(int tagId, tagSide side, double offsetMeters, double frontoffsetMeters) {
     Pose2d tagPose = getTagPose2d(tagId)
-        .orElse(RobotContainer.drivetrain.getPose());
+        .orElse(RobotContainer.m_drivetrain.getPose());
 
     TagOffsetConfig cfg = kTagConfigs.get(tagId);
     if (cfg == null) {

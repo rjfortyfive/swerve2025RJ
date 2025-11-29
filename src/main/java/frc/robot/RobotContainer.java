@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -55,7 +54,7 @@ public class RobotContainer {
 
         // 2) Find the closest tag ID to the robot (search both groups)
         private int getClosestTagId() {
-                Pose2d robotPose = drivetrain.getPose();
+                Pose2d robotPose = m_drivetrain.getPose();
                 List<Integer> allTags = new ArrayList<>(Constants.Vision.kTags);
                 // allTags.addAll(kBlueTags);
                 return allTags.stream()
@@ -65,7 +64,7 @@ public class RobotContainer {
                                 .orElse(Constants.Vision.kTags.get(0));
         }
 
-        public final static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+        public final static CommandSwerveDrivetrain m_drivetrain = TunerConstants.createDrivetrain();
         private final SendableChooser<Command> autoChooser;
         public static SendableChooser<Integer> positionChooser;
 
@@ -93,7 +92,6 @@ public class RobotContainer {
         private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
-        public final Vision vision;
 
         public static final CommandJoystick joystick = new CommandJoystick(0);
         public static final CommandXboxController XboxController = new CommandXboxController(1);
@@ -103,10 +101,11 @@ public class RobotContainer {
         public Effector m_effector = new Effector();
         public Intake m_intake = new Intake();
         public final Hang m_hang = new Hang();
+        public final Vision m_vision = new Vision();
 
         public RobotContainer() {
-                vision = new Vision((pose, timestamp, stdDevs) -> drivetrain.addVisionMeasurement(pose, timestamp,
-                                stdDevs));
+                // vision = new Vision((pose, timestamp, stdDevs) -> drivetrain.addVisionMeasurement(pose, timestamp,
+                //                 stdDevs));
                 configureBindings();
 
                 NamedCommands.registerCommand("scoreL1Coral",
@@ -255,14 +254,14 @@ public class RobotContainer {
                 // Hang control triggers: Only when left bumper is held and a trigger is pressed
                 new Trigger(() -> XboxController.button(Constants.XboxController.bumper.Left).getAsBoolean()
                                 && XboxController.getRawAxis(Constants.XboxController.axis.RightTrigger) > 0.25)
-                                .whileTrue(new InstantCommand(() -> m_hang.start(100), m_hang, drivetrain));
+                                .whileTrue(new InstantCommand(() -> m_hang.start(100), m_hang, m_drivetrain));
 
                 new Trigger(() -> XboxController.button(Constants.XboxController.bumper.Left).getAsBoolean()
                                 && XboxController.getRawAxis(Constants.XboxController.axis.LeftTrigger) > 0.25)
-                                .whileTrue(new InstantCommand(() -> m_hang.start(-100), m_hang, drivetrain));
+                                .whileTrue(new InstantCommand(() -> m_hang.start(-100), m_hang, m_drivetrain));
 
-                drivetrain.setDefaultCommand(
-                                drivetrain.applyRequest(() -> drive
+                m_drivetrain.setDefaultCommand(
+                                m_drivetrain.applyRequest(() -> drive
                                                         .withVelocityX(joystick.getY() * MaxSpeed * Constants.masterDriveMultiplier)
                                                         .withVelocityY(joystick.getX()  * MaxSpeed * Constants.masterDriveMultiplier)
                                                         .withRotationalRate(-joystick.getTwist()  * MaxAngularRate * Constants.masterDriveMultiplier)));
@@ -287,7 +286,7 @@ public class RobotContainer {
                 // joystick.button(2).onTrue(drivetrain.runOnce(() ->
                 // drivetrain.seedFieldCentric()));
 
-                drivetrain.registerTelemetry(logger::telemeterize);
+                m_drivetrain.registerTelemetry(logger::telemeterize);
 
                 // Button commands
 
@@ -313,7 +312,7 @@ public class RobotContainer {
                                                 mCurrentAutoAlignCommand = strafeRightCmd;
 
                                                 return;
-                                        }, drivetrain));
+                                        }, m_drivetrain));
 
                         // Strafe Left: schedule and track the command, only one at a time
                         joystick.button(Constants.Joystick.strafeLeft)
@@ -332,7 +331,7 @@ public class RobotContainer {
 
                                                 mCurrentAutoAlignCommand = strafeLeftCmd;
                                                 return;
-                                        }, drivetrain));
+                                        }, m_drivetrain));
 
                         // Add a cancel binding
                         joystick.button(Constants.Joystick.Function1).onTrue(new InstantCommand(() -> {
