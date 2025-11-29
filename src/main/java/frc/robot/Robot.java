@@ -7,25 +7,16 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.subsystems.Lights;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-
 import com.pathplanner.lib.commands.PathfindingCommand;
 
 import au.grapplerobotics.CanBridge;
-
-import com.ctre.phoenix6.controls.NeutralOut;
 
 
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer;
-    //private Vision vision;
-    private CommandSwerveDrivetrain m_drivetrain;
     private final Lights lights = new Lights();
 
-    private final NeutralOut m_brake = new NeutralOut();
 
     Timer gc = new Timer();
 
@@ -47,14 +38,13 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         // Runs the scheduler for commands
         CommandScheduler.getInstance().run();
-        //vision.periodic();
-        m_drivetrain.periodic();
+
+
         
     }
     @Override
     public void robotInit() {
         m_robotContainer = new RobotContainer();
-        m_drivetrain = m_robotContainer.m_drivetrain;
      //   vision = m_robotContainer.vision;
     }
 
@@ -97,16 +87,6 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledInit() {
 
-    }
-
-    public void resetPose() {
-        
-        
-        Pose2d startPose = new Pose2d(14, 6, Rotation2d.fromDegrees(60)); // Add your third pose here
-
-
-        m_drivetrain.resetPose(startPose);
-        System.out.println("Resetting pose to " + startPose);
     }
 
 }

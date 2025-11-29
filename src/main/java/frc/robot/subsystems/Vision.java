@@ -21,7 +21,6 @@ import com.ctre.phoenix6.Utils;
 import frc.robot.RobotContainer;
 import frc.robot.util.TagUtils;
 import frc.robot.Constants;
-import frc.robot.Logger;
 
 public class Vision extends SubsystemBase {
 
