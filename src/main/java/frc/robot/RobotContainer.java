@@ -161,7 +161,7 @@ public class RobotContainer {
                 if (!Constants.masterNerf) {
                         // Strafe Right: schedule and track the command, only one at a time
                         joystick.button(Constants.Joystick.strafeRight)
-                                .whileTrue(new GoToTagCommand(
+                                .whileTrue(new MakeGoToTag(
                                         m_drivetrain,
                                         m_vision,
                                         tagSide.RIGHT,
@@ -171,7 +171,7 @@ public class RobotContainer {
 
                         // Strafe Left: schedule and track the command, only one at a time
                         joystick.button(Constants.Joystick.strafeRight)
-                                .whileTrue(new GoToTagCommand(
+                                .whileTrue(new MakeGoToTag(
                                         m_drivetrain,
                                         m_vision,
                                         tagSide.LEFT,

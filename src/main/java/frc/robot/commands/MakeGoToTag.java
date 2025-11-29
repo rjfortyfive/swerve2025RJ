@@ -15,7 +15,7 @@ import frc.robot.util.TagUtils.tagSide;
 
 import frc.robot.Constants.Pathfinding;
 
-public class GoToTagCommand extends Command {
+public class MakeGoToTag extends Command {
 
     private final CommandSwerveDrivetrain m_drivetrain;
     private final Vision m_vision;
@@ -36,7 +36,7 @@ public class GoToTagCommand extends Command {
             Math.toRadians(Pathfinding.MaxRotSpeed),
             Math.toRadians(Pathfinding.MaxRotAccel));
 
-    public GoToTagCommand(
+    public MakeGoToTag(
             CommandSwerveDrivetrain drivetrain,
             Vision vision,
             tagSide side,
