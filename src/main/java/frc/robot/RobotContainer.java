@@ -11,8 +11,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.race;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -52,18 +50,6 @@ public class RobotContainer {
         // 1) Separate tag IDs into upper and lower groups
         private static final List<Integer> kStation = List.of(1, 2, 12, 13);
 
-        // 2) Find the closest tag ID to the robot (search both groups)
-        private int getClosestTagId() {
-                Pose2d robotPose = m_drivetrain.getPose();
-                List<Integer> allTags = new ArrayList<>(Constants.Vision.kTags);
-                // allTags.addAll(kBlueTags);
-                return allTags.stream()
-                                .min(Comparator.comparingDouble(id -> TagUtils.getTagPose2d(id)
-                                                .map(p -> p.getTranslation().getDistance(robotPose.getTranslation()))
-                                                .orElse(Double.MAX_VALUE)))
-                                .orElse(Constants.Vision.kTags.get(0));
-        }
-
         public final static CommandSwerveDrivetrain m_drivetrain = TunerConstants.createDrivetrain();
         private final SendableChooser<Command> autoChooser;
         public static SendableChooser<Integer> positionChooser;
@@ -101,65 +87,16 @@ public class RobotContainer {
         public Effector m_effector = new Effector();
         public Intake m_intake = new Intake();
         public final Hang m_hang = new Hang();
-        public final Vision m_vision = new Vision();
+        public final Vision m_vision = new Vision(m_drivetrain);
 
         public RobotContainer() {
                 // vision = new Vision((pose, timestamp, stdDevs) -> drivetrain.addVisionMeasurement(pose, timestamp,
                 //                 stdDevs));
                 configureBindings();
+                configureDefaultCommands();
+                configureNamedCommands();
 
-                NamedCommands.registerCommand("scoreL1Coral",
-                                new SequentialCommandGroup(
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L1 + 2.0),
-                                                                m_elevator),
-                                                new InstantCommand(() -> m_effector.start(30, 10),
-                                                                m_effector),
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(Constants.elevator.level.L1),
-                                                                m_elevator)));
-
-                NamedCommands.registerCommand("scoreL4Coral",
-                                new SequentialCommandGroup(
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L4 - 0.5),
-                                                                m_elevator),
-
-                                                new WaitCommand(.9),
-
-                                                new ScoreL4L3L2(m_effector),
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L1))));
-
-                NamedCommands.registerCommand("startIntakeCoral",
-                                sequence(
-                                                // 1) move the elevator up to position intake
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.intake),
-                                                                m_elevator),
-
-                                                new InstantCommand(
-                                                                () -> m_effector.start(40),
-                                                                m_effector
-
-                                                )));
-
-                NamedCommands.registerCommand("raiseL2",
-                                sequence(
-                                                // 1) move the elevator up to L2
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L2 + 5),
-                                                                m_elevator)
-
-                                ));
-                NamedCommands.registerCommand("intakeCoral",
-                                sequence(new CoralIntake(m_elevator, m_effector, m_intake)));
-
+                
                 autoChooser = AutoBuilder.buildAutoChooser("");
                 SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -259,25 +196,6 @@ public class RobotContainer {
                 new Trigger(() -> XboxController.button(Constants.XboxController.bumper.Left).getAsBoolean()
                                 && XboxController.getRawAxis(Constants.XboxController.axis.LeftTrigger) > 0.25)
                                 .whileTrue(new InstantCommand(() -> m_hang.start(-100), m_hang, m_drivetrain));
-
-                m_drivetrain.setDefaultCommand(
-                                m_drivetrain.applyRequest(() -> drive
-                                                        .withVelocityX(joystick.getY() * MaxSpeed * Constants.masterDriveMultiplier)
-                                                        .withVelocityY(joystick.getX()  * MaxSpeed * Constants.masterDriveMultiplier)
-                                                        .withRotationalRate(-joystick.getTwist()  * MaxAngularRate * Constants.masterDriveMultiplier)));
-                
-                m_effector.setDefaultCommand(new RunCommand(() -> {
-                                double lt = XboxController.getLeftTriggerAxis();
-                                double rt = XboxController.getRightTriggerAxis();
-                                                            
-                                        if (lt > 0.1) {
-                                                m_effector.start(-0.5 * 70 * lt);
-                                        } else if (rt > 0.1) {
-                                                m_effector.start(0.5 * 70 * rt);
-                                        } else {
-                                                m_effector.start(0);
-                                        }
-                                        }, m_effector));
                                                                             
 
 
@@ -296,7 +214,7 @@ public class RobotContainer {
                         joystick.button(Constants.Joystick.strafeRight)
                                         .whileTrue(new RunCommand(() -> {
 
-                                                int closest = getClosestTagId();
+                                                int closest = m_vision.getClosestTagId();
 
                                                 mCurrentTargetSide = tagSide.RIGHT;
 
@@ -317,7 +235,7 @@ public class RobotContainer {
                         // Strafe Left: schedule and track the command, only one at a time
                         joystick.button(Constants.Joystick.strafeLeft)
                                         .whileTrue(new RunCommand(() -> {
-                                                int closest = getClosestTagId();
+                                                int closest = m_vision.getClosestTagId();
                                                 mCurrentTargetTag = closest;
                                                 mCurrentTargetSide = tagSide.LEFT;
                                                 if (mCurrentAutoAlignCommand != null) {
@@ -347,6 +265,82 @@ public class RobotContainer {
                         //                         pathToClosestStation().schedule();
                         //                 }, drivetrain));
                 }
+        }
+
+        private void configureNamedCommands() {
+                NamedCommands.registerCommand("scoreL1Coral",
+                                new SequentialCommandGroup(
+                                                new InstantCommand(
+                                                                () -> m_elevator.toPosition(
+                                                                                Constants.elevator.level.L1 + 2.0),
+                                                                m_elevator),
+                                                new InstantCommand(() -> m_effector.start(30, 10),
+                                                                m_effector),
+                                                new InstantCommand(
+                                                                () -> m_elevator.toPosition(Constants.elevator.level.L1),
+                                                                m_elevator)));
+
+                NamedCommands.registerCommand("scoreL4Coral",
+                                new SequentialCommandGroup(
+                                                new InstantCommand(
+                                                                () -> m_elevator.toPosition(
+                                                                                Constants.elevator.level.L4 - 0.5),
+                                                                m_elevator),
+
+                                                new WaitCommand(.9),
+
+                                                new ScoreL4L3L2(m_effector),
+                                                new InstantCommand(
+                                                                () -> m_elevator.toPosition(
+                                                                                Constants.elevator.level.L1))));
+
+                NamedCommands.registerCommand("startIntakeCoral",
+                                sequence(
+                                                // 1) move the elevator up to position intake
+                                                new InstantCommand(
+                                                                () -> m_elevator.toPosition(
+                                                                                Constants.elevator.level.intake),
+                                                                m_elevator),
+
+                                                new InstantCommand(
+                                                                () -> m_effector.start(40),
+                                                                m_effector
+
+                                                )));
+
+                NamedCommands.registerCommand("raiseL2",
+                                sequence(
+                                                // 1) move the elevator up to L2
+                                                new InstantCommand(
+                                                                () -> m_elevator.toPosition(
+                                                                                Constants.elevator.level.L2 + 5),
+                                                                m_elevator)
+
+                                ));
+                NamedCommands.registerCommand("intakeCoral",
+                                sequence(new CoralIntake(m_elevator, m_effector, m_intake)));
+
+        }
+
+        private void configureDefaultCommands() {
+                m_drivetrain.setDefaultCommand(
+                        m_drivetrain.applyRequest(() -> drive
+                                        .withVelocityX(joystick.getY() * MaxSpeed * Constants.masterDriveMultiplier)
+                                        .withVelocityY(joystick.getX()  * MaxSpeed * Constants.masterDriveMultiplier)
+                                        .withRotationalRate(-joystick.getTwist()  * MaxAngularRate * Constants.masterDriveMultiplier)));
+
+                m_effector.setDefaultCommand(new RunCommand(() -> {
+                        double lt = XboxController.getLeftTriggerAxis();
+                        double rt = XboxController.getRightTriggerAxis();
+                                                    
+                                if (lt > 0.1) {
+                                        m_effector.start(-0.5 * 70 * lt);
+                                } else if (rt > 0.1) {
+                                        m_effector.start(0.5 * 70 * rt);
+                                } else {
+                                        m_effector.start(0);
+                                }
+                                }, m_effector));
         }
 
         public Command getAutonomousCommand() {

@@ -2,6 +2,9 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.Vision.*;
 
+import java.util.Comparator;
+import java.util.List;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,6 +19,8 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import com.ctre.phoenix6.Utils;
 
 import frc.robot.RobotContainer;
+import frc.robot.util.TagUtils;
+import frc.robot.Constants;
 import frc.robot.Logger;
 
 public class Vision extends SubsystemBase {
@@ -34,7 +39,10 @@ public class Vision extends SubsystemBase {
     // Track last seen tag ID
     private int lastSeenTagId = -1;
 
-    public Vision() {
+    private final CommandSwerveDrivetrain m_drivetrain;
+
+    public Vision(CommandSwerveDrivetrain m_drivetrain) {
+        this.m_drivetrain = m_drivetrain;
 
         camera1.setPipelineIndex(0);
         camera2.setPipelineIndex(0);
@@ -124,5 +132,22 @@ public class Vision extends SubsystemBase {
     public Matrix<N3, N1> getEstimationStdDevs() {
         return curStdDevs;
     }
+
+    public int getClosestTagId() {
+    Pose2d robotPose = m_drivetrain.getPose();  // you must store drivetrain reference
+    List<Integer> allTags = Constants.Vision.kTags;
+    
+    return allTags.stream()
+        .min(
+            Comparator.comparingDouble(
+                id -> TagUtils.getTagPose2d(id)
+                    .map(tagPose -> tagPose.getTranslation()
+                        .getDistance(robotPose.getTranslation()))
+                    .orElse(Double.MAX_VALUE)
+            )
+        )
+        .orElse(Constants.Vision.kTags.get(0));
+}
+
     
 }
