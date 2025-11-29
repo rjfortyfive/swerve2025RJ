@@ -94,47 +94,62 @@ public class TagUtils {
   }
 
   public static Pose2d getClosestStationPose(
-      List<Integer> tagIds,
-      Pose2d robotPose,
-      double frontOffsetMeters,
-      double lateralOffsetMeters) {
-    Pose2d closestPose = null;
-    double minDistance = Double.MAX_VALUE;
+    List<Integer> tagIds,
+    Pose2d robotPose,
+    double frontOffsetMeters,
+    double lateralOffsetMeters) {
 
-    for (int tagId : tagIds) {
-      Pose2d tagPose = getTagPose2d(tagId)
-          .orElse(RobotContainer.m_drivetrain.getPose());
+  Pose2d closestPose = null;
+  double minDistance = Double.MAX_VALUE;
 
-      TagOffsetConfig cfg = kTagConfigs.get(tagId);
-      if (cfg == null) {
-        Logger.warn("No tag config for ID {}", tagId);
-        continue;
-      }
-      
-      double effectiveFrontOffset = frontOffsetMeters;
-      
-      Translation2d front = cfg.frontDir.times(effectiveFrontOffset);
-      Translation2d leftShift = cfg.leftDir.times(lateralOffsetMeters);
-      Translation2d rightShift = cfg.rightDir.times(lateralOffsetMeters);
-      Rotation2d heading = tagPose.getRotation();
+  for (int tagId : tagIds) {
 
-      Pose2d[] candidates = new Pose2d[] {
-          new Pose2d(tagPose.getTranslation().plus(front), heading), // center
-          new Pose2d(tagPose.getTranslation().plus(front).plus(leftShift), heading), // center-left
-          new Pose2d(tagPose.getTranslation().plus(front).plus(rightShift), heading) // center-right
-      };
+    // Load tag pose safely
+    Optional<Pose2d> maybeTagPose = getTagPose2d(tagId);
+    if (maybeTagPose.isEmpty()) {
+      Logger.warn("Tag {} is missing from field layout", tagId);
+      continue; // Skip this tag completely
+    }
+    Pose2d tagPose = maybeTagPose.get();
 
-      for (Pose2d candidate : candidates) {
-        double distance = robotPose.getTranslation().getDistance(candidate.getTranslation());
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestPose = candidate;
-        }
-      }
+    // Load tag offset config safely
+    TagOffsetConfig cfg = kTagConfigs.get(tagId);
+    if (cfg == null) {
+      Logger.warn("No TagOffsetConfig for tag {}", tagId);
+      continue;
     }
 
-    return closestPose;
+    // Precompute offsets
+    Translation2d front = cfg.frontDir.times(frontOffsetMeters);
+    Translation2d leftShift = cfg.leftDir.times(lateralOffsetMeters);
+    Translation2d rightShift = cfg.rightDir.times(lateralOffsetMeters);
+    Rotation2d heading = tagPose.getRotation();
+
+    // Candidate poses
+    Pose2d[] candidates = new Pose2d[] {
+        new Pose2d(tagPose.getTranslation().plus(front), heading),              // center
+        new Pose2d(tagPose.getTranslation().plus(front).plus(leftShift), heading),  // left
+        new Pose2d(tagPose.getTranslation().plus(front).plus(rightShift), heading)  // right
+    };
+
+    // Find nearest candidate
+    for (Pose2d candidate : candidates) {
+      double distance = robotPose.getTranslation().getDistance(candidate.getTranslation());
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestPose = candidate;
+      }
+    }
   }
+
+  // If none valid, return robot pose (or choose what makes sense)
+  if (closestPose == null) {
+    Logger.warn("No valid station poses found from tag list");
+    return robotPose;
+  }
+
+  return closestPose;
+}
 
   /**
    * Compute a goal Pose2d offset from the tag.
@@ -145,34 +160,40 @@ public class TagUtils {
    * @param frontoffsetMeters How far off the reef
    */
 
-  public static Pose2d computeTagAdjacencyPose(int tagId, tagSide side, double offsetMeters, double frontoffsetMeters) {
-    Pose2d tagPose = getTagPose2d(tagId)
-        .orElse(RobotContainer.m_drivetrain.getPose());
+   public static Pose2d computeTagAdjacencyPose(
+    int tagId,
+    tagSide side,
+    double offsetMeters,
+    double frontoffsetMeters) {
 
-    TagOffsetConfig cfg = kTagConfigs.get(tagId);
-    if (cfg == null) {
-      Logger.warn("No valid tag config for ID {}", tagId);
-      return tagPose;
-    }
-    Translation2d dir = (side == tagSide.LEFT) ? cfg.leftDir : cfg.rightDir;
-
-    // apply tag-specific lateral tweaks for tags 
-
-    double lateral = offsetMeters;
-    // if (tagId == 18 && side == tagSide.LEFT) {
-    //   lateral += 0.1; // move 0.1 m further left for tag 18
-    // }
-    // if (tagId == 20 && side == tagSide.RIGHT) {
-    //   lateral += 0.18; // move 0.18 m further right for tag 20
-    // }
-    
-    Translation2d override = dir.times(lateral);
-    Translation2d front = cfg.frontDir.times(frontoffsetMeters);
-    return new Pose2d(
-        tagPose.getTranslation().plus(override).plus(front),
-        tagPose.getRotation().plus(Rotation2d.fromDegrees(180)));
-
+  // Load tag pose safely
+  Optional<Pose2d> maybeTagPose = getTagPose2d(tagId);
+  if (maybeTagPose.isEmpty()) {
+    Logger.warn("Tag {} is missing from field layout", tagId);
+    return new Pose2d();
   }
+  Pose2d tagPose = maybeTagPose.get();
+
+  // Load config safely
+  TagOffsetConfig cfg = kTagConfigs.get(tagId);
+  if (cfg == null) {
+    Logger.warn("No TagOffsetConfig for tag {}", tagId);
+    return tagPose;
+  }
+
+  // Lateral translation direction
+  Translation2d lateralDir = (side == tagSide.LEFT) ? cfg.leftDir : cfg.rightDir;
+
+  // Offsets
+  Translation2d lateral = lateralDir.times(offsetMeters);
+  Translation2d front = cfg.frontDir.times(frontoffsetMeters);
+
+  // Final pose
+  return new Pose2d(
+      tagPose.getTranslation().plus(lateral).plus(front),
+      tagPose.getRotation().plus(Rotation2d.fromDegrees(180)));  // Face the tag
+}
+
 };
 
 // rotate that local offset into field frame
