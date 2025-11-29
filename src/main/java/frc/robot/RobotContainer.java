@@ -50,13 +50,6 @@ public class RobotContainer {
                                                                                                // second
                                                                                                // max angular velocity
 
-        /** Shared path-following constraints for all tag paths */
-        public static final PathConstraints kPathConstraints = new PathConstraints(
-                        Constants.Pathfinding.MaxSpeed,
-                        Constants.Pathfinding.MaxAccel,
-                        Units.degreesToRadians(Constants.Pathfinding.MaxRotSpeed),
-                        Units.degreesToRadians(Constants.Pathfinding.MaxRotAccel));
-
         /* Setting up bindings for necessary control of the swerve drive platform */
         public static final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
                         .withDeadband(MaxSpeed * 0.01).withRotationalDeadband(MaxAngularRate * 0.01) // Add a 10%
@@ -99,35 +92,6 @@ public class RobotContainer {
 
                 SmartDashboard.putData("Pose start", positionChooser);
 
-        }
-
-        private Command makeGoToTag(
-                        int tagId,
-                        tagSide side,
-                        double offsetMeters,
-                        double frontOffsetMeters) {
-                // 1) compute the goal pose with your two offsets
-                Pose2d goal = TagUtils.computeTagAdjacencyPose(
-                                tagId,
-                                side,
-                                offsetMeters,
-                                frontOffsetMeters);
-                Logger.debug("computed adjacency goal: {}", goal);
-
-                PathConstraints constraints = kPathConstraints;
-                // 2) build your PathPlanner command as before
-                Command pathCmd = AutoBuilder.pathfindToPose(goal, constraints, 0.0);
-
-                // Canceller: finishes as soon as any joystick movement > 20%
-                Command cancelOnStick = waitUntil(() -> Math.abs(joystick.getY()) > 0.2 ||
-                        Math.abs(joystick.getX()) > 0.2 ||
-                        Math.abs(joystick.getTwist()) > 0.2);
-
-                // Race them: whichever ends first wins and cancels the other
-                return race(pathCmd, cancelOnStick)
-                    .andThen(new InstantCommand(() -> {
-                        mCurrentAutoAlignCommand = null;
-                    }));
         }
 
         private void configureBindings() {

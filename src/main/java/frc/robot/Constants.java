@@ -2,6 +2,8 @@ package frc.robot;
 
 import java.util.List;
 
+import com.pathplanner.lib.path.PathConstraints;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.hal.DriverStationJNI;
@@ -13,6 +15,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.Matrix;
 
 public class Constants {
@@ -67,6 +70,13 @@ public class Constants {
         public static final double MaxRotSpeed = 600;
         // max rot accel deg/s²
         public static final double MaxRotAccel = 600;
+
+        public static final PathConstraints kPathConstraints =
+                new PathConstraints(
+                        MaxSpeed,
+                        MaxAccel,
+                        Units.degreesToRadians(MaxRotSpeed),
+                        Units.degreesToRadians(MaxRotAccel));
 
     }
 

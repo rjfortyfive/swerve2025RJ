@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Constants;
 import frc.robot.Logger;
 
+
 public class TagUtils {
   private static class TagOffsetConfig {
     final Translation2d leftDir;
@@ -193,6 +194,14 @@ public class TagUtils {
       tagPose.getRotation().plus(Rotation2d.fromDegrees(180)));  // Face the tag
 }
 
+
+/** Which side of the tag you want to end up on */
+public enum tagSide {
+  LEFT,    // +Y in tag‐frame
+  RIGHT,   // –Y in tag‐frame
+  INWARD,  // +X in tag‐frame (toward field‐origin)
+  OUTWARD  // –X in tag‐frame (away from field‐origin)
+}
 };
 
 // rotate that local offset into field frame
