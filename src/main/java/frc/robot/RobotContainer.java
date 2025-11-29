@@ -33,7 +33,7 @@ import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.TagUtils;
-import frc.robot.util.tagSide;
+import frc.robot.util.TagUtils.tagSide;;
 
 public class RobotContainer {
         // Tracks the currently scheduled auto-align command for cancellation
@@ -166,45 +166,24 @@ public class RobotContainer {
                 if (!Constants.masterNerf) {
                         // Strafe Right: schedule and track the command, only one at a time
                         joystick.button(Constants.Joystick.strafeRight)
-                                        .whileTrue(new RunCommand(() -> {
-
-                                                Pose2d robotPose = m_drivetrain.getPose();
-                                                int closest = m_vision.getClosestTagId(robotPose);
-
-
-                                                if (mCurrentAutoAlignCommand != null) {
-                                                        mCurrentAutoAlignCommand.cancel();
-                                                        mCurrentAutoAlignCommand = null;
-                                                }
-
-                                                Command strafeRightCmd = makeGoToTag(closest, tagSide.RIGHT, 0.197,
-                                                                0.345);
-
-                                                strafeRightCmd.schedule();
-                                                mCurrentAutoAlignCommand = strafeRightCmd;
-
-                                                return;
-                                        }, m_drivetrain));
+                                .whileTrue(new GoToTagCommand(
+                                        m_drivetrain,
+                                        m_vision,
+                                        tagSide.RIGHT,
+                                        0.197,
+                                        0.345
+                                ));
 
                         // Strafe Left: schedule and track the command, only one at a time
-                        joystick.button(Constants.Joystick.strafeLeft)
-                                        .whileTrue(new RunCommand(() -> {
-                                                Pose2d robotPose = m_drivetrain.getPose();
-                                                int closest = m_vision.getClosestTagId(robotPose);
-
-
-                                                if (mCurrentAutoAlignCommand != null) {
-                                                        mCurrentAutoAlignCommand.cancel();
-                                                        mCurrentAutoAlignCommand = null;
-                                                }
-                                                Command strafeLeftCmd = makeGoToTag(closest, tagSide.LEFT, 0.165,
-                                                                0.345);
-
-                                                strafeLeftCmd.schedule();
-
-                                                mCurrentAutoAlignCommand = strafeLeftCmd;
-                                                return;
-                                        }, m_drivetrain));
+                        joystick.button(Constants.Joystick.strafeRight)
+                                .whileTrue(new GoToTagCommand(
+                                        m_drivetrain,
+                                        m_vision,
+                                        tagSide.LEFT,
+                                        0.165,
+                                        0.345
+                                ));
+                    
 
                         // Add a cancel binding
                         joystick.button(Constants.Joystick.Function1).onTrue(new InstantCommand(() -> {
