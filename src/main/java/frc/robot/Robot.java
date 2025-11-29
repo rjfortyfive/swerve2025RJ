@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.*;
 
 import com.pathplanner.lib.commands.PathfindingCommand;
 
@@ -15,6 +15,7 @@ import au.grapplerobotics.CanBridge;
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer;
+    private Vision m_vision = new Vision();
     private final Lights lights = new Lights();
 
 
@@ -45,7 +46,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         m_robotContainer = new RobotContainer();
-     //   vision = m_robotContainer.vision;
+        m_vision.periodic();
     }
 
     

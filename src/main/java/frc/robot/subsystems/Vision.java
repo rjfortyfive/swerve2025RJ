@@ -16,63 +16,40 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
-import com.ctre.phoenix6.Utils;
-
-import frc.robot.RobotContainer;
 import frc.robot.util.TagUtils;
 import frc.robot.Constants;
 
 public class Vision extends SubsystemBase {
 
-    // Cameras
     private final PhotonCamera camera1 = new PhotonCamera(CameraName1);
     private final PhotonCamera camera2 = new PhotonCamera(CameraName2);
 
-    // Pose estimators
     private final PhotonPoseEstimator estimator1;
     private final PhotonPoseEstimator estimator2;
 
-    // Std devs for estimator
-    private Matrix<N3, N1> curStdDevs;
-
-    // Track last seen tag ID
+    private Pose2d latestPose;
+    private Matrix<N3, N1> latestStdDevs;
     private int lastSeenTagId = -1;
 
-    private final CommandSwerveDrivetrain m_drivetrain;
-
-    public Vision(CommandSwerveDrivetrain m_drivetrain) {
-        this.m_drivetrain = m_drivetrain;
-
+    public Vision() {
         camera1.setPipelineIndex(0);
         camera2.setPipelineIndex(0);
 
-        estimator1 = new PhotonPoseEstimator(
-                kTagLayout,
-                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                RobotToCam1);
-
-        estimator2 = new PhotonPoseEstimator(
-                kTagLayout,
-                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                RobotToCam2);
+        estimator1 = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, RobotToCam1);
+        estimator2 = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, RobotToCam2);
 
         estimator1.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         estimator2.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     }
 
-    public int getLastSeenTagId() {
-        return lastSeenTagId;
-    }
-
     @Override
     public void periodic() {
-        processFrame(camera1, 1, estimator1);
-        processFrame(camera2, 2, estimator2);
+        updateCamera(estimator1, camera1);
+        updateCamera(estimator2, camera2);
     }
 
-    private void processFrame(PhotonCamera cam, int camId, PhotonPoseEstimator estimator) {
-
-        var results = cam.getAllUnreadResults();
+    private void updateCamera(PhotonPoseEstimator estimator, PhotonCamera camera) {
+        var results = camera.getAllUnreadResults();
         if (results.isEmpty()) return;
 
         var last = results.get(results.size() - 1);
@@ -80,13 +57,13 @@ public class Vision extends SubsystemBase {
         if (maybeEst.isEmpty()) return;
 
         var visionEst = maybeEst.get();
-        var visionPose = visionEst.estimatedPose.toPose2d();
+        Pose2d visionPose = visionEst.estimatedPose.toPose2d();
         var targets = last.getTargets();
 
-        // Determine std dev scaling
+        // Std dev calculation
         Matrix<N3, N1> stdDevs = kSingleTagStdDevs;
         int numTags = 0;
-        double avgTagDist = 0;
+        double avgTagDist = 0.0;
 
         for (var tgt : targets) {
             var tagPose = estimator.getFieldTags().getTagPose(tgt.getFiducialId());
@@ -94,59 +71,44 @@ public class Vision extends SubsystemBase {
 
             lastSeenTagId = tgt.getFiducialId();
             numTags++;
-
-            avgTagDist += tagPose.get().toPose2d().getTranslation()
-                    .getDistance(visionPose.getTranslation());
+            avgTagDist += tagPose.get().toPose2d().getTranslation().getDistance(visionPose.getTranslation());
         }
 
         if (numTags > 0) {
             avgTagDist /= numTags;
-            if (numTags > 1) {
-                stdDevs = kMultiTagStdDevs;
-            }
+            if (numTags > 1) stdDevs = kMultiTagStdDevs;
             if (numTags == 1 && avgTagDist > 3.0) {
                 stdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
             } else {
                 double normDist = avgTagDist / 1.5;
-                double rampFactor = 1.0 + normDist * normDist;
-                stdDevs = stdDevs.times(rampFactor);
+                stdDevs = stdDevs.times(1.0 + normDist * normDist);
             }
-        } else {
-            curStdDevs = kSingleTagStdDevs;
         }
 
-        // Filter out estimates too far from odometry
-        double distToRobot = RobotContainer.m_drivetrain.getPose().getTranslation()
-                .getDistance(visionPose.getTranslation());
-
-        if (distToRobot < 5.0) {
-            RobotContainer.m_drivetrain.addVisionMeasurement(
-                    visionPose,
-                    Utils.fpgaToCurrentTime(visionEst.timestampSeconds),
-                    stdDevs);
-        }
+        latestPose = visionPose;
+        latestStdDevs = stdDevs;
     }
 
-    /** Std devs of current vision estimate */
-    public Matrix<N3, N1> getEstimationStdDevs() {
-        return curStdDevs;
+    public Pose2d getLatestPose() {
+        return latestPose;
     }
 
-    public int getClosestTagId() {
-    Pose2d robotPose = m_drivetrain.getPose();  // you must store drivetrain reference
-    List<Integer> allTags = Constants.Vision.kTags;
-    
-    return allTags.stream()
-        .min(
-            Comparator.comparingDouble(
-                id -> TagUtils.getTagPose2d(id)
-                    .map(tagPose -> tagPose.getTranslation()
-                        .getDistance(robotPose.getTranslation()))
-                    .orElse(Double.MAX_VALUE)
-            )
-        )
-        .orElse(Constants.Vision.kTags.get(0));
+    public Matrix<N3, N1> getLatestStdDevs() {
+        return latestStdDevs;
+    }
+
+    public int getLastSeenTagId() {
+        return lastSeenTagId;
+    }
+
+    public int getClosestTagId(Pose2d robotPose) {
+        List<Integer> allTags = Constants.Vision.kTags;
+        return allTags.stream()
+                .min(Comparator.comparingDouble(id ->
+                        TagUtils.getTagPose2d(id)
+                                .map(tagPose -> tagPose.getTranslation().getDistance(robotPose.getTranslation()))
+                                .orElse(Double.MAX_VALUE)))
+                .orElse(Constants.Vision.kTags.get(0));
+    }
 }
 
-    
-}

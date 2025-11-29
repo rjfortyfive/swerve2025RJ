@@ -76,7 +76,7 @@ public class RobotContainer {
         public Effector m_effector = new Effector();
         public Intake m_intake = new Intake();
         public final Hang m_hang = new Hang();
-        public final Vision m_vision = new Vision(m_drivetrain);
+        public final Vision m_vision = new Vision();
 
         public RobotContainer() {
                 // vision = new Vision((pose, timestamp, stdDevs) -> drivetrain.addVisionMeasurement(pose, timestamp,
@@ -85,6 +85,7 @@ public class RobotContainer {
                 configureDefaultCommands();
                 configureNamedCommands();
 
+                m_drivetrain.setVision(m_vision);
                 
                 autoChooser = AutoBuilder.buildAutoChooser("");
                 SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -203,7 +204,9 @@ public class RobotContainer {
                         joystick.button(Constants.Joystick.strafeRight)
                                         .whileTrue(new RunCommand(() -> {
 
-                                                int closest = m_vision.getClosestTagId();
+                                                Pose2d robotPose = m_drivetrain.getPose();
+                                                int closest = m_vision.getClosestTagId(robotPose);
+
 
                                                 if (mCurrentAutoAlignCommand != null) {
                                                         mCurrentAutoAlignCommand.cancel();
@@ -222,7 +225,9 @@ public class RobotContainer {
                         // Strafe Left: schedule and track the command, only one at a time
                         joystick.button(Constants.Joystick.strafeLeft)
                                         .whileTrue(new RunCommand(() -> {
-                                                int closest = m_vision.getClosestTagId();
+                                                Pose2d robotPose = m_drivetrain.getPose();
+                                                int closest = m_vision.getClosestTagId(robotPose);
+
 
                                                 if (mCurrentAutoAlignCommand != null) {
                                                         mCurrentAutoAlignCommand.cancel();
