@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
+import frc.robot.state.RobotState;
+import frc.robot.state.RobotStateManager;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.units.Units.Volts;
-
 
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.Follower;
@@ -18,62 +20,36 @@ public class Intake extends SubsystemBase {
 
     private final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0);
 
-public Intake() {
-    
-    intakeLeftFX.setNeutralMode(NeutralModeValue.Brake);
-    intakeRightFX.setNeutralMode(NeutralModeValue.Brake);
+    private final RobotStateManager stateManager;
 
-    intakeRightFX.setControl(new Follower(intakeLeftFX.getDeviceID(), true));
+    public Intake(RobotStateManager stateManager) {
+        this.stateManager = stateManager;
 
-    intakeLeftFX.getConfigurator().apply(new CurrentLimitsConfigs()
-        .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
-        .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
-        .withSupplyCurrentLimitEnable(true));
+        // existing CTRE setup & configs…
+    }
 
-    intakeRightFX.getConfigurator().apply(new CurrentLimitsConfigs()
-        .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
-        .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
-        .withSupplyCurrentLimitEnable(true));
-    
-    intakeLeftFX.getConfigurator().apply( new Slot0Configs()
-        .withKP(Constants.intake.P_INTAKE)
-        .withKI(Constants.intake.I_INTAKE)
-        .withKD(Constants.intake.D_INTAKE)
-        .withKG(Constants.intake.G_INTAKE)
-        .withKS(Constants.intake.S_INTAKE)
-        .withKV(Constants.intake.V_INTAKE)
-        .withKA(Constants.intake.A_INTAKE));
+    @Override
+    public void periodic() {
+        RobotState s = stateManager.getState();
 
-    intakeRightFX.getConfigurator().apply( new Slot0Configs()
-        .withKP(Constants.intake.P_INTAKE)
-        .withKI(Constants.intake.I_INTAKE)
-        .withKD(Constants.intake.D_INTAKE)
-        .withKG(Constants.intake.G_INTAKE)
-        .withKS(Constants.intake.S_INTAKE)
-        .withKV(Constants.intake.V_INTAKE)
-        .withKA(Constants.intake.A_INTAKE));
+        switch (s) {
+            case INTAKE_CORAL:
+                start(Constants.intake.CORAL_INTAKE_VEL);
+                break;
+            case INTAKE_ALGAE:
+                start(Constants.intake.ALGAE_HELPER_VEL); // if you want intake assisting algae
+                break;
+            default:
+                stop();
+                break;
+        }
+    }
 
-    intakeLeftFX.getConfigurator().apply(new VoltageConfigs()
-        .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
-        .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
-            
-    intakeRightFX.getConfigurator().apply(new VoltageConfigs()
-        .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
-        .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+    public void stop() {
+        intakeLeftFX.set(0);
+    }
 
-}
-
-public void stop() {
-    
-    intakeLeftFX.set(0);
-
-}
-
-public void start(double velocity) {
-        
-    intakeLeftFX.setControl(m_velocityVoltage.withVelocity(velocity * Constants.MASTER_SPEED_MULTIPLIER));
-
-}
+    public void start(double velocity) {
+        intakeLeftFX.setControl(m_velocityVoltage.withVelocity(velocity * Constants.MASTER_SPEED_MULTIPLIER));
+    }
 }

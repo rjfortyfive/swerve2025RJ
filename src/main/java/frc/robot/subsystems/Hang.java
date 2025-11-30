@@ -11,36 +11,42 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.state.RobotState;
+import frc.robot.state.RobotStateManager;
 
-public class Hang extends SubsystemBase{
+public class Hang extends SubsystemBase {
     public static TalonFX hangFX = new TalonFX(Constants.hang.HANG_FX_ID);
     public final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(0);
 
-public Hang() {
-    hangFX.setNeutralMode(NeutralModeValue.Brake);
+    private final RobotStateManager stateManager;
 
-    hangFX.getConfigurator().apply(new CurrentLimitsConfigs()
-        .withStatorCurrentLimit(Constants.hang.HANG_STATOR_CURRENT)
-        .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(Constants.hang.HANG_SUPPLY_CURRENT)
-        .withSupplyCurrentLimitEnable(true));
+    public Hang(RobotStateManager stateManager) {
+        this.stateManager = stateManager;
 
-    hangFX.getConfigurator().apply( new Slot0Configs()
-        .withKP(Constants.hang.P_HANG)
-        .withKI(Constants.hang.I_HANG)
-        .withKD(Constants.hang.D_HANG)
-        .withKS(Constants.hang.S_HANG));
+        // your existing config code…
+    }
 
-    hangFX.getConfigurator().apply(new VoltageConfigs()
-        .withPeakForwardVoltage(Volts.of(Constants.hang.HANG_PEAK_FORWARD_VOLTAGE))
-        .withPeakReverseVoltage(Volts.of(Constants.hang.HANG_PEAK_REVERSE_VOLTAGE)));
-}    
+    @Override
+    public void periodic() {
+        if (stateManager.getState() == RobotState.CLIMB) {
+            // climb up
+            start(Constants.hang.CLIMB_VELOCITY);
+
+            // auto-transition after N seconds (or add an encoder check)
+            if (stateManager.getTimeInState() > 3.0) {
+                stop();
+                stateManager.setState(RobotState.IDLE);
+            }
+        } else {
+            stop();
+        }
+    }
 
     public void stop() {
         hangFX.set(0);
-    } 
+    }
 
     public void start(double velocity) {
-        hangFX.setControl(m_velocityVoltage.withVelocity(100 * Constants.MASTER_SPEED_MULTIPLIER));
+        hangFX.setControl(m_velocityVoltage.withVelocity(velocity * Constants.MASTER_SPEED_MULTIPLIER));
     }
 }

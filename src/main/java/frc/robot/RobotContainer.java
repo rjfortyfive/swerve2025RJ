@@ -1,268 +1,247 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import static edu.wpi.first.wpilibj2.command.Commands.sequence;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequenceCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.*;
-import frc.robot.subsystems.*;
+
 import frc.robot.generated.TunerConstants;
-import frc.robot.util.TagUtils.tagSide;;
+import frc.robot.util.TagUtils.tagSide;
+
+import frc.robot.subsystems.*;
+
+import frc.robot.state.RobotState;
+import frc.robot.state.RobotStateManager;
 
 public class RobotContainer {
-        // Tracks the currently scheduled auto-align command for cancellation
-        private Command mCurrentAutoAlignCommand = null;
-        
-        private final SendableChooser<Command> autoChooser;
-        public static SendableChooser<Integer> positionChooser;
 
-        public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * 1; // kSpeedAt12Volts
-                                                                                                // desired
-                                                                                                // top
-                                                                                                // speed
-        public static double MaxAngularRate = RotationsPerSecond.of(2.5).in(RadiansPerSecond); // 3/4 of a rotation per
-                                                                                               // second
-                                                                                               // max angular velocity
+    // === State Machine ===
+    public final RobotStateManager stateManager = new RobotStateManager();
 
-        /* Setting up bindings for necessary control of the swerve drive platform */
-        public static final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-                        .withDeadband(MaxSpeed * 0.01).withRotationalDeadband(MaxAngularRate * 0.01) // Add a 10%
-                                                                                                     // deadband
-                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive
-                                                                                 // motors
-        private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    // === Auto ===
+    private final SendableChooser<Command> autoChooser;
+    public static SendableChooser<Integer> positionChooser;
 
-        private final Telemetry logger = new Telemetry(MaxSpeed);
+    // === Drive limits ===
+    public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+    public static double MaxAngularRate = RotationsPerSecond.of(2.5).in(RadiansPerSecond);
 
-        public static final CommandJoystick joystick = new CommandJoystick(0);
-        public static final CommandXboxController XboxController = new CommandXboxController(1);
-        public static final CommandJoystick buttonPanel = new CommandJoystick(2);
+    // === Requests ===
+    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+            .withDeadband(MaxSpeed * 0.01)
+            .withRotationalDeadband(MaxAngularRate * 0.01)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
-        public final static CommandSwerveDrivetrain m_drivetrain = TunerConstants.createDrivetrain();
-        public Elevator m_elevator = new Elevator();
-        public Effector m_effector = new Effector();
-        public Intake m_intake = new Intake();
-        public final Hang m_hang = new Hang();
-        public final Vision m_vision = new Vision();
+    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
-        public RobotContainer() {
+    // === Telemetry ===
+    private final Telemetry logger = new Telemetry(MaxSpeed);
 
-                configureBindings();
-                configureDefaultCommands();
-                configureNamedCommands();
+    // === Driver controls ===
+    public static final CommandJoystick driver = new CommandJoystick(0);
+    public static final CommandXboxController operator = new CommandXboxController(1);
+    public static final CommandJoystick panel = new CommandJoystick(2);
 
-                
-                autoChooser = AutoBuilder.buildAutoChooser("");
-                SmartDashboard.putData("Auto Chooser", autoChooser);
+    // === Subsystems ===
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final Elevator elevator = new Elevator(stateManager);
+    public final Effector effector = new Effector(stateManager);
+    public final Intake intake = new Intake(stateManager);
+    public final Hang hang = new Hang(stateManager);
+    public final Vision vision = new Vision();
+    public final Lights lights = new Lights(stateManager);
 
-                // Position chooser for autonomous starting positions
-                positionChooser = new SendableChooser<>();
-                positionChooser.setDefaultOption("Id 7", 1);
-                positionChooser.addOption("Skip", 2);
-                positionChooser.addOption("Id 8", 3);
-                positionChooser.addOption("Id 8", 4);
+    public RobotContainer() {
 
-                SmartDashboard.putData("Pose start", positionChooser);
+        configureBindings();
+        configureDefaultCommands();
+        configureNamedCommands();
 
-        }
+        autoChooser = AutoBuilder.buildAutoChooser("");
+        SmartDashboard.putData("Auto Chooser", autoChooser);
 
-        private void configureBindings() {
-                buttonPanel.button(Constants.buttonPanel.lift.L1)
-                                .onTrue(new InstantCommand(() -> m_elevator.toPosition(Constants.elevator.level.L1)));
-                buttonPanel.button(Constants.buttonPanel.lift.L2)
-                                .onTrue(new InstantCommand(() -> m_elevator.toPosition(Constants.elevator.level.L2)));
-                buttonPanel.button(Constants.buttonPanel.lift.L3)
-                                .onTrue(new InstantCommand(() -> m_elevator.toPosition(Constants.elevator.level.L3)));
-                buttonPanel.button(Constants.buttonPanel.lift.L4)
-                                .onTrue(new InstantCommand(() -> m_elevator.toPosition(Constants.elevator.level.L4)));
-                // buttonPanel.button(Constants.buttonPanel.algae.Lower)
-                //                 .onTrue(new InstantCommand(() -> Sequences.removeL2Algae()));
-                // buttonPanel.button(Constants.buttonPanel.algae.Upper)
-                //                 .onTrue(new InstantCommand(() -> Sequences.removeL3Algae()));
+        positionChooser = new SendableChooser<>();
+        positionChooser.setDefaultOption("ID 7", 1);
+        positionChooser.addOption("Skip", 2);
+        positionChooser.addOption("ID 8", 3);
+        positionChooser.addOption("ID 9", 4);
 
-                // toggle intake on/off each press
-                buttonPanel.button(Constants.buttonPanel.coral.IN)
-                                .whileTrue(new CoralIntake(m_elevator, m_effector, m_intake));
+        SmartDashboard.putData("Pose start", positionChooser);
 
-                buttonPanel.button(Constants.buttonPanel.coral.OUT)
-                                .onTrue(new ScoreL4L3L2(m_effector));
-
-                XboxController.a().onTrue(
-                                new SequentialCommandGroup(
-                                                new InstantCommand(() -> m_elevator
-                                                                .toPosition(Constants.elevator.level.L1 + 2))));
-
-                XboxController.x()
-                                .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
-
-                XboxController.y()
-                                .onTrue(new InstantCommand(() -> m_elevator.toPosition(0)));
-
-                XboxController.povUp()
-                                .whileTrue(new InstantCommand(() -> m_effector.algaeEffectorUp(1), m_effector));
-
-                XboxController.povDown()
-                                .whileTrue(new InstantCommand(() -> m_effector.algaeEffectorDown(1), m_effector));
-
-                XboxController.a()
-                                .whileTrue(new InstantCommand(() -> {
-                                        m_effector.start(20.0, 6.0);
-                                }, m_effector));
-
-                // Hang control triggers: Only when left bumper is held and a trigger is pressed
-                new Trigger(() -> XboxController.leftBumper().getAsBoolean()
-                                && XboxController.getRightTriggerAxis() > 0.25)
-                                .whileTrue(new InstantCommand(() -> m_hang.start(100), m_hang, m_drivetrain));
-
-                new Trigger(() -> XboxController.leftBumper().getAsBoolean()
-                                && XboxController.getLeftTriggerAxis() > 0.25)
-                                .whileTrue(new InstantCommand(() -> m_hang.start(-100), m_hang, m_drivetrain));
-                                                                            
+        drivetrain.registerTelemetry(logger::telemeterize);
+    }
 
 
-                // reset the field-centric heading on middle button press
+    // =======================================================================
+    //                       STATE MACHINE INPUT BINDINGS
+    // =======================================================================
 
-                // joystick.button(2).onTrue(drivetrain.runOnce(() ->
-                // drivetrain.seedFieldCentric()));
+    private void configureBindings() {
 
-                m_drivetrain.registerTelemetry(logger::telemeterize);
+        // === Lift Levels (Operator Panel) ===
+        panel.button(Constants.buttonPanel.lift.L1)
+                .onTrue(new InstantCommand(() ->
+                        stateManager.setState(RobotState.INTAKE_CORAL)));
 
-                // Button commands
+        panel.button(Constants.buttonPanel.lift.L2)
+                .onTrue(new InstantCommand(() ->
+                        stateManager.setState(RobotState.SCORE_CORAL)));
 
-                // Button commands and stick-based triggers for strafeRight and strafeLeft
-                if (!Constants.MASTER_NERF) {
-                        // Strafe Right: schedule and track the command, only one at a time
-                        joystick.button(Constants.Joystick.STRAFE_RIGHT)
-                                .whileTrue(new MakeGoToTag(
-                                        m_drivetrain,
-                                        m_vision,
-                                        tagSide.RIGHT,
-                                        0.197,
-                                        0.345
-                                ));
+        panel.button(Constants.buttonPanel.lift.L3)
+                .onTrue(new InstantCommand(() ->
+                        stateManager.setState(RobotState.SCORE_CORAL)));
 
-                        // Strafe Left: schedule and track the command, only one at a time
-                        joystick.button(Constants.Joystick.STRAFE_RIGHT)
-                                .whileTrue(new MakeGoToTag(
-                                        m_drivetrain,
-                                        m_vision,
-                                        tagSide.LEFT,
-                                        0.165,
-                                        0.345
-                                ));
-                    
+        panel.button(Constants.buttonPanel.lift.L4)
+                .onTrue(new InstantCommand(() ->
+                        stateManager.setState(RobotState.SCORE_CORAL)));
 
-                        // Add a cancel binding
-                        joystick.button(Constants.Joystick.FUNCTION_1).onTrue(new InstantCommand(() -> {
-                                if (mCurrentAutoAlignCommand != null) {
-                                        mCurrentAutoAlignCommand.cancel();
-                                        mCurrentAutoAlignCommand = null;
-                                }
-                        }));
+        // === Coral Intake (Panel) ===
+        panel.button(Constants.buttonPanel.coral.IN)
+                .onTrue(new InstantCommand(() ->
+                        stateManager.setState(RobotState.INTAKE_CORAL)));
+
+        // === Coral Out (Panel) ===
+        panel.button(Constants.buttonPanel.coral.OUT)
+                .onTrue(new InstantCommand(() ->
+                        stateManager.setState(RobotState.SCORE_CORAL)));
+
+        // === Operator Controls ===
+        operator.x().onTrue(
+                new InstantCommand(() -> stateManager.setState(RobotState.INTAKE_CORAL)));
+
+        operator.y().onTrue(
+                new InstantCommand(() -> stateManager.setState(RobotState.IDLE)));
+
+        operator.a().onTrue(
+                new InstantCommand(() -> stateManager.setState(RobotState.SCORE_CORAL)));
+
+        operator.povUp().onTrue(
+                new InstantCommand(() -> stateManager.setState(RobotState.SCORE_ALGAE)));
+
+        operator.povDown().onTrue(
+                new InstantCommand(() -> stateManager.setState(RobotState.INTAKE_ALGAE)));
+
+        operator.start().onTrue(
+                new InstantCommand(() -> stateManager.setState(RobotState.CLIMB)));
+
+        // === Vision Alignment ===
+        driver.button(Constants.Joystick.STRAFE_RIGHT)
+                .onTrue(new InstantCommand(() -> stateManager.setState(RobotState.ALIGN_VISION)));
+
+        // === Cancel Align ===
+        driver.button(Constants.Joystick.FUNCTION_1)
+                .onTrue(new InstantCommand(() -> stateManager.setState(RobotState.DRIVE)));
+
+        // === Manual Override ===
+        operator.back().onTrue(
+                new InstantCommand(() -> stateManager.setState(RobotState.MANUAL_OVERRIDE)));
+    }
 
 
-                }
-        }
+    // =======================================================================
+    //                      DEFAULT COMMANDS (STATE AWARE)
+    // =======================================================================
 
-        private void configureNamedCommands() {
-                NamedCommands.registerCommand("scoreL1Coral",
-                                new SequentialCommandGroup(
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L1 + 2.0),
-                                                                m_elevator),
-                                                new InstantCommand(() -> m_effector.start(30, 10),
-                                                                m_effector),
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(Constants.elevator.level.L1),
-                                                                m_elevator)));
+    private void configureDefaultCommands() {
 
-                NamedCommands.registerCommand("scoreL4Coral",
-                                new SequentialCommandGroup(
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L4 - 0.5),
-                                                                m_elevator),
+        drivetrain.setDefaultCommand(
+                Commands.run(() -> {
 
-                                                new WaitCommand(.9),
+                    RobotState s = stateManager.getState();
 
-                                                new ScoreL4L3L2(m_effector),
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L1))));
+                    if (s == RobotState.DRIVE || s == RobotState.ALIGN_VISION) {
 
-                NamedCommands.registerCommand("startIntakeCoral",
-                                sequence(
-                                                // 1) move the elevator up to position intake
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.INTAKE),
-                                                                m_elevator),
+                        double vx = -driver.getY() * MaxSpeed * Constants.MASTER_DRIVE_MULTIPLIER;
+                        double vy = -driver.getX() * MaxSpeed * Constants.MASTER_DRIVE_MULTIPLIER;
+                        double rot = -driver.getTwist() * MaxAngularRate * Constants.MASTER_DRIVE_MULTIPLIER;
 
-                                                new InstantCommand(
-                                                                () -> m_effector.start(40),
-                                                                m_effector
+                        if (s == RobotState.ALIGN_VISION) {
+                            drivetrain.driveTeleop(vx, vy, rot, true, vision);
+                        } else {
+                            drivetrain.driveTeleop(vx, vy, rot, false, vision);
+                        }
 
-                                                )));
+                    } else {
+                        drivetrain.stop();
+                    }
+                }, drivetrain));
 
-                NamedCommands.registerCommand("raiseL2",
-                                sequence(
-                                                // 1) move the elevator up to L2
-                                                new InstantCommand(
-                                                                () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L2 + 5),
-                                                                m_elevator)
+        // Effector manual override only works in MANUAL mode
+        effector.setDefaultCommand(
+                Commands.run(() -> {
 
-                                ));
-                NamedCommands.registerCommand("intakeCoral",
-                                sequence(new CoralIntake(m_elevator, m_effector, m_intake)));
+                    if (stateManager.getState() != RobotState.MANUAL_OVERRIDE) {
+                        effector.stop();
+                        return;
+                    }
 
-        }
+                    double lt = operator.getLeftTriggerAxis();
+                    double rt = operator.getRightTriggerAxis();
 
-        private void configureDefaultCommands() {
-                m_drivetrain.setDefaultCommand(
-                        m_drivetrain.applyRequest(() -> drive
-                                        .withVelocityX(joystick.getY() * MaxSpeed * Constants.MASTER_DRIVE_MULTIPLIER)
-                                        .withVelocityY(joystick.getX()  * MaxSpeed * Constants.MASTER_DRIVE_MULTIPLIER)
-                                        .withRotationalRate(-joystick.getTwist()  * MaxAngularRate * Constants.MASTER_DRIVE_MULTIPLIER)));
+                    if (lt > 0.1) {
+                        effector.start(-40 * lt);
+                    } else if (rt > 0.1) {
+                        effector.start(40 * rt);
+                    } else {
+                        effector.stop();
+                    }
 
-                m_effector.setDefaultCommand(new RunCommand(() -> {
-                        double lt = XboxController.getLeftTriggerAxis();
-                        double rt = XboxController.getRightTriggerAxis();
-                                                    
-                                if (lt > 0.1) {
-                                        m_effector.start(-0.5 * 70 * lt);
-                                } else if (rt > 0.1) {
-                                        m_effector.start(0.5 * 70 * rt);
-                                } else {
-                                        m_effector.start(0);
-                                }
-                                }, m_effector));
-        }
+                }, effector));
+    }
 
-        public Command getAutonomousCommand() {
-                // return Commands.print("No autonomous command configured");
-                return autoChooser.getSelected();
-        }
+
+    // =======================================================================
+    //                         PATHPLANNER NAMED COMMANDS
+    // =======================================================================
+
+    private void configureNamedCommands() {
+
+        NamedCommands.registerCommand("INTAKE_CORAL",
+                new InstantCommand(() -> stateManager.setState(RobotState.INTAKE_CORAL)));
+
+        NamedCommands.registerCommand("SCORE_CORAL",
+                new InstantCommand(() -> stateManager.setState(RobotState.SCORE_CORAL)));
+
+        NamedCommands.registerCommand("ALIGN_VISION",
+                new InstantCommand(() -> stateManager.setState(RobotState.ALIGN_VISION)));
+
+        NamedCommands.registerCommand("INTAKE_ALGAE",
+                new InstantCommand(() -> stateManager.setState(RobotState.INTAKE_ALGAE)));
+
+        NamedCommands.registerCommand("SCORE_ALGAE",
+                new InstantCommand(() -> stateManager.setState(RobotState.SCORE_ALGAE)));
+
+        NamedCommands.registerCommand("CLIMB",
+                new InstantCommand(() -> stateManager.setState(RobotState.CLIMB)));
+
+        NamedCommands.registerCommand("IDLE",
+                new InstantCommand(() -> stateManager.setState(RobotState.IDLE)));
+    }
+
+
+    // =======================================================================
+    //                           AUTONOMOUS CHOICE
+    // =======================================================================
+
+    public Command getAutonomousCommand() {
+        return autoChooser.getSelected();
+    }
 }
