@@ -30,6 +30,8 @@ public class Vision extends SubsystemBase {
     private Pose2d latestPose;
     private Matrix<N3, N1> latestStdDevs;
     private int lastSeenTagId = -1;
+    private double latestTimestamp = -1.0; 
+
 
     public Vision() {
         camera1.setPipelineIndex(0);
@@ -51,32 +53,39 @@ public class Vision extends SubsystemBase {
     private void updateCamera(PhotonPoseEstimator estimator, PhotonCamera camera) {
         var results = camera.getAllUnreadResults();
         if (results.isEmpty()) return;
-
+    
         var last = results.get(results.size() - 1);
         var maybeEst = estimator.update(last);
         if (maybeEst.isEmpty()) return;
-
+    
         var visionEst = maybeEst.get();
         Pose2d visionPose = visionEst.estimatedPose.toPose2d();
         var targets = last.getTargets();
-
+    
+        // PhotonVision pose timestamp (seconds, same base as WPILib Timer)
+        double ts = visionEst.timestampSeconds;
+    
         // Std dev calculation
         Matrix<N3, N1> stdDevs = kSingleTagStdDevs;
         int numTags = 0;
         double avgTagDist = 0.0;
-
+    
         for (var tgt : targets) {
             var tagPose = estimator.getFieldTags().getTagPose(tgt.getFiducialId());
             if (tagPose.isEmpty()) continue;
-
+    
             lastSeenTagId = tgt.getFiducialId();
             numTags++;
-            avgTagDist += tagPose.get().toPose2d().getTranslation().getDistance(visionPose.getTranslation());
+            avgTagDist += tagPose.get().toPose2d()
+                    .getTranslation()
+                    .getDistance(visionPose.getTranslation());
         }
-
+    
         if (numTags > 0) {
             avgTagDist /= numTags;
-            if (numTags > 1) stdDevs = kMultiTagStdDevs;
+            if (numTags > 1) {
+                stdDevs = kMultiTagStdDevs;
+            }
             if (numTags == 1 && avgTagDist > 3.0) {
                 stdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
             } else {
@@ -84,10 +93,15 @@ public class Vision extends SubsystemBase {
                 stdDevs = stdDevs.times(1.0 + normDist * normDist);
             }
         }
-
-        latestPose = visionPose;
-        latestStdDevs = stdDevs;
+    
+        // 🔑 Only accept this measurement if it's newer than what we have
+        if (latestPose == null || ts > latestTimestamp) {
+            latestPose = visionPose;
+            latestStdDevs = stdDevs;
+            latestTimestamp = ts;
+        }
     }
+    
 
     public Pose2d getLatestPose() {
         return latestPose;
@@ -110,5 +124,11 @@ public class Vision extends SubsystemBase {
                                 .orElse(Double.MAX_VALUE)))
                 .orElse(Constants.Vision.kTags.get(0));
     }
+
+    public double getLatestTimestamp() {
+
+        return latestTimestamp;
+    }
+    
 }
 

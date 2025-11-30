@@ -253,7 +253,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (vision != null && DriverStation.isEnabled() && vision.getLatestPose() != null) {
         addVisionMeasurement(
             vision.getLatestPose(),
-            Timer.getFPGATimestamp(), // or use vision timestamp if desired
+            vision.getLatestTimestamp(), // or use vision timestamp if desired
             vision.getLatestStdDevs()
         );
     }    
