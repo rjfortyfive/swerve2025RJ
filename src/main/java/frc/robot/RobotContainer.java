@@ -67,13 +67,11 @@ public class RobotContainer {
         public final Vision m_vision = new Vision();
 
         public RobotContainer() {
-                // vision = new Vision((pose, timestamp, stdDevs) -> drivetrain.addVisionMeasurement(pose, timestamp,
-                //                 stdDevs));
+
                 configureBindings();
                 configureDefaultCommands();
                 configureNamedCommands();
 
-                m_drivetrain.setVision(m_vision);
                 
                 autoChooser = AutoBuilder.buildAutoChooser("");
                 SmartDashboard.putData("Auto Chooser", autoChooser);
