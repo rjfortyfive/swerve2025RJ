@@ -115,7 +115,7 @@ public class RobotContainer {
 
                 XboxController.rightBumper().whileTrue(new RunCommand(
                                 () -> m_effector.start(
-                                                XboxController.getRawAxis(Constants.XboxController.axis.RightYAxis)
+                                                XboxController.getRightTriggerAxis()
                                                                 * 10)));
 
                 XboxController.x()
@@ -136,12 +136,12 @@ public class RobotContainer {
                                 }, m_effector));
 
                 // Hang control triggers: Only when left bumper is held and a trigger is pressed
-                new Trigger(() -> XboxController.button(Constants.XboxController.bumper.Left).getAsBoolean()
-                                && XboxController.getRawAxis(Constants.XboxController.axis.RightTrigger) > 0.25)
+                new Trigger(() -> XboxController.leftBumper().getAsBoolean()
+                                && XboxController.getRightTriggerAxis() > 0.25)
                                 .whileTrue(new InstantCommand(() -> m_hang.start(100), m_hang, m_drivetrain));
 
-                new Trigger(() -> XboxController.button(Constants.XboxController.bumper.Left).getAsBoolean()
-                                && XboxController.getRawAxis(Constants.XboxController.axis.LeftTrigger) > 0.25)
+                new Trigger(() -> XboxController.leftBumper().getAsBoolean()
+                                && XboxController.getLeftTriggerAxis() > 0.25)
                                 .whileTrue(new InstantCommand(() -> m_hang.start(-100), m_hang, m_drivetrain));
                                                                             
 
