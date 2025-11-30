@@ -38,7 +38,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
-
+    private Vision vision;
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
     /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
@@ -158,35 +158,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
-//         RobotConfig config;
-//         try {
-//             config = RobotConfig.fromGUISettings();
-//     } catch(Exception e) {
-//         e.printStackTrace();
-//     }
-//     AutoBuilder.configure(
-//         this::getPose, // Robot pose supplier
-//         this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-//         this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-//         (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-//         new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-//                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-//                 new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-//         ),
-//         config, // The robot configuration
-//         () -> {
-//           // Boolean supplier that controls when the path will be mirrored for the red alliance
-//           // This will flip the path being followed to the red side of the field.
-//           // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-//           var alliance = DriverStation.getAlliance();
-//           if (alliance.isPresent()) {
-//             return alliance.get() == DriverStation.Alliance.Red;
-//           }
-//           return false;
-//         },
-//         this // Reference to this subsystem to set requirements
-// );
     }
 
     /**
@@ -276,7 +248,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
-    }
+
+    if (vision != null 
+            && DriverStation.isEnabled() 
+            && vision.getLatestPose() != null 
+            && vision.getLatestStdDevs() != null) {
+
+        addVisionMeasurement(
+            vision.getLatestPose(),
+            vision.getLatestTimestamp(),
+            vision.getLatestStdDevs()
+    );
+}
+
+    }    
+
 
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
