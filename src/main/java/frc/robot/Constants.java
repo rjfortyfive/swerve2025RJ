@@ -25,42 +25,6 @@ public class Constants {
 
     public static final double MASTER_VOLTAGE_MULTIPLIER = 1;
 
-    // Right Camera
-    public static final String CAMERA_NAME_1 = "EagleEye01";
-
-    // Left Camera
-    public static final String CAMERA_NAME_2 = "EagleEye02";
-
-    // Cam mounted facing forward, half a meter forward of center, half a meter up
-    // from center.
-
-    // Right Cam
-    public static final Transform3d ROBOT_TO_CAM_1 = new Transform3d(new Translation3d(0.2786892, -0.2726416, 0.1499719),
-            new Rotation3d(0, -0.3490659, 0.1745329));
-
-    // Left Cam
-    public static final Transform3d ROBOT_TO_CAM_2 = new Transform3d(new Translation3d(0.2764772, 0.2724549, 0.1499719),
-            new Rotation3d(0, -0.3490659, -0.1745329));
-
-    // Andymark Field Layout
-    public static final AprilTagFieldLayout TAG_LAYOUT = AprilTagFieldLayout
-            .loadField(AprilTagFields.k2025ReefscapeAndyMark);
-    public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(
-            0.25, // σₓ: odometry may drift ±10 cm
-            0.25, // σᵧ: same sideways
-            Math.toRadians(.15) // σθ: roughly ±5° heading error
-    );
-    public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(
-            0.18, // σₓ: vision ±0.5 cm
-            0.18, // σᵧ: ±0.5 cm
-            Math.toRadians(.025) // σθ: ±2°
-    );
-    public static final Matrix<N3, N1> ODOMETRY_STD_DEVS = VecBuilder.fill(
-            0.075, // 2 cm
-            0.075, // 2 cm
-            Math.toRadians(.1) // 2°
-    );
-
     public static class Pathfinding {
         // max translation m/s
         public static final double MAX_SPEED = 5;
@@ -81,14 +45,33 @@ public class Constants {
     }
 
     public static class Vision {
-        public static final String CAMERA_NAME_1 = Constants.CAMERA_NAME_1;
-        public static final Transform3d ROBOT_TO_CAM_1 = Constants.ROBOT_TO_CAM_1;
-        public static final String CAMERA_NAME_2 = Constants.CAMERA_NAME_2;
-        public static final Transform3d ROBOT_TO_CAM_2 = Constants.ROBOT_TO_CAM_2;
-        public static final AprilTagFieldLayout TAG_LAYOUT = Constants.TAG_LAYOUT;
-        public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = Constants.SINGLE_TAG_STD_DEVS;
-        public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = Constants.MULTI_TAG_STD_DEVS;
-        public static final Matrix<N3, N1> ODOMETRY_STD_DEVS = Constants.ODOMETRY_STD_DEVS;
+        // Cam mounted facing forward, half a meter forward of center, half a meter up
+        // from center.
+        //right camera
+        public static final String CAMERA_NAME_1 = "EagleEye01";
+        public static final Transform3d ROBOT_TO_CAM_1 = new Transform3d(new Translation3d(0.2786892, -0.2726416, 0.1499719),
+        new Rotation3d(0, -0.3490659, 0.1745329));
+        //left camera
+        public static final String CAMERA_NAME_2 = "EagleEye02";
+        public static final Transform3d ROBOT_TO_CAM_2 = new Transform3d(new Translation3d(0.2764772, 0.2724549, 0.1499719),
+        new Rotation3d(0, -0.3490659, -0.1745329));
+        public static final AprilTagFieldLayout TAG_LAYOUT = AprilTagFieldLayout
+        .loadField(AprilTagFields.k2025ReefscapeAndyMark);
+        public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(
+            0.25, // σₓ: odometry may drift ±10 cm
+            0.25, // σᵧ: same sideways
+            Math.toRadians(.15) // σθ: roughly ±5° heading error
+    );
+        public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(
+            0.18, // σₓ: vision ±0.5 cm
+            0.18, // σᵧ: ±0.5 cm
+            Math.toRadians(.025) // σθ: ±2°
+    );
+        public static final Matrix<N3, N1> ODOMETRY_STD_DEVS = VecBuilder.fill(
+            0.075, // 2 cm
+            0.075, // 2 cm
+            Math.toRadians(.1) // 2°
+    );
         public static List<Integer> TAGS = List.of();
 
         /** Odometry update rate in Hz for the SwerveDrivePoseEstimator */
