@@ -1,8 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
-import frc.robot.state.RobotState;
-import frc.robot.state.RobotStateManager;
+import frc.robot.state.*;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.units.Units.Volts;
@@ -15,30 +14,74 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class Intake extends SubsystemBase {
 
+    private final RobotStateManager sm;
+
     private static TalonFX intakeLeftFX = new TalonFX(Constants.intake.INTAKE_LEFT_FX_ID);
     private static TalonFX intakeRightFX = new TalonFX(Constants.intake.INTAKE_RIGHT_FX_ID);
 
     private final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0);
 
-    private final RobotStateManager stateManager;
+    public Intake(RobotStateManager sm) {
+        this.sm = sm;
 
-    public Intake(RobotStateManager stateManager) {
-        this.stateManager = stateManager;
+        // 🔒 CONFIG UNCHANGED
+        intakeLeftFX.setNeutralMode(NeutralModeValue.Brake);
+        intakeRightFX.setNeutralMode(NeutralModeValue.Brake);
 
-        // existing CTRE setup & configs…
+        intakeRightFX.setControl(new Follower(intakeLeftFX.getDeviceID(), true));
+
+        intakeLeftFX.getConfigurator().apply(new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
+            .withSupplyCurrentLimitEnable(true));
+
+        intakeRightFX.getConfigurator().apply(new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
+            .withSupplyCurrentLimitEnable(true));
+
+        intakeLeftFX.getConfigurator().apply( new Slot0Configs()
+            .withKP(Constants.intake.P_INTAKE)
+            .withKI(Constants.intake.I_INTAKE)
+            .withKD(Constants.intake.D_INTAKE)
+            .withKG(Constants.intake.G_INTAKE)
+            .withKS(Constants.intake.S_INTAKE)
+            .withKV(Constants.intake.V_INTAKE)
+            .withKA(Constants.intake.A_INTAKE));
+
+        intakeRightFX.getConfigurator().apply( new Slot0Configs()
+            .withKP(Constants.intake.P_INTAKE)
+            .withKI(Constants.intake.I_INTAKE)
+            .withKD(Constants.intake.D_INTAKE)
+            .withKG(Constants.intake.G_INTAKE)
+            .withKS(Constants.intake.S_INTAKE)
+            .withKV(Constants.intake.V_INTAKE)
+            .withKA(Constants.intake.A_INTAKE));
+
+        intakeLeftFX.getConfigurator().apply(new VoltageConfigs()
+            .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
+            .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+
+        intakeRightFX.getConfigurator().apply(new VoltageConfigs()
+            .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
+            .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
     }
 
     @Override
     public void periodic() {
-        RobotState s = stateManager.getState();
 
-        switch (s) {
+        switch (sm.getState()) {
+
             case INTAKE_CORAL:
-                start(Constants.intake.CORAL_INTAKE_VEL);
+                start(Constants.intake.CORAL_VELOCITY);
                 break;
+
             case INTAKE_ALGAE:
-                start(Constants.intake.ALGAE_HELPER_VEL); // if you want intake assisting algae
+                start(Constants.intake.ALGAE_VELOCITY);
                 break;
+
             default:
                 stop();
                 break;

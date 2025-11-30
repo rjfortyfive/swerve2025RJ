@@ -290,4 +290,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             DriverStation.reportError("Failed to load PathPlanner config and configure Autobuilder", ex.getStackTrace());
         }
     }
+    public void driveTeleop(double x, double y, double rot, boolean alignWithVision, Vision vision) {
+        if (alignWithVision && vision.hasPose()) {
+            // Example: simple “point at tag” heading controller
+            Pose2d currentPose = getState().Pose;
+            int tagId = vision.getLastSeenTagId();
+            // compute desired heading, run your own heading PID, etc...
+            // then call setControl(...) with a SwerveRequest that uses that heading
+        } else {
+            // your normal field-centric drive code here
+        }
+    }
+    
+    public void stop() {
+        // a reasonable field-centric stop —
+        // or just use an existing request you have for braking
+        this.setControl(new SwerveRequest.Idle());
+    }
+    
 }

@@ -1,8 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
-import frc.robot.state.RobotState;
-import frc.robot.state.RobotStateManager;
+import frc.robot.state.*;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -26,6 +25,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase;
 
 public class Effector extends SubsystemBase {
+    private final RobotStateManager sm;
+
     private static LaserCan intakeSensor = new LaserCan(2);
 
     private static TalonFX effectorLeftFX = new TalonFX(Constants.effector.EFFECTOR_LEFT_FX_ID);
@@ -36,75 +37,160 @@ public class Effector extends SubsystemBase {
     private final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0);
     private final static PositionVoltage m_positionVoltage = new PositionVoltage(0);
 
-    private final RobotStateManager stateManager;
+    public Effector(RobotStateManager sm) {
+        this.sm = sm;
 
-    public Effector(RobotStateManager stateManager) {
-        this.stateManager = stateManager;
+        // 🔒 ALL YOUR ORIGINAL CONFIGURATION
+        SparkMaxConfig algaeConfig = new SparkMaxConfig();
 
-        // your existing CTRE + REV config code here...
+        effectorLeftFX.setNeutralMode(NeutralModeValue.Brake);
+        effectorRightFX.setNeutralMode(NeutralModeValue.Brake);
+
+        algaeConfig.idleMode(IdleMode.kBrake);
+
+        effectorRightFX.getConfigurator().apply(new MotorOutputConfigs()
+            .withInverted(InvertedValue.Clockwise_Positive));
+
+        effectorLeftFX.getConfigurator().apply(new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
+            .withSupplyCurrentLimitEnable(true));
+
+        effectorRightFX.getConfigurator().apply(new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
+            .withStatorCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
+            .withSupplyCurrentLimitEnable(true));
+        
+        algaeConfig.smartCurrentLimit(20);
+
+        effectorLeftFX.getConfigurator().apply(new Slot0Configs()
+            .withKP(Constants.effector.P_EFFECTOR)
+            .withKI(Constants.effector.I_EFFECTOR)
+            .withKD(Constants.effector.D_EFFECTOR)
+            .withKG(Constants.effector.G_EFFECTOR)
+            .withKS(Constants.effector.S_EFFECTOR)
+            .withKV(Constants.effector.V_EFFECTOR)
+            .withKA(Constants.effector.A_EFFECTOR));
+            
+        effectorRightFX.getConfigurator().apply(new Slot0Configs()
+            .withKP(Constants.effector.P_EFFECTOR)
+            .withKI(Constants.effector.I_EFFECTOR)
+            .withKD(Constants.effector.D_EFFECTOR)
+            .withKG(Constants.effector.G_EFFECTOR)
+            .withKS(Constants.effector.S_EFFECTOR)
+            .withKV(Constants.effector.V_EFFECTOR)
+            .withKA(Constants.effector.A_EFFECTOR));
+        
+        effectorLeftFX.getConfigurator().apply(new VoltageConfigs()
+            .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
+            .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+            
+        effectorRightFX.getConfigurator().apply(new VoltageConfigs()
+            .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
+            .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+        
+        effectorLeftFX.getConfigurator().apply(new MotionMagicConfigs()
+            .withMotionMagicCruiseVelocity(RotationsPerSecond.of(30 * Constants.MASTER_SPEED_MULTIPLIER))
+            .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.MASTER_SPEED_MULTIPLIER)));
+
+        effectorRightFX.getConfigurator().apply(new MotionMagicConfigs()
+            .withMotionMagicCruiseVelocity(RotationsPerSecond.of(30 * Constants.MASTER_SPEED_MULTIPLIER))
+            .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.MASTER_SPEED_MULTIPLIER)));
+    
+        AbsoluteEncoderConfig algaeEncoder = algaeConfig.absoluteEncoder;
+        algaeEncoder.positionConversionFactor(1.0);
+        algaeEncoder.velocityConversionFactor(1.0);
+        algaeEncoder.zeroOffset(0.0);
+
+        algaeMotor.configure(
+            algaeConfig,
+            SparkBase.ResetMode.kResetSafeParameters, 
+            SparkBase.PersistMode.kPersistParameters
+        );
     }
 
     @Override
     public void periodic() {
-        RobotState s = stateManager.getState();
+        RobotState s = sm.getState();
+
+        // Don't fight manual control
+        if (s == RobotState.MANUAL_OVERRIDE) {
+            return;
+        }
 
         switch (s) {
             case INTAKE_CORAL:
-                // Intake inward until LaserCan sees a coral, then auto-idle
-                start(Constants.effector.CORAL_INTAKE_VEL);
-                algaeMotor.set(0); // algae off
+                // Coral intake inwards
+                start(Constants.effector.CORAL_INTAKE_VELOCITY);
+                algaeMotor.set(0);
 
-                if (isCoralDetected() && stateManager.getTimeInState() > 0.2) {
+                // Auto-exit when coral detected & small dwell time
+                if (isCoralDetected() && sm.timeInState() > 0.25) {
                     stop();
-                    stateManager.setState(RobotState.IDLE);
+                    sm.setState(RobotState.IDLE);
                 }
                 break;
 
             case SCORE_CORAL:
-                // Spit coral outwards for a bit, then auto-idle
-                start(Constants.effector.CORAL_SCORE_VEL);
+                // Coral outwards (scoring)
+                start(Constants.effector.CORAL_SCORE_VELOCITY);
                 algaeMotor.set(0);
 
-                if (stateManager.getTimeInState() > 0.5) {
+                if (sm.timeInState() > 0.5) {
                     stop();
-                    stateManager.setState(RobotState.IDLE);
+                    sm.setState(RobotState.IDLE);
                 }
                 break;
 
             case INTAKE_ALGAE:
-                // Use algae motor to pull in
-                start(0);
+                // Algae intake
+                start(0); // keep coral wheels off or mild help if desired
                 algaeEffectorDown(Constants.effector.ALGAE_IN_PERCENT);
 
-                // Auto-transition purely time based (unless you later add a sensor)
-                if (stateManager.getTimeInState() > 1.0) {
+                if (sm.timeInState() > 1.0) {
                     algaeMotor.set(0);
-                    stateManager.setState(RobotState.IDLE);
+                    sm.setState(RobotState.IDLE);
                 }
                 break;
 
             case SCORE_ALGAE:
-                // push algae out
+                // Algae scoring
                 start(0);
                 algaeEffectorUp(Constants.effector.ALGAE_OUT_PERCENT);
 
-                if (stateManager.getTimeInState() > 0.7) {
+                if (sm.timeInState() > 0.7) {
                     algaeMotor.set(0);
-                    stateManager.setState(RobotState.IDLE);
+                    sm.setState(RobotState.IDLE);
                 }
                 break;
 
             default:
-                // Any other state → stop everything
+                // Any other state -> stop
                 stop();
                 algaeMotor.set(0);
                 break;
         }
     }
 
+    public double getLeftPosition() {
+        return effectorLeftFX.getPosition().getValueAsDouble();
+    }
+
+    public double getRightPosition() {
+        return effectorRightFX.getPosition().getValueAsDouble();
+    }
+
     public void moveToPositions(double leftPos, double rightPos) {
         effectorLeftFX.setControl(m_positionVoltage.withPosition(leftPos));
         effectorRightFX.setControl(m_positionVoltage.withPosition(rightPos));
+    }
+
+    public boolean coralAtPosition(double leftTarget, double rightTarget) {
+        double leftErr  = Math.abs(getLeftPosition()  - leftTarget);
+        double rightErr = Math.abs(getRightPosition() - rightTarget);
+        return leftErr < 0.02 && rightErr < 0.02;
     }
 
     public void stop() {
@@ -114,7 +200,7 @@ public class Effector extends SubsystemBase {
 
     public void start(double velocity) {
         effectorLeftFX.setControl(m_velocityVoltage.withVelocity(velocity * Constants.MASTER_SPEED_MULTIPLIER));
-        effectorRightFX.setControl(m_velocityVoltage.withVelocity(-velocity * Constants.MASTER_SPEED_MULTIPLIER));
+        effectorRightFX.setControl(m_velocityVoltage.withVelocity(velocity * Constants.MASTER_SPEED_MULTIPLIER));
     }
 
     public void start(double velocityLeft, double velocityRight) {
@@ -127,7 +213,7 @@ public class Effector extends SubsystemBase {
         double rightCurrentPos = effectorRightFX.getPosition().getValueAsDouble();
 
         double leftTarget = leftCurrentPos + Constants.intake.LOCK_ROTATIONS;
-        double rightTarget = rightCurrentPos - Constants.intake.LOCK_ROTATIONS;
+        double rightTarget = rightCurrentPos - Constants.intake.LOCK_ROTATIONS; 
 
         effectorLeftFX.setControl(m_positionVoltage.withPosition(leftTarget));
         effectorRightFX.setControl(m_positionVoltage.withPosition(rightTarget));

@@ -2,244 +2,206 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequenceCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import frc.robot.generated.TunerConstants;
+import frc.robot.state.*;
+import frc.robot.subsystems.*;
 import frc.robot.util.TagUtils.tagSide;
 
-import frc.robot.subsystems.*;
-
-import frc.robot.state.RobotState;
-import frc.robot.state.RobotStateManager;
-
+/**
+ * Full state-machine RobotContainer
+ */
 public class RobotContainer {
 
-    // === State Machine ===
-    public final RobotStateManager stateManager = new RobotStateManager();
+    // State Machine
+    private final RobotStateManager sm = new RobotStateManager();
 
-    // === Auto ===
     private final SendableChooser<Command> autoChooser;
     public static SendableChooser<Integer> positionChooser;
 
-    // === Drive limits ===
     public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-    public static double MaxAngularRate = RotationsPerSecond.of(2.5).in(RadiansPerSecond);
+    public static double MaxAngularRate = RadiansPerSecond.of(3.0);
 
-    // === Requests ===
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+    // Drive request
+    public static final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.01)
             .withRotationalDeadband(MaxAngularRate * 0.01)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-
-    // === Telemetry ===
-    private final Telemetry logger = new Telemetry(MaxSpeed);
-
-    // === Driver controls ===
     public static final CommandJoystick driver = new CommandJoystick(0);
     public static final CommandXboxController operator = new CommandXboxController(1);
-    public static final CommandJoystick panel = new CommandJoystick(2);
 
-    // === Subsystems ===
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    public final Elevator elevator = new Elevator(stateManager);
-    public final Effector effector = new Effector(stateManager);
-    public final Intake intake = new Intake(stateManager);
-    public final Hang hang = new Hang(stateManager);
+    // Subsystems
+    public final static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final Elevator elevator = new Elevator(sm);
+    public final Effector effector = new Effector(sm);
+    public final Intake intake = new Intake(sm);
+    public final Hang hang = new Hang(sm);
+    public final Lights lights = new Lights(sm);    
     public final Vision vision = new Vision();
-    public final Lights lights = new Lights(stateManager);
 
     public RobotContainer() {
 
         configureBindings();
         configureDefaultCommands();
-        configureNamedCommands();
 
         autoChooser = AutoBuilder.buildAutoChooser("");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         positionChooser = new SendableChooser<>();
-        positionChooser.setDefaultOption("ID 7", 1);
+        positionChooser.setDefaultOption("Id 7", 1);
         positionChooser.addOption("Skip", 2);
-        positionChooser.addOption("ID 8", 3);
-        positionChooser.addOption("ID 9", 4);
-
+        positionChooser.addOption("Id 8", 3);
         SmartDashboard.putData("Pose start", positionChooser);
-
-        drivetrain.registerTelemetry(logger::telemeterize);
     }
 
-
-    // =======================================================================
-    //                       STATE MACHINE INPUT BINDINGS
-    // =======================================================================
-
+    /**
+     * Button bindings converted to state transitions
+     */
     private void configureBindings() {
 
-        // === Lift Levels (Operator Panel) ===
-        panel.button(Constants.buttonPanel.lift.L1)
-                .onTrue(new InstantCommand(() ->
-                        stateManager.setState(RobotState.INTAKE_CORAL)));
+        // ─────────────────────────────────────────────
+        // DRIVER CONTROLS (Joystick 0)
+        // ─────────────────────────────────────────────
 
-        panel.button(Constants.buttonPanel.lift.L2)
-                .onTrue(new InstantCommand(() ->
-                        stateManager.setState(RobotState.SCORE_CORAL)));
+        // Auto-align (full auto)
+        driver.trigger().whileTrue(new InstantCommand(() -> sm.setState(RobotState.ALIGN_VISION)));
 
-        panel.button(Constants.buttonPanel.lift.L3)
-                .onTrue(new InstantCommand(() ->
-                        stateManager.setState(RobotState.SCORE_CORAL)));
+        // Cancel align or forced IDLE
+        driver.button(2).onTrue(new InstantCommand(() -> sm.setState(RobotState.DRIVE)));
 
-        panel.button(Constants.buttonPanel.lift.L4)
-                .onTrue(new InstantCommand(() ->
-                        stateManager.setState(RobotState.SCORE_CORAL)));
+        // Strafe Left/Right using vision-assisted targeting
+        driver.button(3).onTrue(new InstantCommand(() -> sm.setState(RobotState.ALIGN_VISION)));
+        driver.button(4).onTrue(new InstantCommand(() -> sm.setState(RobotState.ALIGN_VISION)));
 
-        // === Coral Intake (Panel) ===
-        panel.button(Constants.buttonPanel.coral.IN)
-                .onTrue(new InstantCommand(() ->
-                        stateManager.setState(RobotState.INTAKE_CORAL)));
+        // ─────────────────────────────────────────────
+        // OPERATOR CONTROLS (Xbox Controller)
+        // ─────────────────────────────────────────────
 
-        // === Coral Out (Panel) ===
-        panel.button(Constants.buttonPanel.coral.OUT)
-                .onTrue(new InstantCommand(() ->
-                        stateManager.setState(RobotState.SCORE_CORAL)));
+        // Intake coral
+        operator.x().onTrue(new InstantCommand(() -> sm.setState(RobotState.INTAKE_CORAL)));
 
-        // === Operator Controls ===
-        operator.x().onTrue(
-                new InstantCommand(() -> stateManager.setState(RobotState.INTAKE_CORAL)));
+        // Score coral
+        operator.a().onTrue(new InstantCommand(() -> sm.setState(RobotState.SCORE_CORAL)));
 
-        operator.y().onTrue(
-                new InstantCommand(() -> stateManager.setState(RobotState.IDLE)));
+        // Algae up/down
+        operator.povUp().onTrue(new InstantCommand(() -> sm.setState(RobotState.SCORE_ALGAE)));
+        operator.povDown().onTrue(new InstantCommand(() -> sm.setState(RobotState.INTAKE_ALGAE)));
 
-        operator.a().onTrue(
-                new InstantCommand(() -> stateManager.setState(RobotState.SCORE_CORAL)));
+        // Climb
+        operator.start().onTrue(new InstantCommand(() -> sm.setState(RobotState.CLIMB)));
 
-        operator.povUp().onTrue(
-                new InstantCommand(() -> stateManager.setState(RobotState.SCORE_ALGAE)));
+        // Manual override
+        operator.back().onTrue(new InstantCommand(
+            () -> sm.setState(RobotState.MANUAL_OVERRIDE)
+        ));
+        operator.back().onFalse(new InstantCommand(
+            () -> sm.setState(RobotState.IDLE)
+        ));
 
-        operator.povDown().onTrue(
-                new InstantCommand(() -> stateManager.setState(RobotState.INTAKE_ALGAE)));
-
-        operator.start().onTrue(
-                new InstantCommand(() -> stateManager.setState(RobotState.CLIMB)));
-
-        // === Vision Alignment ===
-        driver.button(Constants.Joystick.STRAFE_RIGHT)
-                .onTrue(new InstantCommand(() -> stateManager.setState(RobotState.ALIGN_VISION)));
-
-        // === Cancel Align ===
-        driver.button(Constants.Joystick.FUNCTION_1)
-                .onTrue(new InstantCommand(() -> stateManager.setState(RobotState.DRIVE)));
-
-        // === Manual Override ===
-        operator.back().onTrue(
-                new InstantCommand(() -> stateManager.setState(RobotState.MANUAL_OVERRIDE)));
+        // Reset elevator to 0
+        operator.y().onTrue(new InstantCommand(() -> elevator.toPosition(0)));
     }
-
-
-    // =======================================================================
-    //                      DEFAULT COMMANDS (STATE AWARE)
-    // =======================================================================
-
+    /**
+     * Default commands for subsystems
+     */
     private void configureDefaultCommands() {
 
+        // Default driving when in DRIVE state
         drivetrain.setDefaultCommand(
-                Commands.run(() -> {
+            new RunCommand(() -> {
+                if (sm.getState() == RobotState.DRIVE ||
+                    sm.getState() == RobotState.IDLE ||
+                    sm.getState() == RobotState.MANUAL_OVERRIDE) {
 
-                    RobotState s = stateManager.getState();
+                    drivetrain.setControl(drive
+                        .withVelocityX(driver.getY() * MaxSpeed)
+                        .withVelocityY(driver.getX() * MaxSpeed)
+                        .withRotationalRate(-driver.getTwist() * MaxAngularRate));
+                }
+            }, drivetrain)
+        );
 
-                    if (s == RobotState.DRIVE || s == RobotState.ALIGN_VISION) {
-
-                        double vx = -driver.getY() * MaxSpeed * Constants.MASTER_DRIVE_MULTIPLIER;
-                        double vy = -driver.getX() * MaxSpeed * Constants.MASTER_DRIVE_MULTIPLIER;
-                        double rot = -driver.getTwist() * MaxAngularRate * Constants.MASTER_DRIVE_MULTIPLIER;
-
-                        if (s == RobotState.ALIGN_VISION) {
-                            drivetrain.driveTeleop(vx, vy, rot, true, vision);
-                        } else {
-                            drivetrain.driveTeleop(vx, vy, rot, false, vision);
-                        }
-
-                    } else {
-                        drivetrain.stop();
-                    }
-                }, drivetrain));
-
-        // Effector manual override only works in MANUAL mode
+        // Manual override for effector (Triggers)
         effector.setDefaultCommand(
-                Commands.run(() -> {
+            new RunCommand(() -> {
 
-                    if (stateManager.getState() != RobotState.MANUAL_OVERRIDE) {
-                        effector.stop();
-                        return;
-                    }
+                if (sm.getState() != RobotState.MANUAL_OVERRIDE) return;
 
-                    double lt = operator.getLeftTriggerAxis();
-                    double rt = operator.getRightTriggerAxis();
+                double lt = operator.getLeftTriggerAxis();
+                double rt = operator.getRightTriggerAxis();
 
-                    if (lt > 0.1) {
-                        effector.start(-40 * lt);
-                    } else if (rt > 0.1) {
-                        effector.start(40 * rt);
-                    } else {
-                        effector.stop();
-                    }
+                if (lt > 0.1) effector.start(-70 * lt);
+                else if (rt > 0.1) effector.start(70 * rt);
+                else effector.stop();
 
-                }, effector));
+            }, effector)
+        );
     }
 
+    /**
+     * Auto-align Vision State logic (full auto align)
+     */
+    private void handleVisionAlign() {
 
-    // =======================================================================
-    //                         PATHPLANNER NAMED COMMANDS
-    // =======================================================================
+        if (sm.getState() != RobotState.ALIGN_VISION) return;
 
-    private void configureNamedCommands() {
+        var tagPose = vision.getLatestPose();
+        if (tagPose == null) {
+            // No vision → fallback to DRIVE
+            sm.setState(RobotState.DRIVE);
+            return;
+        }
 
-        NamedCommands.registerCommand("INTAKE_CORAL",
-                new InstantCommand(() -> stateManager.setState(RobotState.INTAKE_CORAL)));
+        var current = drivetrain.getPose();
+        var target = tagPose;
 
-        NamedCommands.registerCommand("SCORE_CORAL",
-                new InstantCommand(() -> stateManager.setState(RobotState.SCORE_CORAL)));
+        // Offset adjustments (from your old MakeGoToTag)
+        double desiredX = target.getX() - 0.30;   // forward offset
+        double desiredY = target.getY();          // lateral offset
 
-        NamedCommands.registerCommand("ALIGN_VISION",
-                new InstantCommand(() -> stateManager.setState(RobotState.ALIGN_VISION)));
+        double errorX = desiredX - current.getX();
+        double errorY = desiredY - current.getY();
+        double errorHeading = target.getRotation().minus(current.getRotation()).getRadians();
 
-        NamedCommands.registerCommand("INTAKE_ALGAE",
-                new InstantCommand(() -> stateManager.setState(RobotState.INTAKE_ALGAE)));
+        boolean aligned =
+            Math.abs(errorX) < 0.05 &&
+            Math.abs(errorY) < 0.05 &&
+            Math.abs(errorHeading) < Math.toRadians(3);
 
-        NamedCommands.registerCommand("SCORE_ALGAE",
-                new InstantCommand(() -> stateManager.setState(RobotState.SCORE_ALGAE)));
+        if (aligned) {
+            sm.setState(RobotState.DRIVE);
+            return;
+        }
 
-        NamedCommands.registerCommand("CLIMB",
-                new InstantCommand(() -> stateManager.setState(RobotState.CLIMB)));
+        // Simple proportional approach
+        double k = 1.5;
 
-        NamedCommands.registerCommand("IDLE",
-                new InstantCommand(() -> stateManager.setState(RobotState.IDLE)));
+        drivetrain.setControl(
+            drive
+                .withVelocityX(k * errorX)
+                .withVelocityY(k * errorY)
+                .withRotationalRate(k * errorHeading)
+        );
     }
-
-
-    // =======================================================================
-    //                           AUTONOMOUS CHOICE
-    // =======================================================================
+    /**
+     * Main periodic for RobotContainer-driven state tasks
+     */
+    public void periodic() {
+        handleVisionAlign();
+    }
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();

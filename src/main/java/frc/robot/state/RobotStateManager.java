@@ -6,32 +6,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class RobotStateManager {
     private RobotState currentState = RobotState.DISABLED;
     private RobotState previousState = RobotState.DISABLED;
-    private double lastStateChangeTime = Timer.getFPGATimestamp();
+    private double stateStart = Timer.getFPGATimestamp();
 
-    public synchronized RobotState getState() {
+    public RobotState getState() {
         return currentState;
     }
 
-    public synchronized RobotState getPreviousState() {
-        return previousState;
-    }
+    public void setState(RobotState s) {
+        if (s == currentState) return;
 
-    public synchronized void setState(RobotState newState) {
-        if (newState == currentState) {
-            return;
-        }
         previousState = currentState;
-        currentState = newState;
-        lastStateChangeTime = Timer.getFPGATimestamp();
+        currentState = s;
+        stateStart = Timer.getFPGATimestamp();
 
-        System.out.println("[RobotState] " + previousState + " -> " + currentState);
-
-        SmartDashboard.putString("Robot/State", currentState.name());
-        SmartDashboard.putString("Robot/PrevState", previousState.name());
+        SmartDashboard.putString("RobotState/Current", s.name());
+        SmartDashboard.putString("RobotState/Previous", previousState.name());
     }
 
-    /** Seconds since the last call to setState. */
-    public synchronized double getTimeInState() {
-        return Timer.getFPGATimestamp() - lastStateChangeTime;
+    public double timeInState() {
+        return Timer.getFPGATimestamp() - stateStart;
     }
 }
