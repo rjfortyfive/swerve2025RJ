@@ -155,8 +155,8 @@ public class Effector extends SubsystemBase {
         double leftCurrentPos = effectorLeftFX.getPosition().getValueAsDouble();
         double rightCurrentPos = effectorRightFX.getPosition().getValueAsDouble();
 
-        double leftTarget = leftCurrentPos + Constants.intake.lockRotations;
-        double rightTarget = rightCurrentPos - Constants.intake.lockRotations; 
+        double leftTarget = leftCurrentPos + Constants.intake.LOCK_ROTATIONS;
+        double rightTarget = rightCurrentPos - Constants.intake.LOCK_ROTATIONS; 
 
         effectorLeftFX.setControl(m_positionVoltage.withPosition(leftTarget));
         effectorRightFX.setControl(m_positionVoltage.withPosition(rightTarget));

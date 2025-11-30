@@ -83,7 +83,7 @@ public class TagUtils {
           new Translation2d(1 / Math.sqrt(3), -2 / Math.sqrt(3)))));
 
   // Pull in your field’s AprilTag layout
-  private static final AprilTagFieldLayout kTagLayout = Constants.Vision.kTagLayout;
+  private static final AprilTagFieldLayout kTagLayout = Constants.Vision.TAG_LAYOUT;
 
   /** @return 2D pose of that AprilTag, if it exists in the layout */
   public static Optional<Pose2d> getTagPose2d(int tagId) {

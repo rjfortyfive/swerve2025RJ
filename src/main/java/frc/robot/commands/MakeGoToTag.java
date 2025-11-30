@@ -31,10 +31,10 @@ public class MakeGoToTag extends Command {
 
     private final PathConstraints constraints =
         new PathConstraints(
-            Pathfinding.MaxSpeed,
-            Pathfinding.MaxAccel,
-            Math.toRadians(Pathfinding.MaxRotSpeed),
-            Math.toRadians(Pathfinding.MaxRotAccel));
+            Pathfinding.MAX_SPEED,
+            Pathfinding.MAX_ACCEL,
+            Math.toRadians(Pathfinding.MAX_ROT_SPEED),
+            Math.toRadians(Pathfinding.MAX_ROT_ACCEL));
 
     public MakeGoToTag(
             CommandSwerveDrivetrain drivetrain,

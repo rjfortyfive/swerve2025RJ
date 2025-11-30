@@ -102,10 +102,10 @@ public class RobotContainer {
                 //                 .onTrue(new InstantCommand(() -> Sequences.removeL3Algae()));
 
                 // toggle intake on/off each press
-                buttonPanel.button(Constants.buttonPanel.coral.In)
+                buttonPanel.button(Constants.buttonPanel.coral.IN)
                                 .whileTrue(new CoralIntake(m_elevator, m_effector, m_intake));
 
-                buttonPanel.button(Constants.buttonPanel.coral.Out)
+                buttonPanel.button(Constants.buttonPanel.coral.OUT)
                                 .onTrue(new ScoreL4L3L2(m_effector));
 
                 XboxController.a().onTrue(
@@ -151,9 +151,9 @@ public class RobotContainer {
                 // Button commands
 
                 // Button commands and stick-based triggers for strafeRight and strafeLeft
-                if (!Constants.masterNerf) {
+                if (!Constants.MASTER_NERF) {
                         // Strafe Right: schedule and track the command, only one at a time
-                        joystick.button(Constants.Joystick.strafeRight)
+                        joystick.button(Constants.Joystick.STRAFE_RIGHT)
                                 .whileTrue(new MakeGoToTag(
                                         m_drivetrain,
                                         m_vision,
@@ -163,7 +163,7 @@ public class RobotContainer {
                                 ));
 
                         // Strafe Left: schedule and track the command, only one at a time
-                        joystick.button(Constants.Joystick.strafeRight)
+                        joystick.button(Constants.Joystick.STRAFE_RIGHT)
                                 .whileTrue(new MakeGoToTag(
                                         m_drivetrain,
                                         m_vision,
@@ -174,7 +174,7 @@ public class RobotContainer {
                     
 
                         // Add a cancel binding
-                        joystick.button(Constants.Joystick.Function1).onTrue(new InstantCommand(() -> {
+                        joystick.button(Constants.Joystick.FUNCTION_1).onTrue(new InstantCommand(() -> {
                                 if (mCurrentAutoAlignCommand != null) {
                                         mCurrentAutoAlignCommand.cancel();
                                         mCurrentAutoAlignCommand = null;
@@ -217,7 +217,7 @@ public class RobotContainer {
                                                 // 1) move the elevator up to position intake
                                                 new InstantCommand(
                                                                 () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.intake),
+                                                                                Constants.elevator.level.INTAKE),
                                                                 m_elevator),
 
                                                 new InstantCommand(
@@ -243,9 +243,9 @@ public class RobotContainer {
         private void configureDefaultCommands() {
                 m_drivetrain.setDefaultCommand(
                         m_drivetrain.applyRequest(() -> drive
-                                        .withVelocityX(joystick.getY() * MaxSpeed * Constants.masterDriveMultiplier)
-                                        .withVelocityY(joystick.getX()  * MaxSpeed * Constants.masterDriveMultiplier)
-                                        .withRotationalRate(-joystick.getTwist()  * MaxAngularRate * Constants.masterDriveMultiplier)));
+                                        .withVelocityX(joystick.getY() * MaxSpeed * Constants.MASTER_DRIVE_MULTIPLIER)
+                                        .withVelocityY(joystick.getX()  * MaxSpeed * Constants.MASTER_DRIVE_MULTIPLIER)
+                                        .withRotationalRate(-joystick.getTwist()  * MaxAngularRate * Constants.MASTER_DRIVE_MULTIPLIER)));
 
                 m_effector.setDefaultCommand(new RunCommand(() -> {
                         double lt = XboxController.getLeftTriggerAxis();

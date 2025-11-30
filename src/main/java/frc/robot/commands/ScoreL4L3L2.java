@@ -35,8 +35,8 @@ public class ScoreL4L3L2 extends Command {
             double rightCurrent = m_effector.getRightPosition();
 
             // Outtake = reverse lock direction (your right motor is inverted)
-            targetPositionLeft  = leftCurrent  + Constants.effector.scoreRotations;
-            targetPositionRight = rightCurrent - Constants.effector.scoreRotations;
+            targetPositionLeft  = leftCurrent  + Constants.effector.SCORE_ROTATIONS;
+            targetPositionRight = rightCurrent - Constants.effector.SCORE_ROTATIONS;
 
             // Command motion magic to rotate additional amount
             m_effector.moveToPositions(targetPositionLeft, targetPositionRight);

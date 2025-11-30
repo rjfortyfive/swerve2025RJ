@@ -28,7 +28,7 @@ public class CoralIntake extends Command {
     public void initialize() {
         coralHasBeenSeen = false;
         coralHasBeenReversed = false;
-        m_elevator.toPosition(Constants.elevator.level.intake);
+        m_elevator.toPosition(Constants.elevator.level.INTAKE);
     }
 
     @Override

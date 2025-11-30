@@ -23,8 +23,8 @@ import frc.robot.util.TagUtils;
 public class Vision extends SubsystemBase {
 
     // Cameras
-    private final PhotonCamera camera1 = new PhotonCamera(CameraName1);
-    private final PhotonCamera camera2 = new PhotonCamera(CameraName2);
+    private final PhotonCamera camera1 = new PhotonCamera(CAMERA_NAME_1);
+    private final PhotonCamera camera2 = new PhotonCamera(CAMERA_NAME_2);
 
     // Pose estimators
     private final PhotonPoseEstimator estimator1;
@@ -44,14 +44,14 @@ public class Vision extends SubsystemBase {
         camera2.setPipelineIndex(0);
 
         estimator1 = new PhotonPoseEstimator(
-                kTagLayout,
+                TAG_LAYOUT,
                 PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                RobotToCam1);
+                ROBOT_TO_CAM_1);
 
         estimator2 = new PhotonPoseEstimator(
-                kTagLayout,
+                TAG_LAYOUT,
                 PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-                RobotToCam2);
+                ROBOT_TO_CAM_2);
 
         estimator1.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         estimator2.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
@@ -115,7 +115,7 @@ public class Vision extends SubsystemBase {
         avgTagDist /= numTags;
 
         // Base std dev selection
-        Matrix<N3, N1> stdDevs = (numTags > 1) ? kMultiTagStdDevs : kSingleTagStdDevs;
+        Matrix<N3, N1> stdDevs = (numTags > 1) ? MULTI_TAG_STD_DEVS : SINGLE_TAG_STD_DEVS;
 
         // Ambiguity gating: reject bad single-tag results
         var bestTarget = last.getBestTarget();
@@ -188,13 +188,13 @@ public class Vision extends SubsystemBase {
      * This does NOT require cameras to currently see that tag.
      */
     public int getClosestTagId(Pose2d robotPose) {
-        List<Integer> allTags = Constants.Vision.kTags;
+        List<Integer> allTags = Constants.Vision.TAGS;
         return allTags.stream()
                 .min(Comparator.comparingDouble(id ->
                         TagUtils.getTagPose2d(id)
                                 .map(tagPose -> tagPose.getTranslation()
                                         .getDistance(robotPose.getTranslation()))
                                 .orElse(Double.MAX_VALUE)))
-                .orElse(Constants.Vision.kTags.get(0));
+                .orElse(Constants.Vision.TAGS.get(0));
     }
 }
