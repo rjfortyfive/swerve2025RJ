@@ -108,7 +108,7 @@ public class Constants {
         }
 
         public static final class intake {
-            public static final int cancel = 10;
+            public static final int CANCEL = 10;
 
         }
     }
