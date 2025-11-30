@@ -39,14 +39,14 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         // Runs the scheduler for commands
         CommandScheduler.getInstance().run();
-
+        m_vision.periodic();
 
         
     }
     @Override
     public void robotInit() {
         m_robotContainer = new RobotContainer();
-        m_vision.periodic();
+
     }
 
     
