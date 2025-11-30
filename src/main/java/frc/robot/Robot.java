@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         m_robotContainer = new RobotContainer();
-
+        lights.lightsOn(Lights.purpleGoldStep);
     }
 
     
@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
             m_autonomousCommand.cancel();
         }
         Constants.setL4();
-        lights.lightsOn(Lights.purpleGoldStep);
+
     }
 
     @Override
