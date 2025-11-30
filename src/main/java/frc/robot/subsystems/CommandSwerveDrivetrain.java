@@ -250,14 +250,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
 
-        if (vision != null && DriverStation.isEnabled() && vision.getLatestPose() != null) {
+    if (vision != null 
+            && DriverStation.isEnabled() 
+            && vision.getLatestPose() != null 
+            && vision.getLatestStdDevs() != null) {
+
         addVisionMeasurement(
             vision.getLatestPose(),
-            vision.getLatestTimestamp(), // or use vision timestamp if desired
+            vision.getLatestTimestamp(),
             vision.getLatestStdDevs()
-        );
+    );
+}
+
     }    
-    }
+
 
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
