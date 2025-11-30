@@ -113,11 +113,6 @@ public class RobotContainer {
                                                 new InstantCommand(() -> m_elevator
                                                                 .toPosition(Constants.elevator.level.L1 + 2))));
 
-                XboxController.rightBumper().whileTrue(new RunCommand(
-                                () -> m_effector.start(
-                                                XboxController.getRightTriggerAxis()
-                                                                * 10)));
-
                 XboxController.x()
                                 .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
 
