@@ -1,6 +1,7 @@
 package frc.robot;
 
 import java.util.List;
+import java.util.Map;
 
 import com.pathplanner.lib.path.PathConstraints;
 
@@ -230,7 +231,9 @@ public class Constants {
     }
 
     public static final class lights {
-        public static LEDPattern PURPLE = LEDPattern.solid(Color.kPurple);
+        public static Color purple = Color.fromHSV(135, 220, 170); // Uses OpenCV HSV values
+        public static Color gold = Color.fromHSV(23, 242, 214);
+        public static LEDPattern purpleGoldStep = LEDPattern.steps(Map.of(0, purple, 0.5, gold));
     }
 
 }

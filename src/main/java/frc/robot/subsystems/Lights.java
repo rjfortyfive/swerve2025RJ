@@ -15,10 +15,6 @@ public class Lights extends SubsystemBase {
   
     public final AddressableLED m_led;
     public final AddressableLEDBuffer m_buffer;
-
-    public static Color purple = Color.fromHSV(135, 220, 170); // Uses OpenCV HSV values
-    public static Color gold = Color.fromHSV(23, 242, 214);
-    public static LEDPattern purpleGoldStep = LEDPattern.steps(Map.of(0, purple, 0.5, gold));
   
     public Lights() {
       m_led = new AddressableLED(kPort);
@@ -39,6 +35,7 @@ public class Lights extends SubsystemBase {
       m_led.setData(m_buffer);
       m_led.start();
     }
+  
   
     // public void periodic() {
     //   purpleGoldStep.applyTo(m_buffer);

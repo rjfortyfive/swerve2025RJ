@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         m_robotContainer = new RobotContainer();
-        lights.lightsOn(Lights.purpleGoldStep);
+        lights.lightsOn(Constants.lights.purpleGoldStep);
     }
 
     
