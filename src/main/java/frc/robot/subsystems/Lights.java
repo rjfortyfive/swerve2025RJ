@@ -7,16 +7,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class Lights extends SubsystemBase {
-    private static final int kPort = 1;
-    private static final int kLength = 45;
+    private static final int m_Port = 1;
+    private static final int m_Length = 45;
   
-    public final AddressableLED m_led;
+    public final AddressableLED m_LED;
     public final AddressableLEDBuffer m_buffer;
   
     public Lights() {
-      m_led = new AddressableLED(kPort);
-      m_buffer = new AddressableLEDBuffer(kLength);
-      m_led.setLength(kLength);
+      m_LED = new AddressableLED(m_Port);
+      m_buffer = new AddressableLEDBuffer(m_Length);
+      m_LED.setLength(m_Length);
       
   
       // Set the default command to turn the strip off, otherwise the last colors written by
@@ -29,8 +29,8 @@ public class Lights extends SubsystemBase {
 
     public void lightsOn(LEDPattern pattern) {
       pattern.applyTo(m_buffer);
-      m_led.setData(m_buffer);
-      m_led.start();
+      m_LED.setData(m_buffer);
+      m_LED.start();
     }
 
   }
