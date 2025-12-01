@@ -36,7 +36,8 @@ public class Robot extends TimedRobot {
     }
     @Override
     public void robotInit() {
-
+        //Load Elastic Dashboard
+        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     }
 
     
