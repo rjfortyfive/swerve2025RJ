@@ -218,12 +218,15 @@ public class RobotContainer {
         }
 
         private void configureDefaultCommands() {
+
+                // Default command for driving with joystick
                 m_drivetrain.setDefaultCommand(
                         m_drivetrain.applyRequest(() -> drive
                                         .withVelocityX(joystick.getY() * MaxSpeed * Constants.MASTER_DRIVE_MULTIPLIER)
                                         .withVelocityY(joystick.getX()  * MaxSpeed * Constants.MASTER_DRIVE_MULTIPLIER)
                                         .withRotationalRate(-joystick.getTwist()  * MaxAngularRate * Constants.MASTER_DRIVE_MULTIPLIER)));
 
+                // Default command for effector control with Xbox triggers                                              
                 m_effector.setDefaultCommand(new RunCommand(() -> {
                         double lt = XboxController.getLeftTriggerAxis();
                         double rt = XboxController.getRightTriggerAxis();
