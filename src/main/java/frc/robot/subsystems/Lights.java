@@ -1,11 +1,8 @@
 package frc.robot.subsystems;
 
-import java.util.Map;
-
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -35,20 +32,5 @@ public class Lights extends SubsystemBase {
       m_led.setData(m_buffer);
       m_led.start();
     }
-  
-  
-    // public void periodic() {
-    //   purpleGoldStep.applyTo(m_buffer);
-    //   m_led.setData(m_buffer);
-    //   m_led.start(); // Previously after m_led.SetLength(kLength);
-    // }
-  
-    // /**
-    //  * Creates a command that runs a pattern on the entire LED strip.
-    //  *
-    //  * @param pattern the LED pattern to run
-    //  */
-    // public Command runPattern(LEDPattern pattern) {
-    //   return run(() -> pattern.applyTo(m_buffer));
-    // }
+
   }

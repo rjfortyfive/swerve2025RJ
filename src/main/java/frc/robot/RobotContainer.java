@@ -31,8 +31,6 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.util.TagUtils.tagSide;;
 
 public class RobotContainer {
-        // Tracks the currently scheduled auto-align command for cancellation
-        private Command mCurrentAutoAlignCommand = null;
         
         private final SendableChooser<Command> autoChooser;
         public static SendableChooser<Integer> positionChooser;
@@ -65,6 +63,7 @@ public class RobotContainer {
         public Intake m_intake = new Intake();
         public final Hang m_hang = new Hang();
         public final Vision m_vision = new Vision();
+        public final Lights m_lights = new Lights();
 
         public RobotContainer() {
 
@@ -239,6 +238,8 @@ public class RobotContainer {
                                         m_effector.start(0);
                                 }
                                 }, m_effector));
+                // Default command for lights
+                m_lights.setDefaultCommand(new RunCommand(() -> m_lights.lightsOn(Constants.lights.purpleGoldStep), m_lights));
         }
 
         public Command getAutonomousCommand() {
