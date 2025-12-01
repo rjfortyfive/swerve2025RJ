@@ -159,13 +159,6 @@ public class RobotContainer {
                                         0.165,
                                         0.345
                                 ));
-                    
-
-                        // Add a cancel binding
-                        joystick.button(Constants.Joystick.FUNCTION_1)
-                                .onTrue(new InstantCommand(() -> MakeGoToTag.cancelActive()));
-
-
                 }
         }
 

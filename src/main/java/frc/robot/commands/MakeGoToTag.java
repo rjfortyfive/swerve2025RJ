@@ -25,8 +25,6 @@ public class MakeGoToTag extends Command {
 
     private Command currentPathCommand = null;
 
-    private static MakeGoToTag activeInstance = null;
-
     // How often to refresh the path (in seconds)
     private static final double UPDATE_PERIOD = 0.25; 
     private double timer = 0.0;
@@ -53,12 +51,7 @@ public class MakeGoToTag extends Command {
 
         addRequirements(drivetrain); // vision has no actuators
     }
-    public static void cancelActive() {
-        if (activeInstance != null) {
-            activeInstance.cancel();
-            activeInstance = null;
-        }
-    }
+
     @Override
     public void initialize() {
         timer = 0.0;
@@ -112,9 +105,6 @@ public class MakeGoToTag extends Command {
         if (currentPathCommand != null) {
             currentPathCommand.cancel();
             currentPathCommand = null;
-        }
-        if (activeInstance == this) {
-            activeInstance = null;
         }
     }
 
