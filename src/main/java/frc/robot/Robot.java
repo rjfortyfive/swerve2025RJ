@@ -10,13 +10,16 @@ import frc.robot.subsystems.*;
 import com.pathplanner.lib.commands.PathfindingCommand;
 
 import au.grapplerobotics.CanBridge;
+import frc.robot.state.*;
+
 
 
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer;
+    private final RobotStateManager sm = new RobotStateManager();
     private Vision m_vision = new Vision();
-    private final Lights lights = new Lights();
+    private final Lights lights = new Lights(sm);
 
 
     Timer gc = new Timer();
