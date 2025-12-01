@@ -62,8 +62,7 @@ public class Vision extends SubsystemBase {
         // Try to update from both cameras; the internal logic chooses which one wins
         updateCamera(estimator1, camera1);
         updateCamera(estimator2, camera2);
-
-        // Optional: basic dashboard telemetry
+        // Publish to SmartDashboard
         SmartDashboard.putBoolean("Vision/HasPose", latestPose != null);
         SmartDashboard.putNumber("Vision/LastTimestamp", latestTimestamp);
         SmartDashboard.putString("Vision/Camera", latestCameraName);

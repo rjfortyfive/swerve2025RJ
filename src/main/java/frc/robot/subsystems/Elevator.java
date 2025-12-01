@@ -21,13 +21,16 @@ public class Elevator extends SubsystemBase {
     public final static TalonFX elevatorRightFX = new TalonFX(Constants.elevator.ELEVATOR_RIGHT_FX_ID);
     public final static DigitalInput bottomlimitSwitch = new DigitalInput(0);
     private boolean hasZeroed = false;
-//private final static MotionMagicVoltage motionControl = new MotionMagicVoltage(0);
 
     public Elevator() {
-        System.out.println("Creating new motor with ID " + Constants.elevator.ELEVATOR_LEFT_FX_ID);
+        //setting Elevator motors to Brake mode
         elevatorLeftFX.setNeutralMode(NeutralModeValue.Brake);
+        elevatorRightFX.setNeutralMode(NeutralModeValue.Brake);
+        
+        //Setting Right elevator motor to invert
         elevatorRightFX.setControl(new Follower(elevatorLeftFX.getDeviceID(), true));
 
+        //Current Limits Configuration for elevator motors
         elevatorLeftFX.getConfigurator().apply(new CurrentLimitsConfigs()
             .withStatorCurrentLimit(Constants.elevator.ELEVATOR_STATOR_CURRENT)
             .withStatorCurrentLimitEnable(true)
@@ -40,6 +43,7 @@ public class Elevator extends SubsystemBase {
             .withSupplyCurrentLimit(Constants.elevator.ELEVATOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));            
 
+        //PID Configuration for elevator motors
         elevatorLeftFX.getConfigurator().apply( new Slot0Configs()
             .withKP(Constants.elevator.P_ELEVATOR)
             .withKI(Constants.elevator.I_ELEVATOR)
@@ -57,7 +61,8 @@ public class Elevator extends SubsystemBase {
             .withKS(Constants.elevator.S_ELEVATOR)
             .withKV(Constants.elevator.V_ELEVATOR)
             .withKA(Constants.elevator.A_ELEVATOR));        
-            
+        
+        //Motion Magic Configurations for elevator motors
         elevatorLeftFX.getConfigurator().apply(new MotionMagicConfigs()
             .withMotionMagicCruiseVelocity(RotationsPerSecond.of(Constants.elevator.ELEVATOR_CRUISE_VELOCITY * Constants.MASTER_SPEED_MULTIPLIER))
             .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(Constants.elevator.ELEVATOR_ACCEL)));
@@ -66,6 +71,7 @@ public class Elevator extends SubsystemBase {
             .withMotionMagicCruiseVelocity(RotationsPerSecond.of(Constants.elevator.ELEVATOR_CRUISE_VELOCITY * Constants.MASTER_SPEED_MULTIPLIER))
             .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(Constants.elevator.ELEVATOR_ACCEL)));
         
+        //Soft Limits Configuration for elevator motors
         elevatorLeftFX.getConfigurator().apply(new SoftwareLimitSwitchConfigs()
             .withForwardSoftLimitEnable(true)
             .withForwardSoftLimitThreshold(Constants.elevator.ELEVATOR_UPPER_LIMIT)
@@ -105,7 +111,6 @@ public class Elevator extends SubsystemBase {
 
     public void toPosition(double rotations) {
         System.out.println("Going to " + rotations);
-        //elevatorLeftFX.setControl(motionControl.withPosition(rotations));
         elevatorLeftFX.setControl(new MotionMagicVoltage(rotations));
     }
 

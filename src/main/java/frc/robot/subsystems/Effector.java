@@ -36,16 +36,21 @@ public class Effector extends SubsystemBase {
     private final static PositionVoltage m_positionVoltage = new PositionVoltage(0);
 
     public Effector() {
+        //algae Spark Max Configuration
         SparkMaxConfig algaeConfig = new SparkMaxConfig();
 
+        //effector motor set to Brake Motor
         effectorLeftFX.setNeutralMode(NeutralModeValue.Brake);
         effectorRightFX.setNeutralMode(NeutralModeValue.Brake);
 
+        //alage motor set to brake mode
         algaeConfig.idleMode(IdleMode.kBrake);
 
+        //Setting Right effector motor to invert
         effectorRightFX.getConfigurator().apply(new MotorOutputConfigs()
             .withInverted(InvertedValue.Clockwise_Positive));
 
+        //Current Limits Configuration for effector motors
         effectorLeftFX.getConfigurator().apply(new CurrentLimitsConfigs()
             .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
             .withStatorCurrentLimitEnable(true)
@@ -58,8 +63,10 @@ public class Effector extends SubsystemBase {
             .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));
         
+        //Current Limits Configuration for algae motor
         algaeConfig.smartCurrentLimit(20);
 
+        //PID Configurations for effector motors
         effectorLeftFX.getConfigurator().apply( new Slot0Configs()
             .withKP(Constants.effector.P_EFFECTOR)
             .withKI(Constants.effector.I_EFFECTOR)
@@ -78,6 +85,7 @@ public class Effector extends SubsystemBase {
             .withKV(Constants.effector.V_EFFECTOR)
             .withKA(Constants.effector.A_EFFECTOR));
         
+        //Voltage Configurations for effector motors
         effectorLeftFX.getConfigurator().apply(new VoltageConfigs()
             .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
             .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
@@ -86,6 +94,7 @@ public class Effector extends SubsystemBase {
             .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
             .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
         
+        //Motion Magic Configurations for effector motors
         effectorLeftFX.getConfigurator().apply(new MotionMagicConfigs()
             .withMotionMagicCruiseVelocity(RotationsPerSecond.of(30 * Constants.MASTER_SPEED_MULTIPLIER))
             .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.MASTER_SPEED_MULTIPLIER)));
@@ -94,10 +103,13 @@ public class Effector extends SubsystemBase {
             .withMotionMagicCruiseVelocity(RotationsPerSecond.of(30 * Constants.MASTER_SPEED_MULTIPLIER))
             .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100 * Constants.MASTER_SPEED_MULTIPLIER)));
     
+        //Absolute Encoder Configuration for algae motor
         AbsoluteEncoderConfig algaeEncoder = algaeConfig.absoluteEncoder;
         algaeEncoder.positionConversionFactor(1.0);
         algaeEncoder.velocityConversionFactor(1.0);
         algaeEncoder.zeroOffset(0.0);
+
+        //Apply configuration to algae motor
         algaeMotor.configure(
             algaeConfig,
             SparkBase.ResetMode.kResetSafeParameters, 
@@ -137,21 +149,21 @@ public class Effector extends SubsystemBase {
     }
 
     public void start(double velocity) {
-
+        //symmetric start for effector wheels
         effectorLeftFX.setControl(m_velocityVoltage.withVelocity(velocity * Constants.MASTER_SPEED_MULTIPLIER));
         effectorRightFX.setControl(m_velocityVoltage.withVelocity(velocity * Constants.MASTER_SPEED_MULTIPLIER));
 
     }
 
     public void start(double velocityLeft, double velocityRight) {
-        // Turn on intake and effector wheels
+        //asymmetric start for effector wheels
         effectorLeftFX.setControl(m_velocityVoltage.withVelocity(velocityLeft * Constants.MASTER_SPEED_MULTIPLIER));
         effectorRightFX.setControl(m_velocityVoltage.withVelocity(velocityRight * Constants.MASTER_SPEED_MULTIPLIER));
 
     }
 
     public void startLock() {
-        // Turn on intake
+        // Locking coral by rotating effector LOCK_ROTATIONS
         double leftCurrentPos = effectorLeftFX.getPosition().getValueAsDouble();
         double rightCurrentPos = effectorRightFX.getPosition().getValueAsDouble();
 

@@ -19,12 +19,14 @@ public class Intake extends SubsystemBase {
     private final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0);
 
 public Intake() {
-    
+    //setting Intake motors to Brake mode
     intakeLeftFX.setNeutralMode(NeutralModeValue.Brake);
     intakeRightFX.setNeutralMode(NeutralModeValue.Brake);
 
+    //Setting Right intake motor to follow Left intake motor
     intakeRightFX.setControl(new Follower(intakeLeftFX.getDeviceID(), true));
 
+    //Current Limits Configuration for intake motors
     intakeLeftFX.getConfigurator().apply(new CurrentLimitsConfigs()
         .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
         .withStatorCurrentLimitEnable(true)
@@ -37,6 +39,7 @@ public Intake() {
         .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
         .withSupplyCurrentLimitEnable(true));
     
+    //PID Configuration for intake motors
     intakeLeftFX.getConfigurator().apply( new Slot0Configs()
         .withKP(Constants.intake.P_INTAKE)
         .withKI(Constants.intake.I_INTAKE)
@@ -55,6 +58,7 @@ public Intake() {
         .withKV(Constants.intake.V_INTAKE)
         .withKA(Constants.intake.A_INTAKE));
 
+    //Max Voltage configuration for intake motors
     intakeLeftFX.getConfigurator().apply(new VoltageConfigs()
         .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
         .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));

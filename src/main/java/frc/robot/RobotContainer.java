@@ -88,6 +88,7 @@ public class RobotContainer {
         }
 
         private void configureBindings() {
+                // Elevator level buttons on button Board
                 buttonPanel.button(Constants.buttonPanel.lift.L1)
                                 .onTrue(new InstantCommand(() -> m_elevator.toPosition(Constants.elevator.level.L1)));
                 buttonPanel.button(Constants.buttonPanel.lift.L2)
@@ -100,56 +101,43 @@ public class RobotContainer {
                 //                 .onTrue(new InstantCommand(() -> Sequences.removeL2Algae()));
                 // buttonPanel.button(Constants.buttonPanel.algae.Upper)
                 //                 .onTrue(new InstantCommand(() -> Sequences.removeL3Algae()));
-
-                // toggle intake on/off each press
+                // Intake and Reef Score on Button Board
                 buttonPanel.button(Constants.buttonPanel.coral.IN)
-                                .whileTrue(new CoralIntake(m_elevator, m_effector, m_intake));
-
+                                .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
                 buttonPanel.button(Constants.buttonPanel.coral.OUT)
                                 .onTrue(new ScoreL4L3L2(m_effector));
-
+                // Elevator To Intake Position                                
                 XboxController.a().onTrue(
                                 new SequentialCommandGroup(
                                                 new InstantCommand(() -> m_elevator
                                                                 .toPosition(Constants.elevator.level.L1 + 2))));
-
+                // Coral Intake Command
                 XboxController.x()
                                 .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
-
+                // Elevator to zero position
                 XboxController.y()
                                 .onTrue(new InstantCommand(() -> m_elevator.toPosition(0)));
-
+                // Algae Effector Up and Down on D-Pad
                 XboxController.povUp()
                                 .whileTrue(new InstantCommand(() -> m_effector.algaeEffectorUp(1), m_effector));
-
                 XboxController.povDown()
                                 .whileTrue(new InstantCommand(() -> m_effector.algaeEffectorDown(1), m_effector));
-
+                // Asymmetric Effector outtake for L1
                 XboxController.a()
                                 .whileTrue(new InstantCommand(() -> {
                                         m_effector.start(20.0, 6.0);
                                 }, m_effector));
-
                 // Hang control triggers: Only when left bumper is held and a trigger is pressed
                 new Trigger(() -> XboxController.leftBumper().getAsBoolean()
                                 && XboxController.getRightTriggerAxis() > 0.25)
                                 .whileTrue(new InstantCommand(() -> m_hang.start(100), m_hang, m_drivetrain));
-
                 new Trigger(() -> XboxController.leftBumper().getAsBoolean()
                                 && XboxController.getLeftTriggerAxis() > 0.25)
                                 .whileTrue(new InstantCommand(() -> m_hang.start(-100), m_hang, m_drivetrain));
-                                                                            
-
-
                 // reset the field-centric heading on middle button press
-
                 // joystick.button(2).onTrue(drivetrain.runOnce(() ->
                 // drivetrain.seedFieldCentric()));
-
                 m_drivetrain.registerTelemetry(logger::telemeterize);
-
-                // Button commands
-
                 // Button commands and stick-based triggers for strafeRight and strafeLeft
                 if (!Constants.MASTER_NERF) {
                         // Strafe Right: schedule and track the command, only one at a time
@@ -174,12 +162,8 @@ public class RobotContainer {
                     
 
                         // Add a cancel binding
-                        joystick.button(Constants.Joystick.FUNCTION_1).onTrue(new InstantCommand(() -> {
-                                if (mCurrentAutoAlignCommand != null) {
-                                        mCurrentAutoAlignCommand.cancel();
-                                        mCurrentAutoAlignCommand = null;
-                                }
-                        }));
+                        joystick.button(Constants.Joystick.FUNCTION_1)
+                                .onTrue(new InstantCommand(() -> MakeGoToTag.cancelActive()));
 
 
                 }

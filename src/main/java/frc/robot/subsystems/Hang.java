@@ -17,20 +17,24 @@ public class Hang extends SubsystemBase{
     public final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(0);
 
 public Hang() {
+    //setting Hang motor to Brake mode
     hangFX.setNeutralMode(NeutralModeValue.Brake);
 
+    //Current Limits Configuration for hang motor
     hangFX.getConfigurator().apply(new CurrentLimitsConfigs()
         .withStatorCurrentLimit(Constants.hang.HANG_STATOR_CURRENT)
         .withStatorCurrentLimitEnable(true)
         .withSupplyCurrentLimit(Constants.hang.HANG_SUPPLY_CURRENT)
         .withSupplyCurrentLimitEnable(true));
 
+    //PID Configuration for hang motor
     hangFX.getConfigurator().apply( new Slot0Configs()
         .withKP(Constants.hang.P_HANG)
         .withKI(Constants.hang.I_HANG)
         .withKD(Constants.hang.D_HANG)
         .withKS(Constants.hang.S_HANG));
 
+    //Max Voltage configuration for hang motor
     hangFX.getConfigurator().apply(new VoltageConfigs()
         .withPeakForwardVoltage(Volts.of(Constants.hang.HANG_PEAK_FORWARD_VOLTAGE))
         .withPeakReverseVoltage(Volts.of(Constants.hang.HANG_PEAK_REVERSE_VOLTAGE)));
@@ -41,6 +45,6 @@ public Hang() {
     } 
 
     public void start(double velocity) {
-        hangFX.setControl(m_velocityVoltage.withVelocity(100 * Constants.MASTER_SPEED_MULTIPLIER));
+        hangFX.setControl(m_velocityVoltage.withVelocity(velocity * Constants.MASTER_SPEED_MULTIPLIER));
     }
 }
