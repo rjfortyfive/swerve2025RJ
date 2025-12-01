@@ -27,7 +27,7 @@ public class Constants {
     public static final double MASTER_VOLTAGE_MULTIPLIER = 1;
 
     public static class CanIDs {
-        //Drivetrain
+        //Drivetrain on CANivore
         public static final int PIGEON_ID = 0;
         public static final int FRONT_LEFT_DRIVE_FX_ID = 1;
         public static final int FRONT_LEFT_STEER_FX_ID = 2;
@@ -41,17 +41,17 @@ public class Constants {
         public static final int BACK_RIGHT_DRIVE_FX_ID = 7;
         public static final int BACK_RIGHT_STEER_FX_ID = 8;
         public static final int BACK_RIGHT_ENCODER_ID = 20;
-        //Elevator
+        //Elevator on RIO
         public static final int ELEVATOR_LEFT_FX_ID = 10;
         public static final int ELEVATOR_RIGHT_FX_ID = 11;
-        //Effector
+        //Effector on RIO
         public static final int EFFECTOR_LEFT_FX_ID = 12;
         public static final int EFFECTOR_RIGHT_FX_ID = 13;
         public static final int EFFECTOR_LASER_ID = 2;
-        //Intake
+        //Intake on RIO
         public static final int INTAKE_RIGHT_FX_ID = 15;
         public static final int INTAKE_LEFT_FX_ID = 16;
-        //Hang
+        //Hang on RIO
         public static final int HANG_FX_ID = 14;
 
 
@@ -75,7 +75,140 @@ public class Constants {
                         Units.degreesToRadians(MAX_ROT_ACCEL));
 
     }
+// Bindings for joystick and Button Panel
+    public static final class Joystick {
+        public static final int FUNCTION_1 = 10;
+        // public static final int Function2 = 9;
+        public static final int STRAFE_LEFT = 6;
+        public static final int STRAFE_RIGHT = 7 ;
+    }
 
+    public static final class buttonPanel {
+        public static final class lift {
+            public static final int L1 = 3;
+            public static final int L2 = 2;
+            public static final int L3 = 4;
+            public static final int L4 = 8;
+        }
+
+        public static final class coral {
+            public static final int IN = 1;
+            public static final int OUT = 7;
+        }
+
+        public static final class algae {
+            public static final int LOWER = 5;
+            public static final int UPPER = 9;
+        }
+
+        public static final class intake {
+            public static final int CANCEL = 10;
+
+        }
+    }
+//Subsystem Constants
+
+// Effector Constants
+    public static final class effector {
+        public static final double DEFAULT_VELOCITY = 15;
+        public static final double SCORE_ROTATIONS = 4;
+        public static final double SCORE_VELOCITY = 15;
+  // We are using Motion Magic position control with voltage control output type,
+  // so the PID parameters are in volts
+        public static final double P_EFFECTOR = 1.0; 
+        public static final double I_EFFECTOR = 0.0;
+        public static final double D_EFFECTOR = 0.0; 
+        public static final double G_EFFECTOR = 0.0;
+        public static final double S_EFFECTOR = 1.0;
+        public static final double V_EFFECTOR = 0.0;
+        public static final double A_EFFECTOR = 0.0;
+
+        public static final double EFFECTOR_STATOR_CURRENT = 80.0;
+        public static final double EFFECTOR_SUPPLY_CURRENT = 40.0;
+
+        public static final double EFFECTOR_PEAK_VOLTAGE = 8.0 * Constants.MASTER_VOLTAGE_MULTIPLIER;
+
+        public static final double EFFECTOR_LEFT_CRUISE_VELOCITY = 30;
+        public static final double EFFECTOR_RIGHT_CRUISE_VELOCITY = 10;
+        public static final double EFFECTOR_ACCEL = 100;
+
+        public static final double LOCK_ROTATIONS = -2.75;
+    }
+// Elevator Constants
+    public static final class elevator {
+        public static final int ELEVATOR_BOTTOM_SWITCH = 0;
+        public static final double P_ELEVATOR = 1.5;
+        public static final double I_ELEVATOR = 0.06;
+        public static final double D_ELEVATOR = 0.01;
+        public static final double G_ELEVATOR = 0.42;
+        public static final double S_ELEVATOR = 0.3;
+        public static final double V_ELEVATOR = 0.13;
+        public static final double A_ELEVATOR = 0;
+
+        public static final double ELEVATOR_STATOR_CURRENT = 120;
+        public static final double ELEVATOR_SUPPLY_CURRENT = 60;
+
+        public static final double ELEVATOR_CRUISE_VELOCITY = 90;
+        public static final double ELEVATOR_ACCEL = 500;
+
+        public static final double ELEVATOR_LOWER_LIMIT = 0;
+        public static final double ELEVATOR_UPPER_LIMIT = 75;
+
+        public static class level {
+            public static double L1 = 0.05;
+            public static double L2 = 15.5;
+            public static double L3 = 37.5;
+            public static double L4 = 73.0;
+            public static double INTAKE = 1.2;
+            public static double ACTIVE_LEVEL = 1;
+
+        }
+
+        public static final class algaeLevel {
+            public static final double L2 = 30.0;
+            public static final double L3 = 49.0;
+        }
+    }
+// Hang Constants
+    public static final class hang {
+        public static final double P_HANG = 1;
+        public static final double I_HANG = 0;
+        public static final double D_HANG = 0;
+        public static final double S_HANG = 5;
+
+        public static final double HANG_STATOR_CURRENT = 80.0;
+        public static final double HANG_SUPPLY_CURRENT = 40.0; 
+
+        public static final double HANG_PEAK_FORWARD_VOLTAGE = 12.0 * Constants.MASTER_VOLTAGE_MULTIPLIER;
+        public static final double HANG_PEAK_REVERSE_VOLTAGE = 8.0 * Constants.MASTER_VOLTAGE_MULTIPLIER;
+
+    }
+// Intake Constants
+    public static final class intake {
+        public static final int INTAKE_RIGHT_FX_ID = 15;
+        public static final int INTAKE_LEFT_FX_ID = 16;
+        public static final double INTAKE_ROTATIONS = 2.5;
+        public static final double LOCK_SPEED_RPS = 25;
+        public static final double P_INTAKE = 0.3;
+        public static final double I_INTAKE = 0.0;
+        public static final double D_INTAKE = 0.0;
+        public static final double A_INTAKE = 0.0;
+        public static final double G_INTAKE = 0.0;
+        public static final double S_INTAKE = 0.0;
+        public static final double V_INTAKE = 0.0;
+
+        public static final double INTAKE_STATOR_CURRENT = 65.0;
+        public static final double INTAKE_SUPPLY_CURRENT = 40.0;
+
+        public static final double INTAKE_PEAK_VOLTAGE = 8.0 * Constants.MASTER_VOLTAGE_MULTIPLIER;
+    }
+// Lights Constants
+    public static final class lights {
+        public static Color purple = Color.fromHSV(135, 220, 170); // Uses OpenCV HSV values
+        public static Color gold = Color.fromHSV(23, 242, 214);
+        public static LEDPattern purpleGoldStep = LEDPattern.steps(Map.of(0, purple, 0.5, gold));
+    }
+// Vision Constants
     public static class Vision {
         // Cam mounted facing forward, half a meter forward of center, half a meter up
         // from center.
@@ -113,132 +246,7 @@ public class Constants {
         public static final int PIPLINE_INDEX = 0;
 
     }
-
-    public static final class Joystick {
-        public static final int FUNCTION_1 = 10;
-        // public static final int Function2 = 9;
-        public static final int STRAFE_LEFT = 6;
-        public static final int STRAFE_RIGHT = 7 ;
-    }
-
-    public static final class buttonPanel {
-        public static final class lift {
-            public static final int L1 = 3;
-            public static final int L2 = 2;
-            public static final int L3 = 4;
-            public static final int L4 = 8;
-        }
-
-        public static final class coral {
-            public static final int IN = 1;
-            public static final int OUT = 7;
-        }
-
-        public static final class algae {
-            public static final int LOWER = 5;
-            public static final int UPPER = 9;
-        }
-
-        public static final class intake {
-            public static final int CANCEL = 10;
-
-        }
-    }
-
-    public static final class elevator {
-        public static final int ELEVATOR_BOTTOM_SWITCH = 0;
-        public static final double P_ELEVATOR = 1.5;
-        public static final double I_ELEVATOR = 0.06;
-        public static final double D_ELEVATOR = 0.01;
-        public static final double G_ELEVATOR = 0.42;
-        public static final double S_ELEVATOR = 0.3;
-        public static final double V_ELEVATOR = 0.13;
-        public static final double A_ELEVATOR = 0;
-
-        public static final double ELEVATOR_STATOR_CURRENT = 120;
-        public static final double ELEVATOR_SUPPLY_CURRENT = 60;
-
-        public static final double ELEVATOR_CRUISE_VELOCITY = 90;
-        public static final double ELEVATOR_ACCEL = 500;
-
-        public static final double ELEVATOR_LOWER_LIMIT = 0;
-        public static final double ELEVATOR_UPPER_LIMIT = 75;
-
-        public static class level {
-            public static double L1 = 0.05;
-            public static double L2 = 15.5;
-            public static double L3 = 37.5;
-            public static double L4 = 73.0;
-            public static double INTAKE = 1.2;
-            public static double ACTIVE_LEVEL = 1;
-
-        }
-
-        public static final class algaeLevel {
-            public static final double L2 = 30.0;
-            public static final double L3 = 49.0;
-        }
-    }
-
-    public static final class effector {
-        public static final double DEFAULT_VELOCITY = 15;
-        public static final double SCORE_ROTATIONS = 4;
-        public static final double SCORE_VELOCITY = 15;
-  // We are using Motion Magic position control with voltage control output type,
-  // so the PID parameters are in volts
-        public static final double P_EFFECTOR = 1.0; 
-        public static final double I_EFFECTOR = 0.0;
-        public static final double D_EFFECTOR = 0.0; 
-        public static final double G_EFFECTOR = 0.0;
-        public static final double S_EFFECTOR = 1.0;
-        public static final double V_EFFECTOR = 0.0;
-        public static final double A_EFFECTOR = 0.0;
-
-        public static final double EFFECTOR_STATOR_CURRENT = 80.0;
-        public static final double EFFECTOR_SUPPLY_CURRENT = 40.0;
-
-        public static final double EFFECTOR_PEAK_VOLTAGE = 8.0 * Constants.MASTER_VOLTAGE_MULTIPLIER;
-
-        public static final double EFFECTOR_LEFT_CRUISE_VELOCITY = 30;
-        public static final double EFFECTOR_RIGHT_CRUISE_VELOCITY = 10;
-        public static final double EFFECTOR_ACCEL = 100;
-
-        public static final double LOCK_ROTATIONS = -2.75;
-    }
-
-    public static final class intake {
-        public static final int INTAKE_RIGHT_FX_ID = 15;
-        public static final int INTAKE_LEFT_FX_ID = 16;
-        public static final double INTAKE_ROTATIONS = 2.5;
-        public static final double LOCK_SPEED_RPS = 25;
-        public static final double P_INTAKE = 0.3;
-        public static final double I_INTAKE = 0.0;
-        public static final double D_INTAKE = 0.0;
-        public static final double A_INTAKE = 0.0;
-        public static final double G_INTAKE = 0.0;
-        public static final double S_INTAKE = 0.0;
-        public static final double V_INTAKE = 0.0;
-
-        public static final double INTAKE_STATOR_CURRENT = 65.0;
-        public static final double INTAKE_SUPPLY_CURRENT = 40.0;
-
-        public static final double INTAKE_PEAK_VOLTAGE = 8.0 * Constants.MASTER_VOLTAGE_MULTIPLIER;
-    }
-
-    public static final class hang {
-        public static final double P_HANG = 1;
-        public static final double I_HANG = 0;
-        public static final double D_HANG = 0;
-        public static final double S_HANG = 5;
-
-        public static final double HANG_STATOR_CURRENT = 80.0;
-        public static final double HANG_SUPPLY_CURRENT = 40.0; 
-
-        public static final double HANG_PEAK_FORWARD_VOLTAGE = 12.0 * Constants.MASTER_VOLTAGE_MULTIPLIER;
-        public static final double HANG_PEAK_REVERSE_VOLTAGE = 8.0 * Constants.MASTER_VOLTAGE_MULTIPLIER;
-
-    }
-
+// Sets L4 and Tags based on alliance color
     public static void setL4() {
         var driverStation = DriverStationJNI.getAllianceStation().toString();
         if (driverStation.contains("Blue")) {
@@ -254,12 +262,6 @@ public class Constants {
 
             System.out.println("Setting red side L4");
         }
-    }
-
-    public static final class lights {
-        public static Color purple = Color.fromHSV(135, 220, 170); // Uses OpenCV HSV values
-        public static Color gold = Color.fromHSV(23, 242, 214);
-        public static LEDPattern purpleGoldStep = LEDPattern.steps(Map.of(0, purple, 0.5, gold));
     }
 
 }
