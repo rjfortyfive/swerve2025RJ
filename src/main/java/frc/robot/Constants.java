@@ -26,6 +26,37 @@ public class Constants {
 
     public static final double MASTER_VOLTAGE_MULTIPLIER = 1;
 
+    public static class CanIDs {
+        //Drivetrain
+        public static final int PIGEON_ID = 0;
+        public static final int FRONT_LEFT_DRIVE_FX_ID = 1;
+        public static final int FRONT_LEFT_STEER_FX_ID = 2;
+        public static final int FRONT_LEFT_ENCODER_ID = 14;
+        public static final int FRONT_RIGHT_DRIVE_FX_ID = 3;
+        public static final int FRONT_RIGHT_STEER_FX_ID = 4;
+        public static final int FRONT_RIGHT_ENCODER_ID = 16;
+        public static final int BACK_LEFT_DRIVE_FX_ID = 5;
+        public static final int BACK_LEFT_STEER_FX_ID = 6;
+        public static final int BACK_LEFT_ENCODER_ID = 18;
+        public static final int BACK_RIGHT_DRIVE_FX_ID = 7;
+        public static final int BACK_RIGHT_STEER_FX_ID = 8;
+        public static final int BACK_RIGHT_ENCODER_ID = 20;
+        //Elevator
+        public static final int ELEVATOR_LEFT_FX_ID = 10;
+        public static final int ELEVATOR_RIGHT_FX_ID = 11;
+        //Effector
+        public static final int EFFECTOR_LEFT_FX_ID = 12;
+        public static final int EFFECTOR_RIGHT_FX_ID = 13;
+        public static final int EFFECTOR_LASER_ID = 2;
+        //Intake
+        public static final int INTAKE_RIGHT_FX_ID = 15;
+        public static final int INTAKE_LEFT_FX_ID = 16;
+        //Hang
+        public static final int HANG_FX_ID = 14;
+
+
+    }
+
     public static class Pathfinding {
         // max translation m/s
         public static final double MAX_SPEED = 5;
@@ -115,9 +146,6 @@ public class Constants {
     }
 
     public static final class elevator {
-        public static final int ELEVATOR_LEFT_FX_ID = 10;
-        public static final int ELEVATOR_RIGHT_FX_ID = 11;
-
         public static final int ELEVATOR_BOTTOM_SWITCH = 0;
         public static final double P_ELEVATOR = 1.5;
         public static final double I_ELEVATOR = 0.06;
@@ -153,8 +181,6 @@ public class Constants {
     }
 
     public static final class effector {
-        public static final int EFFECTOR_LEFT_FX_ID = 12;
-        public static final int EFFECTOR_RIGHT_FX_ID = 13;
         public static final double DEFAULT_VELOCITY = 15;
         public static final double SCORE_ROTATIONS = 4;
         public static final double SCORE_VELOCITY = 15;
@@ -176,12 +202,13 @@ public class Constants {
         public static final double EFFECTOR_LEFT_CRUISE_VELOCITY = 30;
         public static final double EFFECTOR_RIGHT_CRUISE_VELOCITY = 10;
         public static final double EFFECTOR_ACCEL = 100;
+
+        public static final double LOCK_ROTATIONS = -2.75;
     }
 
     public static final class intake {
         public static final int INTAKE_RIGHT_FX_ID = 15;
         public static final int INTAKE_LEFT_FX_ID = 16;
-        public static final double LOCK_ROTATIONS = -2.75;
         public static final double INTAKE_ROTATIONS = 2.5;
         public static final double LOCK_SPEED_RPS = 25;
         public static final double P_INTAKE = 0.3;
@@ -199,7 +226,6 @@ public class Constants {
     }
 
     public static final class hang {
-        public static final int HANG_FX_ID = 14;
         public static final double P_HANG = 1;
         public static final double I_HANG = 0;
         public static final double D_HANG = 0;

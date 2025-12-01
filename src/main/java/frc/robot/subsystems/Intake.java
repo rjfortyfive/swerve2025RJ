@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
+import frc.robot.Constants.intake;
+import frc.robot.Constants.CanIDs;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -13,8 +15,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class Intake extends SubsystemBase {
 
-    private static TalonFX intakeLeftFX = new TalonFX(Constants.intake.INTAKE_LEFT_FX_ID);
-    private static TalonFX intakeRightFX = new TalonFX(Constants.intake.INTAKE_RIGHT_FX_ID);
+    private static TalonFX intakeLeftFX = new TalonFX(CanIDs.INTAKE_LEFT_FX_ID);
+    private static TalonFX intakeRightFX = new TalonFX(CanIDs.INTAKE_RIGHT_FX_ID);
 
     private final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0);
 
@@ -28,44 +30,44 @@ public Intake() {
 
     //Current Limits Configuration for intake motors
     intakeLeftFX.getConfigurator().apply(new CurrentLimitsConfigs()
-        .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
+        .withStatorCurrentLimit(intake.INTAKE_STATOR_CURRENT)
         .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
+        .withSupplyCurrentLimit(intake.INTAKE_SUPPLY_CURRENT)
         .withSupplyCurrentLimitEnable(true));
 
     intakeRightFX.getConfigurator().apply(new CurrentLimitsConfigs()
-        .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
+        .withStatorCurrentLimit(intake.INTAKE_STATOR_CURRENT)
         .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
+        .withSupplyCurrentLimit(intake.INTAKE_SUPPLY_CURRENT)
         .withSupplyCurrentLimitEnable(true));
     
     //PID Configuration for intake motors
     intakeLeftFX.getConfigurator().apply( new Slot0Configs()
-        .withKP(Constants.intake.P_INTAKE)
-        .withKI(Constants.intake.I_INTAKE)
-        .withKD(Constants.intake.D_INTAKE)
-        .withKG(Constants.intake.G_INTAKE)
-        .withKS(Constants.intake.S_INTAKE)
-        .withKV(Constants.intake.V_INTAKE)
-        .withKA(Constants.intake.A_INTAKE));
+        .withKP(intake.P_INTAKE)
+        .withKI(intake.I_INTAKE)
+        .withKD(intake.D_INTAKE)
+        .withKG(intake.G_INTAKE)
+        .withKS(intake.S_INTAKE)
+        .withKV(intake.V_INTAKE)
+        .withKA(intake.A_INTAKE));
 
     intakeRightFX.getConfigurator().apply( new Slot0Configs()
-        .withKP(Constants.intake.P_INTAKE)
-        .withKI(Constants.intake.I_INTAKE)
-        .withKD(Constants.intake.D_INTAKE)
-        .withKG(Constants.intake.G_INTAKE)
-        .withKS(Constants.intake.S_INTAKE)
-        .withKV(Constants.intake.V_INTAKE)
-        .withKA(Constants.intake.A_INTAKE));
+        .withKP(intake.P_INTAKE)
+        .withKI(intake.I_INTAKE)
+        .withKD(intake.D_INTAKE)
+        .withKG(intake.G_INTAKE)
+        .withKS(intake.S_INTAKE)
+        .withKV(intake.V_INTAKE)
+        .withKA(intake.A_INTAKE));
 
     //Max Voltage configuration for intake motors
     intakeLeftFX.getConfigurator().apply(new VoltageConfigs()
-        .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
-        .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+        .withPeakForwardVoltage(Volts.of(intake.INTAKE_PEAK_VOLTAGE))
+        .withPeakReverseVoltage(Volts.of(-intake.INTAKE_PEAK_VOLTAGE)));
             
     intakeRightFX.getConfigurator().apply(new VoltageConfigs()
-        .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
-        .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+        .withPeakForwardVoltage(Volts.of(intake.INTAKE_PEAK_VOLTAGE))
+        .withPeakReverseVoltage(Volts.of(-intake.INTAKE_PEAK_VOLTAGE)));
 
 }
 

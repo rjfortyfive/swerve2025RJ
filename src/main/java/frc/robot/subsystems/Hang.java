@@ -11,9 +11,11 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.CanIDs;
+import frc.robot.Constants.hang;
 
 public class Hang extends SubsystemBase{
-    public static TalonFX hangFX = new TalonFX(Constants.hang.HANG_FX_ID);
+    public static TalonFX hangFX = new TalonFX(CanIDs.HANG_FX_ID);
     public final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(0);
 
 public Hang() {
@@ -22,22 +24,22 @@ public Hang() {
 
     //Current Limits Configuration for hang motor
     hangFX.getConfigurator().apply(new CurrentLimitsConfigs()
-        .withStatorCurrentLimit(Constants.hang.HANG_STATOR_CURRENT)
+        .withStatorCurrentLimit(hang.HANG_STATOR_CURRENT)
         .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(Constants.hang.HANG_SUPPLY_CURRENT)
+        .withSupplyCurrentLimit(hang.HANG_SUPPLY_CURRENT)
         .withSupplyCurrentLimitEnable(true));
 
     //PID Configuration for hang motor
     hangFX.getConfigurator().apply( new Slot0Configs()
-        .withKP(Constants.hang.P_HANG)
-        .withKI(Constants.hang.I_HANG)
-        .withKD(Constants.hang.D_HANG)
-        .withKS(Constants.hang.S_HANG));
+        .withKP(hang.P_HANG)
+        .withKI(hang.I_HANG)
+        .withKD(hang.D_HANG)
+        .withKS(hang.S_HANG));
 
     //Max Voltage configuration for hang motor
     hangFX.getConfigurator().apply(new VoltageConfigs()
-        .withPeakForwardVoltage(Volts.of(Constants.hang.HANG_PEAK_FORWARD_VOLTAGE))
-        .withPeakReverseVoltage(Volts.of(Constants.hang.HANG_PEAK_REVERSE_VOLTAGE)));
+        .withPeakForwardVoltage(Volts.of(hang.HANG_PEAK_FORWARD_VOLTAGE))
+        .withPeakReverseVoltage(Volts.of(-hang.HANG_PEAK_REVERSE_VOLTAGE)));
 }    
 
     public void stop() {

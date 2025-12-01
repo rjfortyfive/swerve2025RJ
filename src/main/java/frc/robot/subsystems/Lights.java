@@ -17,14 +17,6 @@ public class Lights extends SubsystemBase {
       m_LED = new AddressableLED(m_Port);
       m_buffer = new AddressableLEDBuffer(m_Length);
       m_LED.setLength(m_Length);
-      
-  
-      // Set the default command to turn the strip off, otherwise the last colors written by
-      // the last command to run will continue to be displayed.
-      // Note: Other default patterns could be used instead!
-      // setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack)).withName("Off"));
-
-      
     }
 
     public void lightsOn(LEDPattern pattern) {

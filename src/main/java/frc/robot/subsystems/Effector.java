@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
+import frc.robot.Constants.CanIDs;
+import frc.robot.Constants.effector;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
@@ -26,8 +28,8 @@ import com.revrobotics.spark.SparkBase;
 public class Effector extends SubsystemBase {
     private static LaserCan intakeSensor = new LaserCan(2);
 
-    private static TalonFX effectorLeftFX = new TalonFX(Constants.effector.EFFECTOR_LEFT_FX_ID);
-    private static TalonFX effectorRightFX = new TalonFX(Constants.effector.EFFECTOR_RIGHT_FX_ID);
+    private static TalonFX effectorLeftFX = new TalonFX(CanIDs.EFFECTOR_LEFT_FX_ID);
+    private static TalonFX effectorRightFX = new TalonFX(CanIDs.EFFECTOR_RIGHT_FX_ID);
 
     private static SparkMax algaeMotor = new SparkMax(1, MotorType.kBrushed);
 
@@ -54,13 +56,13 @@ public class Effector extends SubsystemBase {
         effectorLeftFX.getConfigurator().apply(new CurrentLimitsConfigs()
             .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
             .withStatorCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
+            .withSupplyCurrentLimit(effector.EFFECTOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));
 
         effectorRightFX.getConfigurator().apply(new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Constants.effector.EFFECTOR_STATOR_CURRENT)
+            .withStatorCurrentLimit(effector.EFFECTOR_STATOR_CURRENT)
             .withStatorCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(Constants.effector.EFFECTOR_SUPPLY_CURRENT)
+            .withSupplyCurrentLimit(effector.EFFECTOR_SUPPLY_CURRENT)
             .withSupplyCurrentLimitEnable(true));
         
         //Current Limits Configuration for algae motor
@@ -68,31 +70,31 @@ public class Effector extends SubsystemBase {
 
         //PID Configurations for effector motors
         effectorLeftFX.getConfigurator().apply( new Slot0Configs()
-            .withKP(Constants.effector.P_EFFECTOR)
-            .withKI(Constants.effector.I_EFFECTOR)
-            .withKD(Constants.effector.D_EFFECTOR)
-            .withKG(Constants.effector.G_EFFECTOR)
-            .withKS(Constants.effector.S_EFFECTOR)
-            .withKV(Constants.effector.V_EFFECTOR)
-            .withKA(Constants.effector.A_EFFECTOR));
+            .withKP(effector.P_EFFECTOR)
+            .withKI(effector.I_EFFECTOR)
+            .withKD(effector.D_EFFECTOR)
+            .withKG(effector.G_EFFECTOR)
+            .withKS(effector.S_EFFECTOR)
+            .withKV(effector.V_EFFECTOR)
+            .withKA(effector.A_EFFECTOR));
             
         effectorRightFX.getConfigurator().apply( new Slot0Configs()
-            .withKP(Constants.effector.P_EFFECTOR)
-            .withKI(Constants.effector.I_EFFECTOR)
-            .withKD(Constants.effector.D_EFFECTOR)
-            .withKG(Constants.effector.G_EFFECTOR)
-            .withKS(Constants.effector.S_EFFECTOR)
-            .withKV(Constants.effector.V_EFFECTOR)
-            .withKA(Constants.effector.A_EFFECTOR));
+            .withKP(effector.P_EFFECTOR)
+            .withKI(effector.I_EFFECTOR)
+            .withKD(effector.D_EFFECTOR)
+            .withKG(effector.G_EFFECTOR)
+            .withKS(effector.S_EFFECTOR)
+            .withKV(effector.V_EFFECTOR)
+            .withKA(effector.A_EFFECTOR));
         
         //Voltage Configurations for effector motors
         effectorLeftFX.getConfigurator().apply(new VoltageConfigs()
-            .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
-            .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+            .withPeakForwardVoltage(Volts.of(effector.EFFECTOR_PEAK_VOLTAGE))
+            .withPeakReverseVoltage(Volts.of(-effector.EFFECTOR_PEAK_VOLTAGE)));
             
         effectorRightFX.getConfigurator().apply(new VoltageConfigs()
-            .withPeakForwardVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE))
-            .withPeakReverseVoltage(Volts.of(Constants.effector.EFFECTOR_PEAK_VOLTAGE)));
+            .withPeakForwardVoltage(Volts.of(effector.EFFECTOR_PEAK_VOLTAGE))
+            .withPeakReverseVoltage(Volts.of(-effector.EFFECTOR_PEAK_VOLTAGE)));
         
         //Motion Magic Configurations for effector motors
         effectorLeftFX.getConfigurator().apply(new MotionMagicConfigs()
@@ -167,8 +169,8 @@ public class Effector extends SubsystemBase {
         double leftCurrentPos = effectorLeftFX.getPosition().getValueAsDouble();
         double rightCurrentPos = effectorRightFX.getPosition().getValueAsDouble();
 
-        double leftTarget = leftCurrentPos + Constants.intake.LOCK_ROTATIONS;
-        double rightTarget = rightCurrentPos - Constants.intake.LOCK_ROTATIONS; 
+        double leftTarget = leftCurrentPos + effector.LOCK_ROTATIONS;
+        double rightTarget = rightCurrentPos - effector.LOCK_ROTATIONS; 
 
         effectorLeftFX.setControl(m_positionVoltage.withPosition(leftTarget));
         effectorRightFX.setControl(m_positionVoltage.withPosition(rightTarget));
