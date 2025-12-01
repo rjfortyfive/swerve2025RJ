@@ -14,7 +14,6 @@ import au.grapplerobotics.CanBridge;
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer;
-    private Vision m_vision = new Vision();
 
     public Robot() {
         // Initialize robot components
@@ -32,7 +31,7 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         // Runs the scheduler for commands
         CommandScheduler.getInstance().run();
-        m_vision.periodic();
+
 
         
     }
@@ -45,6 +44,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
+        // Update vision while disabled
+        m_robotContainer.m_vision.periodic();
     }
 
     @Override

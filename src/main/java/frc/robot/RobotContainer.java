@@ -62,7 +62,7 @@ public class RobotContainer {
         public Effector m_effector = new Effector();
         public Intake m_intake = new Intake();
         public final Hang m_hang = new Hang();
-        public final Vision m_vision = new Vision();
+        public Vision m_vision = new Vision();
         public final Lights m_lights = new Lights();
 
         public RobotContainer() {
