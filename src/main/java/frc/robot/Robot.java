@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,10 +31,16 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
+        // Publish Match Timer to Elastic
+        double matchTime = DriverStation.getMatchTime();
+
+        NetworkTableInstance.getDefault()
+            .getTable("FMSInfo")
+            .getEntry("MatchTime")
+            .setDouble(matchTime);       
+       
         // Runs the scheduler for commands
         CommandScheduler.getInstance().run();
-
-
         
     }
     @Override
