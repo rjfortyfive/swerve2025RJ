@@ -1,8 +1,10 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -55,8 +57,6 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
         }
-        // RobotContainer.drivetrain.seedFieldCentric(); // Not currently working -
-        // reverses direction on blue side
     }
 
     @Override
@@ -65,7 +65,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        // resetPose();
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
