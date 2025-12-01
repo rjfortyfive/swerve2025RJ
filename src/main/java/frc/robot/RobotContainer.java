@@ -179,7 +179,7 @@ public class RobotContainer {
                                 new SequentialCommandGroup(
                                                 new InstantCommand(
                                                                 () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L4 - 0.5),
+                                                                                Constants.elevator.level.L4),
                                                                 m_elevator),
 
                                                 new WaitCommand(.9),
