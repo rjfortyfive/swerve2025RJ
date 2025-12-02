@@ -56,14 +56,27 @@
             }
           },
           {
-            "title": "Pose",
+            "title": "Auto Chooser",
+            "x": 256.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "Field",
             "x": 768.0,
             "y": 256.0,
-            "width": 640.0,
+            "width": 768.0,
             "height": 384.0,
             "type": "Field",
             "properties": {
-              "topic": "/Pose",
+              "topic": "/SmartDashboard/Field",
               "period": 0.06,
               "field_game": "Reefscape",
               "robot_width": 0.85,
@@ -76,16 +89,48 @@
             }
           },
           {
-            "title": "Auto Chooser",
-            "x": 256.0,
+            "title": "HasPose",
+            "x": 0.0,
             "y": 512.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 128.0,
-            "type": "ComboBox Chooser",
+            "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Auto Chooser",
+              "topic": "/SmartDashboard/Vision/HasPose",
               "period": 0.06,
-              "sort_options": false
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "LastAmbiguity",
+            "x": 0.0,
+            "y": 640.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Vision/LastAmbiguity",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Camera",
+            "x": 128.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Vision/Camera",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
             }
           }
         ]
@@ -131,7 +176,7 @@
             "height": 512.0,
             "type": "Field",
             "properties": {
-              "topic": "/Pose",
+              "topic": "/SmartDashboard/Field",
               "period": 0.06,
               "field_game": "Reefscape",
               "robot_width": 0.85,
@@ -246,7 +291,7 @@
             "height": 256.0,
             "type": "Field",
             "properties": {
-              "topic": "/Pose",
+              "topic": "/SmartDashboard/Field",
               "period": 0.06,
               "field_game": "Reefscape",
               "robot_width": 0.85,
@@ -443,7 +488,7 @@
             "height": 256.0,
             "type": "Field",
             "properties": {
-              "topic": "/Pose",
+              "topic": "/SmartDashboard/Field",
               "period": 0.06,
               "field_game": "Reefscape",
               "robot_width": 0.85,
@@ -505,9 +550,8 @@
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Pose/robotPose",
+              "topic": "/SmartDashboard/Field",
               "period": 0.06,
-              "data_type": "double[]",
               "show_submit_button": false
             }
           },
