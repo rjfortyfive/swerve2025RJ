@@ -37,7 +37,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private double m_lastSimTime;
     private Vision m_vision;
 
-    private final Field2d m_field = new Field2d();
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
     /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
@@ -146,7 +145,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (Utils.isSimulation()) {
         startSimThread();
     }
-    SmartDashboard.putData("Field", m_field);
 }
 
 
@@ -203,7 +201,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 );
                 m_hasAppliedOperatorPerspective = true;
             });
-        m_field.setRobotPose(getState().Pose);
         }  
 
     if (m_vision != null 
