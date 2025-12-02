@@ -48,8 +48,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
 
-    private final Field2d m_field = new Field2d();
-
 
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
 
@@ -151,9 +149,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (Utils.isSimulation()) {
         startSimThread();
     }
-
-    configureAutoBuilder();
-    SmartDashboard.putData("Field", m_field);
 }
 
 
@@ -210,10 +205,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 );
                 m_hasAppliedOperatorPerspective = true;
             });
-        }
-    
-    // Update Elastic Field
-    m_field.setRobotPose(getPose());    
+        }  
 
     if (m_vision != null 
             && DriverStation.isEnabled() 
@@ -244,20 +236,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
-    public void configureAutoBuilder() {
-        try {
-            var config = RobotConfig.fromGUISettings();
-            AutoBuilder.configure(
-                () -> getState().Pose, this::resetPose, 
-                () -> getState().Speeds, (speeds, feedforwards) -> setControl(m_pathApplyRobotSpeeds.withSpeeds(speeds).withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons()).withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())), 
-                new PPHolonomicDriveController(new PIDConstants(10, 0, 0), new PIDConstants(5, 0, 0)), config, () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red, this);
-        }
-        catch (Exception ex) {
-            DriverStation.reportError("Failed to load PathPlanner config and configure Autobuilder", ex.getStackTrace());
-        }
-    }
 
     public void setVision(Vision vision) {
         this.m_vision = vision;
+    }    
+
+    public SwerveRequest.ApplyRobotSpeeds getPathApplyRobotSpeeds() {
+        return m_pathApplyRobotSpeeds;
     }    
 }

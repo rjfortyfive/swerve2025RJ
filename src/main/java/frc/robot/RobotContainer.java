@@ -14,7 +14,11 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -68,6 +72,8 @@ public class RobotContainer {
         public RobotContainer() {
 
                 m_drivetrain.setVision(m_vision);
+
+                configureAutoBuilder();
 
                 configureBindings();
                 configureDefaultCommands();
@@ -245,6 +251,54 @@ public class RobotContainer {
                 // Default command for lights
                 m_lights.setDefaultCommand(new RunCommand(() -> m_lights.lightsOn(Constants.lights.purpleGoldStep), m_lights));
         }
+        private void configureAutoBuilder() {
+            try {
+                var config = RobotConfig.fromGUISettings();
+        
+                AutoBuilder.configure(
+                    // 1) Robot pose supplier (EXACT same as before)
+                    () -> m_drivetrain.getState().Pose,
+        
+                    // 2) Pose reset function (EXACT same)
+                    (pose) -> m_drivetrain.resetPose(pose),
+        
+                    // 3) Robot speeds supplier (EXACT same)
+                    () -> m_drivetrain.getState().Speeds,
+        
+                    // 4) Apply chassis speeds + feedforwards (EXACT same logic)
+                    (speeds, feedforwards) ->
+                        m_drivetrain.setControl(
+                                m_drivetrain.getPathApplyRobotSpeeds()
+                                        .withSpeeds(speeds)
+                                        .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                                        .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
+                        ),
+        
+                    // 5) Holonomic controller (EXACT same PID constants)
+                    new PPHolonomicDriveController(
+                        new PIDConstants(10, 0, 0),
+                        new PIDConstants(5, 0, 0)
+                    ),
+        
+                    // 6) PathPlanner GUI config (EXACT same)
+                    config,
+        
+                    // 7) Alliance mirroring (EXACT same)
+                    () -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red,
+        
+                    // 8) Subsystem instance reference (EXACT same meaning as "this" before)
+                    m_drivetrain
+                );
+        
+            } catch (Exception ex) {
+                DriverStation.reportError(
+                    "Failed to load PathPlanner config and configure AutoBuilder",
+                    ex.getStackTrace()
+                );
+            }
+        }
+                        
+        
 
         public Command getAutonomousCommand() {
                 // return Commands.print("No autonomous command configured");
