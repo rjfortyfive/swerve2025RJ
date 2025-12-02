@@ -256,4 +256,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             DriverStation.reportError("Failed to load PathPlanner config and configure Autobuilder", ex.getStackTrace());
         }
     }
+
+    public void setVision(Vision vision) {
+        this.m_vision = vision;
+    }    
 }

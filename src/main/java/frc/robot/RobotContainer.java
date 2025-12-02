@@ -67,6 +67,8 @@ public class RobotContainer {
 
         public RobotContainer() {
 
+                m_drivetrain.setVision(m_vision);
+
                 configureBindings();
                 configureDefaultCommands();
                 configureNamedCommands();
@@ -83,6 +85,8 @@ public class RobotContainer {
                 positionChooser.addOption("Id 8", 4);
 
                 SmartDashboard.putData("Pose start", positionChooser);
+
+                
 
         }
 
