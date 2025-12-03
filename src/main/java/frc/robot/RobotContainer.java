@@ -39,11 +39,11 @@ public class RobotContainer {
         private final SendableChooser<Command> autoChooser;
         public static SendableChooser<Integer> positionChooser;
 
-        public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * 1; // kSpeedAt12Volts
+        public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * Constants.MASTER_DRIVE_MULTIPLIER; // kSpeedAt12Volts
                                                                                                 // desired
                                                                                                 // top
                                                                                                 // speed
-        public static double MaxAngularRate = RotationsPerSecond.of(2.5).in(RadiansPerSecond); // 3/4 of a rotation per
+        public static double MaxAngularRate = RotationsPerSecond.of(2.5).in(RadiansPerSecond) * Constants.MASTER_DRIVE_MULTIPLIER; // 3/4 of a rotation per
                                                                                                // second
                                                                                                // max angular velocity
 
@@ -231,9 +231,9 @@ public class RobotContainer {
                 // Default command for driving with joystick
                 m_drivetrain.setDefaultCommand(
                         m_drivetrain.applyRequest(() -> drive
-                                        .withVelocityX(joystick.getY() * MaxSpeed * Constants.MASTER_DRIVE_MULTIPLIER)
-                                        .withVelocityY(joystick.getX()  * MaxSpeed * Constants.MASTER_DRIVE_MULTIPLIER)
-                                        .withRotationalRate(-joystick.getTwist()  * MaxAngularRate * Constants.MASTER_DRIVE_MULTIPLIER)));
+                                        .withVelocityX(joystick.getY())
+                                        .withVelocityY(joystick.getX())
+                                        .withRotationalRate(-joystick.getTwist())));
 
                 // Default command for effector control with Xbox triggers                                              
                 m_effector.setDefaultCommand(new RunCommand(() -> {
