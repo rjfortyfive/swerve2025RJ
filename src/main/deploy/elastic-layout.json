@@ -412,8 +412,8 @@
           },
           {
             "title": "OdometryFrequency",
-            "x": 128.0,
-            "y": 384.0,
+            "x": 384.0,
+            "y": 256.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -446,8 +446,8 @@
           },
           {
             "title": "infos",
-            "x": 0.0,
-            "y": 256.0,
+            "x": 256.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -460,8 +460,8 @@
           },
           {
             "title": "errors",
-            "x": 0.0,
-            "y": 384.0,
+            "x": 256.0,
+            "y": 256.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -474,7 +474,7 @@
           },
           {
             "title": "warnings",
-            "x": 128.0,
+            "x": 384.0,
             "y": 128.0,
             "width": 128.0,
             "height": 128.0,
@@ -545,7 +545,7 @@
           {
             "title": "Camera",
             "x": 0.0,
-            "y": 640.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -559,7 +559,7 @@
           {
             "title": "HasPose",
             "x": 128.0,
-            "y": 640.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -576,7 +576,7 @@
           {
             "title": "LastAmbiguity",
             "x": 0.0,
-            "y": 768.0,
+            "y": 256.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -590,7 +590,7 @@
           {
             "title": "LastNumTags",
             "x": 128.0,
-            "y": 768.0,
+            "y": 256.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -604,7 +604,7 @@
           {
             "title": "LastTagId",
             "x": 0.0,
-            "y": 896.0,
+            "y": 384.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -618,7 +618,7 @@
           {
             "title": "LastTimestamp",
             "x": 128.0,
-            "y": 896.0,
+            "y": 384.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -627,6 +627,19 @@
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
+            }
+          },
+          {
+            "title": "Pose start",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Pose start",
+              "period": 0.06,
+              "sort_options": false
             }
           }
         ]
