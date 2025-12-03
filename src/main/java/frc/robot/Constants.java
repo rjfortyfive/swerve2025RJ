@@ -63,7 +63,7 @@ public class Constants {
         // max accel m/s²
         public static final double MAX_ACCEL = 2.5;
         // max rot deg/s
-        public static final double MAX_ROT_SPEED = 600;
+        public static final double MAX_ROT_SPEED = 300;
         // max rot accel deg/s²
         public static final double MAX_ROT_ACCEL = 600;
 
