@@ -136,9 +136,8 @@ public class RobotContainer {
                                                                 () -> m_effector.stopAlgaeEffector(), m_effector));
                 // Asymmetric Effector outtake for L1
                 XboxController.a()
-                                .whileTrue(new InstantCommand(() -> {
-                                        m_effector.start(20.0, 6.0);
-                                }, m_effector));
+                                .whileTrue(new StartEndCommand(() -> m_effector.start(20.0, 6.0), 
+                                                                () -> m_effector.stop(), m_effector));
                 // Hang control triggers: Only when left bumper is held and a trigger is pressed
                 new Trigger(() -> XboxController.leftBumper().getAsBoolean()
                                 && XboxController.getRightTriggerAxis() > 0.25)
