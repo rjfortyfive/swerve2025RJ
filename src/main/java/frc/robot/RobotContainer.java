@@ -128,9 +128,9 @@ public class RobotContainer {
                                 .onTrue(new InstantCommand(() -> m_elevator.toPosition(0)));
                 // Algae Effector Up and Down on D-Pad
                 XboxController.povUp()
-                                .whileTrue(new InstantCommand(() -> m_effector.algaeEffectorUp(1), m_effector));
+                                .whileTrue(new InstantCommand(() -> m_effector.moveAlgaeEffector(1), m_effector));
                 XboxController.povDown()
-                                .whileTrue(new InstantCommand(() -> m_effector.algaeEffectorDown(1), m_effector));
+                                .whileTrue(new InstantCommand(() -> m_effector.moveAlgaeEffector(-1), m_effector));
                 // Asymmetric Effector outtake for L1
                 XboxController.a()
                                 .whileTrue(new InstantCommand(() -> {
