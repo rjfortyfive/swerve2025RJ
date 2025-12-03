@@ -183,4 +183,8 @@ public class Effector extends SubsystemBase {
     public void moveAlgaeEffector(double percent) {
         algaeMotor.set(percent);
     }
+
+    public void stopAlgaeEffector(){
+        algaeMotor.set(0);
+    }
 }

@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -128,7 +129,8 @@ public class RobotContainer {
                                 .onTrue(new InstantCommand(() -> m_elevator.toPosition(0)));
                 // Algae Effector Up and Down on D-Pad
                 XboxController.povUp()
-                                .whileTrue(new InstantCommand(() -> m_effector.moveAlgaeEffector(1), m_effector));
+                                .whileTrue(new StartEndCommand(() -> m_effector.moveAlgaeEffector(1), 
+                                                                  () -> m_effector.stopAlgaeEffector(), m_effector));
                 XboxController.povDown()
                                 .whileTrue(new InstantCommand(() -> m_effector.moveAlgaeEffector(-1), m_effector));
                 // Asymmetric Effector outtake for L1
@@ -236,7 +238,7 @@ public class RobotContainer {
                                         .withRotationalRate(-joystick.getTwist())));
 
                 // Default command for effector control with Xbox triggers                                              
-                m_effector.setDefaultCommand(new RunCommand(() -> {
+                m_effector.setDefaultCommand(new StartEndCommand(() -> {
                         double lt = XboxController.getLeftTriggerAxis();
                         double rt = XboxController.getRightTriggerAxis();
                                                     
@@ -246,8 +248,9 @@ public class RobotContainer {
                                         m_effector.start(0.5 * 70 * rt);
                                 } else {
                                         m_effector.start(0);
-                                }
-                                }, m_effector));
+                                }}, 
+                                () -> m_effector.stop(),
+                                m_effector));
                 // Default command for lights
                 m_lights.setDefaultCommand(new RunCommand(() -> m_lights.lightsOn(Constants.lights.purpleGoldStep), m_lights));
         }
