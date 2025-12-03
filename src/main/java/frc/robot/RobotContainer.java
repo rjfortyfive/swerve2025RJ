@@ -38,7 +38,6 @@ import frc.robot.util.TagUtils.tagSide;;
 public class RobotContainer {
         
         private final SendableChooser<Command> autoChooser;
-        public static SendableChooser<Integer> positionChooser;
 
         public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * Constants.MASTER_DRIVE_MULTIPLIER; // kSpeedAt12Volts
                                                                                                 // desired
@@ -83,17 +82,6 @@ public class RobotContainer {
                 
                 autoChooser = AutoBuilder.buildAutoChooser("");
                 SmartDashboard.putData("Auto Chooser", autoChooser);
-
-                // Position chooser for autonomous starting positions
-                positionChooser = new SendableChooser<>();
-                positionChooser.setDefaultOption("Id 7", 1);
-                positionChooser.addOption("Skip", 2);
-                positionChooser.addOption("Id 8", 3);
-                positionChooser.addOption("Id 8", 4);
-
-                SmartDashboard.putData("Pose start", positionChooser);
-
-                
 
         }
 
