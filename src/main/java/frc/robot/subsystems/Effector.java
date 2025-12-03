@@ -26,7 +26,7 @@ import com.revrobotics.spark.SparkBase;
 
 
 public class Effector extends SubsystemBase {
-    private static LaserCan intakeSensor = new LaserCan(2);
+    private static LaserCan effectorSensor = new LaserCan(CanIDs.EFFECTOR_LASER_ID);
 
     private static TalonFX effectorLeftFX = new TalonFX(CanIDs.EFFECTOR_LEFT_FX_ID);
     private static TalonFX effectorRightFX = new TalonFX(CanIDs.EFFECTOR_RIGHT_FX_ID);
@@ -177,7 +177,7 @@ public class Effector extends SubsystemBase {
     }
 
     public boolean isCoralDetected() {
-        return intakeSensor.getMeasurement().distance_mm < 10;
+        return effectorSensor.getMeasurement().distance_mm < 10;
     }
 
     public void moveAlgaeEffector(double percent) {
