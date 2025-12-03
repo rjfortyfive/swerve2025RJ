@@ -129,10 +129,10 @@ public class RobotContainer {
                 // Hang control triggers: Only when left bumper is held and a trigger is pressed
                 new Trigger(() -> XboxController.leftBumper().getAsBoolean()
                                 && XboxController.getRightTriggerAxis() > 0.25)
-                                .whileTrue(new InstantCommand(() -> m_hang.start(100), m_hang, m_drivetrain));
+                                .whileTrue(new StartEndCommand(() -> m_hang.start(100), () -> m_hang.stop(), m_hang, m_drivetrain));
                 new Trigger(() -> XboxController.leftBumper().getAsBoolean()
                                 && XboxController.getLeftTriggerAxis() > 0.25)
-                                .whileTrue(new InstantCommand(() -> m_hang.start(-100), m_hang, m_drivetrain));
+                                .whileTrue(new StartEndCommand(() -> m_hang.start(-100), () -> m_hang.stop(), m_hang, m_drivetrain));
                 // reset the field-centric heading on middle button press
                 // joystick.button(2).onTrue(drivetrain.runOnce(() ->
                 // drivetrain.seedFieldCentric()));
