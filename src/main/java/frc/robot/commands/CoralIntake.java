@@ -42,13 +42,13 @@ public class CoralIntake extends Command {
         {
             coralHasBeenSeen = true;
             m_intake.stop();
-            m_effector.startLock();
+            m_effector.start(20);
 
         }
         else if (!m_effector.isCoralDetected() && coralHasBeenSeen) // no coral, was seen = reverse
         {
             coralHasBeenReversed = true;
-            m_effector.start(-15);
+            m_effector.startLock();
         }
 
     }
