@@ -12,6 +12,7 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -208,12 +209,12 @@ public class TunerConstants {
         Matrix<N3, N1> odometryStdDevs = new Matrix<>(N3.instance, N1.instance);
         odometryStdDevs.set(0, 0, 0.02);     // x
         odometryStdDevs.set(1, 0, 0.02);     // y
-        odometryStdDevs.set(2, 0, 0.002);    // theta
+        odometryStdDevs.set(2, 0, Units.degreesToRadians(1));    // theta
     
         Matrix<N3, N1> visionStdDevs = new Matrix<>(N3.instance, N1.instance);
         visionStdDevs.set(0, 0, 0.7);        // x
         visionStdDevs.set(1, 0, 0.7);        // y
-        visionStdDevs.set(2, 0, 0.15);        // theta
+        visionStdDevs.set(2, 0, Units.degreesToRadians(8.5));        // theta
     
         return new CommandSwerveDrivetrain(
             DrivetrainConstants,

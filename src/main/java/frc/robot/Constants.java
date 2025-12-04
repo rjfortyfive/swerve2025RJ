@@ -225,12 +225,12 @@ public class Constants {
         public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(
             0.55, // σₓ: odometry may drift ±10 cm
             0.55, // σᵧ: same sideways
-            Math.toRadians(25.0) // σθ: roughly ±5° heading error
+            Units.degreesToRadians(25.0) // σθ: roughly ±5° heading error
     );
         public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(
             0.25, // σₓ: vision ±0.5 cm
             0.25, // σᵧ: ±0.5 cm
-            Math.toRadians(10.0) // σθ: ±2°
+            Units.degreesToRadians(10.0) // σθ: ±2°
     );
 
         public static List<Integer> TAGS = List.of();
