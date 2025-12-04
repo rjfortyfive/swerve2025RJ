@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -17,7 +18,6 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,7 +39,7 @@ public class RobotContainer {
         
         private final SendableChooser<Command> autoChooser;
 
-        public static LinearVelocity MaxSpeed = TunerConstants.kSpeedAt12Volts; // kSpeedAt12Volts
+        public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts
                                                                                                 // desired
                                                                                                 // top
                                                                                                 // speed
@@ -49,13 +49,13 @@ public class RobotContainer {
 
         /* Setting up bindings for necessary control of the swerve drive platform */
         public static final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-                        .withDeadband(MaxSpeed.times(0.01)).withRotationalDeadband(MaxAngularRate * 0.01) // Add a 10%
+                        .withDeadband(MaxSpeed * 0.01).withRotationalDeadband(MaxAngularRate * 0.01) // Add a 10%
                                                                                                      // deadband
                         .withDriveRequestType(DriveRequestType.Velocity); // Use open-loop control for drive
                                                                                  // motors
         private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
-        //private final Telemetry logger = new Telemetry(MaxSpeed);
+        private final Telemetry logger = new Telemetry(MaxSpeed);
 
         public static final CommandJoystick joystick = new CommandJoystick(0);
         public static final CommandXboxController XboxController = new CommandXboxController(1);
@@ -136,7 +136,7 @@ public class RobotContainer {
                 // reset the field-centric heading on middle button press
                 // joystick.button(2).onTrue(drivetrain.runOnce(() ->
                 // drivetrain.seedFieldCentric()));
-               // m_drivetrain.registerTelemetry(logger::telemeterize); //breaks because I removed logger up there because linearvelocty of max speed
+                m_drivetrain.registerTelemetry(logger::telemeterize);
                 // Button commands and stick-based triggers for strafeRight and strafeLeft
                 if (!Constants.MASTER_NERF) {
                         // Strafe Right: schedule and track the command, only one at a time
@@ -220,10 +220,12 @@ public class RobotContainer {
 
                 // Default command for driving with joystick
                 m_drivetrain.setDefaultCommand(
-                        m_drivetrain.applyRequest(() -> drive
-                                        .withVelocityX(joystick.getY())
-                                        .withVelocityY(joystick.getX())
-                                        .withRotationalRate(-joystick.getTwist())));
+                        m_drivetrain.applyRequest(() -> 
+                                drive.withVelocityX(joystick.getY() * MaxSpeed)
+                                     .withVelocityY(joystick.getX() * MaxSpeed)
+                                     .withRotationalRate(-joystick.getTwist() * MaxAngularRate)
+                        )
+                );
 
                 // Default command for effector control with Xbox triggers                                              
                 m_effector.setDefaultCommand(new StartEndCommand(() -> {
