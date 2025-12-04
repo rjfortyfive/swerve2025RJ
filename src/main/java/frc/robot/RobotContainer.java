@@ -43,7 +43,7 @@ public class RobotContainer {
                                                                                                 // desired
                                                                                                 // top
                                                                                                 // speed
-        public static double MaxAngularRate = RotationsPerSecond.of(2.5).in(RadiansPerSecond) * Constants.MASTER_DRIVE_MULTIPLIER; // 3/4 of a rotation per
+        public static double MaxAngularRate = RotationsPerSecond.of(1.25).in(RadiansPerSecond) * Constants.MASTER_DRIVE_MULTIPLIER; // 3/4 of a rotation per
                                                                                                // second
                                                                                                // max angular velocity
 
