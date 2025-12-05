@@ -228,19 +228,20 @@ public class RobotContainer {
                 );
 
                 // Default command for effector control with Xbox triggers                                              
-                m_effector.setDefaultCommand(new StartEndCommand(() -> {
-                        double lt = XboxController.getLeftTriggerAxis();
-                        double rt = XboxController.getRightTriggerAxis();
-                                                    
-                                if (lt > 0.1) {
-                                        m_effector.start(-0.5 * 70 * lt);
-                                } else if (rt > 0.1) {
-                                        m_effector.start(0.5 * 70 * rt);
-                                } else {
-                                        m_effector.start(0);
-                                }}, 
-                                () -> m_effector.stop(),
-                                m_effector));
+                m_effector.setDefaultCommand(
+                        new RunCommand(() -> {
+                            double lt = XboxController.getLeftTriggerAxis();
+                            double rt = XboxController.getRightTriggerAxis();
+                    
+                            if (rt > 0.1) {
+                                m_effector.start(70 * rt);  // Outtake
+                            } else if (lt > 0.1) {
+                                m_effector.start(-70 * lt); // Intake
+                            } else {
+                                m_effector.stop();
+                            }
+                        }, m_effector)
+                    );
                 // Default command for lights
                 m_lights.setDefaultCommand(new RunCommand(() -> m_lights.lightsOn(Constants.lights.purpleGoldStep), m_lights));
         }
