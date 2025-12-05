@@ -644,6 +644,222 @@
           }
         ]
       }
+    },
+    {
+      "name": "DriveState",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Drive Pose (Reefscape Field)",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 768.0,
+            "height": 512.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/DriveState/Pose",
+              "period": 0.06,
+              "field_game": "Reefscape",
+              "robot_width": 0.85,
+              "robot_length": 0.85,
+              "show_other_objects": true,
+              "show_trajectories": false,
+              "field_rotation": 0.0,
+              "robot_color": 4294198070
+            }
+          },
+    
+          {
+            "title": "Chassis Speeds (vx, vy, ω)",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/DriveState/Speeds",
+              "period": 0.06,
+              "data_type": "struct",
+              "show_submit_button": false
+            }
+          },
+    
+          {
+            "title": "Odometry Frequency (Hz)",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/DriveState/OdometryFrequency",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+    
+          {
+            "title": "Timestamp",
+            "x": 960.0,
+            "y": 128.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/DriveState/Timestamp",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+    
+          {
+            "title": "Module 0 State",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/DriveState/ModuleStates",
+              "index": 0,
+              "period": 0.06,
+              "data_type": "struct",
+              "show_submit_button": false
+            }
+          },
+    
+          {
+            "title": "Module 1 State",
+            "x": 192.0,
+            "y": 512.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/DriveState/ModuleStates",
+              "index": 1,
+              "period": 0.06,
+              "data_type": "struct",
+              "show_submit_button": false
+            }
+          },
+    
+          {
+            "title": "Module 2 State",
+            "x": 384.0,
+            "y": 512.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/DriveState/ModuleStates",
+              "index": 2,
+              "period": 0.06,
+              "data_type": "struct",
+              "show_submit_button": false
+            }
+          },
+    
+          {
+            "title": "Module 3 State",
+            "x": 576.0,
+            "y": 512.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/DriveState/ModuleStates",
+              "index": 3,
+              "period": 0.06,
+              "data_type": "struct",
+              "show_submit_button": false
+            }
+          },
+    
+          {
+            "title": "Module 0 Target",
+            "x": 0.0,
+            "y": 640.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/DriveState/ModuleTargets",
+              "index": 0,
+              "period": 0.06,
+              "data_type": "struct",
+              "show_submit_button": false
+            }
+          },
+    
+          {
+            "title": "Module 1 Target",
+            "x": 192.0,
+            "y": 640.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/DriveState/ModuleTargets",
+              "index": 1,
+              "period": 0.06,
+              "data_type": "struct",
+              "show_submit_button": false
+            }
+          },
+    
+          {
+            "title": "Module 2 Target",
+            "x": 384.0,
+            "y": 640.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/DriveState/ModuleTargets",
+              "index": 2,
+              "period": 0.06,
+              "data_type": "struct",
+              "show_submit_button": false
+            }
+          },
+    
+          {
+            "title": "Module 3 Target",
+            "x": 576.0,
+            "y": 640.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/DriveState/ModuleTargets",
+              "index": 3,
+              "period": 0.06,
+              "data_type": "struct",
+              "show_submit_button": false
+            }
+          },
+    
+          {
+            "title": "Module Positions (Raw)",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 384.0,
+            "height": 512.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/DriveState/ModulePositions",
+              "period": 0.06,
+              "data_type": "struct[]",
+              "show_submit_button": false
+            }
+          }
+        ]
+      }
     }
+    
   ]
 }
