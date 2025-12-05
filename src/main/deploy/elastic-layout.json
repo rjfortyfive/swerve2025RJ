@@ -76,12 +76,12 @@
             "height": 384.0,
             "type": "Field",
             "properties": {
-              "topic": "/SmartDashboard/Field",
+              "topic": "/DriveState/Pose",
               "period": 0.06,
               "field_game": "Reefscape",
               "robot_width": 0.85,
               "robot_length": 0.85,
-              "show_other_objects": true,
+              "show_other_objects": false,
               "show_trajectories": true,
               "field_rotation": 0.0,
               "robot_color": 4294198070,
@@ -176,12 +176,12 @@
             "height": 512.0,
             "type": "Field",
             "properties": {
-              "topic": "/SmartDashboard/Field",
+              "topic": "/DriveState/Pose",
               "period": 0.06,
               "field_game": "Reefscape",
               "robot_width": 0.85,
               "robot_length": 0.85,
-              "show_other_objects": true,
+              "show_other_objects": false,
               "show_trajectories": true,
               "field_rotation": 0.0,
               "robot_color": 4294198070,
@@ -291,12 +291,12 @@
             "height": 256.0,
             "type": "Field",
             "properties": {
-              "topic": "/SmartDashboard/Field",
+              "topic": "/DriveState/Pose",
               "period": 0.06,
               "field_game": "Reefscape",
               "robot_width": 0.85,
               "robot_length": 0.85,
-              "show_other_objects": true,
+              "show_other_objects": false,
               "show_trajectories": true,
               "field_rotation": 0.0,
               "robot_color": 4294198070,
@@ -432,12 +432,12 @@
             "height": 256.0,
             "type": "Field",
             "properties": {
-              "topic": "/SmartDashboard/Field",
+              "topic": "/DriveState/Pose",
               "period": 0.06,
               "field_game": "Reefscape",
               "robot_width": 0.85,
               "robot_length": 0.85,
-              "show_other_objects": true,
+              "show_other_objects": false,
               "show_trajectories": true,
               "field_rotation": 0.0,
               "robot_color": 4294198070,
@@ -666,10 +666,10 @@
               "show_other_objects": true,
               "show_trajectories": false,
               "field_rotation": 0.0,
-              "robot_color": 4294198070
+              "robot_color": 4294198070,
+              "trajectory_color": 4294967295
             }
           },
-    
           {
             "title": "Chassis Speeds (vx, vy, ω)",
             "x": 768.0,
@@ -684,7 +684,6 @@
               "show_submit_button": false
             }
           },
-    
           {
             "title": "Odometry Frequency (Hz)",
             "x": 768.0,
@@ -699,7 +698,6 @@
               "show_submit_button": false
             }
           },
-    
           {
             "title": "Timestamp",
             "x": 960.0,
@@ -714,7 +712,6 @@
               "show_submit_button": false
             }
           },
-    
           {
             "title": "Module 0 State",
             "x": 0.0,
@@ -724,13 +721,11 @@
             "type": "Text Display",
             "properties": {
               "topic": "/DriveState/ModuleStates",
-              "index": 0,
               "period": 0.06,
               "data_type": "struct",
               "show_submit_button": false
             }
           },
-    
           {
             "title": "Module 1 State",
             "x": 192.0,
@@ -740,13 +735,11 @@
             "type": "Text Display",
             "properties": {
               "topic": "/DriveState/ModuleStates",
-              "index": 1,
               "period": 0.06,
               "data_type": "struct",
               "show_submit_button": false
             }
           },
-    
           {
             "title": "Module 2 State",
             "x": 384.0,
@@ -756,13 +749,11 @@
             "type": "Text Display",
             "properties": {
               "topic": "/DriveState/ModuleStates",
-              "index": 2,
               "period": 0.06,
               "data_type": "struct",
               "show_submit_button": false
             }
           },
-    
           {
             "title": "Module 3 State",
             "x": 576.0,
@@ -772,13 +763,11 @@
             "type": "Text Display",
             "properties": {
               "topic": "/DriveState/ModuleStates",
-              "index": 3,
               "period": 0.06,
               "data_type": "struct",
               "show_submit_button": false
             }
           },
-    
           {
             "title": "Module 0 Target",
             "x": 0.0,
@@ -788,13 +777,11 @@
             "type": "Text Display",
             "properties": {
               "topic": "/DriveState/ModuleTargets",
-              "index": 0,
               "period": 0.06,
               "data_type": "struct",
               "show_submit_button": false
             }
           },
-    
           {
             "title": "Module 1 Target",
             "x": 192.0,
@@ -804,13 +791,11 @@
             "type": "Text Display",
             "properties": {
               "topic": "/DriveState/ModuleTargets",
-              "index": 1,
               "period": 0.06,
               "data_type": "struct",
               "show_submit_button": false
             }
           },
-    
           {
             "title": "Module 2 Target",
             "x": 384.0,
@@ -820,13 +805,11 @@
             "type": "Text Display",
             "properties": {
               "topic": "/DriveState/ModuleTargets",
-              "index": 2,
               "period": 0.06,
               "data_type": "struct",
               "show_submit_button": false
             }
           },
-    
           {
             "title": "Module 3 Target",
             "x": 576.0,
@@ -836,13 +819,11 @@
             "type": "Text Display",
             "properties": {
               "topic": "/DriveState/ModuleTargets",
-              "index": 3,
               "period": 0.06,
               "data_type": "struct",
               "show_submit_button": false
             }
           },
-    
           {
             "title": "Module Positions (Raw)",
             "x": 768.0,
@@ -860,6 +841,5 @@
         ]
       }
     }
-    
   ]
 }
