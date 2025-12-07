@@ -207,9 +207,9 @@ public class TunerConstants {
         double odometryHz = 250.0;
     
         Matrix<N3, N1> odometryStdDevs = new Matrix<>(N3.instance, N1.instance);
-        odometryStdDevs.set(0, 0, 0.02);     // x
-        odometryStdDevs.set(1, 0, 0.02);     // y
-        odometryStdDevs.set(2, 0, Units.degreesToRadians(1));    // theta
+        odometryStdDevs.set(0, 0, 0.03);     // x
+        odometryStdDevs.set(1, 0, 0.03);     // y
+        odometryStdDevs.set(2, 0, Units.degreesToRadians(1.25));    // theta
     
         Matrix<N3, N1> visionStdDevs = new Matrix<>(N3.instance, N1.instance);
         visionStdDevs.set(0, 0, 0.25);        // x

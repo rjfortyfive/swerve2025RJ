@@ -70,9 +70,6 @@ public class RobotContainer {
         public final Lights m_lights = new Lights();
 
         public RobotContainer() {
-
-                m_drivetrain.setVision(m_vision);
-
                 configureAutoBuilder();
 
                 configureBindings();

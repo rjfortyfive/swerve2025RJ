@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -16,7 +17,10 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
+import com.ctre.phoenix6.Utils;
+
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.util.TagUtils;
 
 public class Vision extends SubsystemBase {
@@ -29,7 +33,7 @@ public class Vision extends SubsystemBase {
     private final PhotonPoseEstimator estimator1;
     private final PhotonPoseEstimator estimator2;
 
-    // Latest fused vision result (from either camera)
+    // Telemetry state
     private Pose2d latestPose;
     private Matrix<N3, N1> latestStdDevs;
     private double latestTimestamp = -1.0;
@@ -58,16 +62,17 @@ public class Vision extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Try to update from both cameras; the internal logic chooses which one wins
-        updateCamera(estimator1, camera1);
-        updateCamera(estimator2, camera2);
-        // Publish to SmartDashboard
+        processCamera(camera1, estimator1);
+        processCamera(camera2, estimator2);
+
+        // Dashboard publishing (unchanged)
         SmartDashboard.putBoolean("Vision/HasPose", latestPose != null);
         SmartDashboard.putNumber("Vision/LastTimestamp", latestTimestamp);
         SmartDashboard.putString("Vision/Camera", latestCameraName);
         SmartDashboard.putNumber("Vision/LastTagId", lastSeenTagId);
         SmartDashboard.putNumber("Vision/LastAmbiguity", latestAmbiguity);
         SmartDashboard.putNumber("Vision/LastNumTags", latestNumTags);
+
         if (latestStdDevs != null) {
             SmartDashboard.putNumber("Vision/StdDevX", latestStdDevs.get(0, 0));
             SmartDashboard.putNumber("Vision/StdDevY", latestStdDevs.get(1, 0));
@@ -75,7 +80,7 @@ public class Vision extends SubsystemBase {
         }
     }
 
-    private void updateCamera(PhotonPoseEstimator estimator, PhotonCamera camera) {
+    private void processCamera(PhotonCamera camera, PhotonPoseEstimator estimator) {
         var results = camera.getAllUnreadResults();
         if (results.isEmpty()) return;
 
@@ -87,9 +92,7 @@ public class Vision extends SubsystemBase {
         Pose2d visionPose = visionEst.estimatedPose.toPose2d();
         var targets = last.getTargets();
 
-        if (targets.isEmpty()) {
-            return;
-        }
+        if (targets.isEmpty()) return;
 
         int numTags = 0;
         double avgTagDist = 0.0;
@@ -100,92 +103,57 @@ public class Vision extends SubsystemBase {
 
             lastSeenTagId = tgt.getFiducialId();
             numTags++;
-            avgTagDist += tagPose.get()
-                    .toPose2d()
+            avgTagDist += tagPose.get().toPose2d()
                     .getTranslation()
                     .getDistance(visionPose.getTranslation());
         }
 
-        if (numTags == 0) {
-            return;
-        }
+        if (numTags == 0) return;
 
         avgTagDist /= numTags;
 
-        // Base std dev selection
-        Matrix<N3, N1> stdDevs = (numTags > 1) ? MULTI_TAG_STD_DEVS : SINGLE_TAG_STD_DEVS;
+        Matrix<N3, N1> stdDevs = (numTags > 1)
+                ? MULTI_TAG_STD_DEVS
+                : SINGLE_TAG_STD_DEVS;
 
-        // Ambiguity gating: reject bad single-tag results
+        // Ambiguity gating
         var bestTarget = last.getBestTarget();
         double ambiguity = bestTarget.getPoseAmbiguity();
-        // if (numTags == 1 && ambiguity > 0.2) {
-        //     // too ambiguous – skip this measurement
-        //     return;
-        // }
+        if (numTags == 1 && ambiguity > 0.25) return;
 
-        // // Distance-based rejection for far single-tag
-        // if (numTags == 1 && avgTagDist > 3.0) {
-        //     stdDevs = VecBuilder.fill(
-        //             Double.MAX_VALUE,
-        //             Double.MAX_VALUE,
-        //             Double.MAX_VALUE);
-        // } else {
-            // Quadratic ramp based on distance
+        // Distance-based scaling
+        if (numTags == 1 && avgTagDist > 3.0) {
+            stdDevs = VecBuilder.fill(
+                    Double.MAX_VALUE,
+                    Double.MAX_VALUE,
+                    Double.MAX_VALUE);
+        } else {
             double normDist = avgTagDist / 1.5;
-            double rampFactor = 1.0 + normDist * normDist;
-            stdDevs = stdDevs.times(rampFactor);
-        // }
-
-        // PhotonVision timestamp (seconds since robot start, same timebase as WPILib)
-        double ts = visionEst.timestampSeconds;
-
-        // Prefer:
-        //  - newer measurements
-        //  - and, if timestamps are nearly equal, multi-tag over single-tag
-        double qualityBoost = (numTags > 1) ? 1e-4 : 0.0;
-        double newScore = ts + qualityBoost;
-        double oldScore = latestTimestamp + ((latestNumTags > 1) ? 1e-4 : 0.0);
-
-        if (latestPose == null || newScore > oldScore) {
-            
-            latestPose = visionPose;
-            latestStdDevs = stdDevs;
-            latestTimestamp = ts;
-            latestCameraName = camera.getName();
-            latestAmbiguity = ambiguity;
-            latestNumTags = numTags;
+            stdDevs = stdDevs.times(1.0 + normDist * normDist);
         }
+
+        double ts = Utils.fpgaToCurrentTime(visionEst.timestampSeconds);
+
+        // ✅ ✅ ✅ DIRECT FUSION (THIS IS THE CRITICAL PART)
+        RobotContainer.m_drivetrain.addVisionMeasurement(
+                visionPose,
+                ts,
+                stdDevs
+        );
+
+        // Store telemetry
+        latestPose = visionPose;
+        latestStdDevs = stdDevs;
+        latestTimestamp = ts;
+        latestCameraName = camera.getName();
+        latestAmbiguity = ambiguity;
+        latestNumTags = numTags;
     }
 
-    /** Latest fused vision pose (from either camera), or null if none yet. */
-    public Pose2d getLatestPose() {
-        return latestPose;
-    }
-
-    /** Latest vision standard deviations, or null if none yet. */
-    public Matrix<N3, N1> getLatestStdDevs() {
-        return latestStdDevs;
-    }
-
-    /** Timestamp (seconds) of the latest accepted vision measurement. */
-    public double getLatestTimestamp() {
-        return latestTimestamp;
-    }
-
-    /** ID of the last AprilTag seen by any camera. */
     public int getLastSeenTagId() {
         return lastSeenTagId;
     }
 
-    /** Name of the camera that produced the latest accepted pose. */
-    public String getLatestCameraName() {
-        return latestCameraName;
-    }
-
-    /**
-     * Compute closest tag ID to the given robot pose using the field layout.
-     * This does NOT require cameras to currently see that tag.
-     */
     public int getClosestTagId(Pose2d robotPose) {
         List<Integer> allTags = Constants.Vision.TAGS;
         return allTags.stream()

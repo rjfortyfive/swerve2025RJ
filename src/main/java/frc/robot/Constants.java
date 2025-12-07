@@ -225,7 +225,7 @@ public class Constants {
         public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(
             0.45, // σₓ: odometry may drift ±10 cm
             0.45, // σᵧ: same sideways
-            Units.degreesToRadians(12.0) // σθ: roughly ±5° heading error
+            Units.degreesToRadians(14.0) // σθ: roughly ±5° heading error
     );
         public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(
             0.18, // σₓ: vision ±0.5 cm
