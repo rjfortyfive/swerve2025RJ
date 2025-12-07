@@ -212,9 +212,9 @@ public class TunerConstants {
         odometryStdDevs.set(2, 0, Units.degreesToRadians(1));    // theta
     
         Matrix<N3, N1> visionStdDevs = new Matrix<>(N3.instance, N1.instance);
-        visionStdDevs.set(0, 0, 0.7);        // x
-        visionStdDevs.set(1, 0, 0.7);        // y
-        visionStdDevs.set(2, 0, Units.degreesToRadians(8.5));        // theta
+        visionStdDevs.set(0, 0, 0.25);        // x
+        visionStdDevs.set(1, 0, 0.25);        // y
+        visionStdDevs.set(2, 0, Units.degreesToRadians(6));        // theta
     
         return new CommandSwerveDrivetrain(
             DrivetrainConstants,

@@ -223,14 +223,14 @@ public class Constants {
         public static final AprilTagFieldLayout TAG_LAYOUT = AprilTagFieldLayout
         .loadField(AprilTagFields.k2025ReefscapeAndyMark);
         public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(
-            0.55, // σₓ: odometry may drift ±10 cm
-            0.55, // σᵧ: same sideways
-            Units.degreesToRadians(25.0) // σθ: roughly ±5° heading error
+            0.45, // σₓ: odometry may drift ±10 cm
+            0.45, // σᵧ: same sideways
+            Units.degreesToRadians(12.0) // σθ: roughly ±5° heading error
     );
         public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(
-            0.25, // σₓ: vision ±0.5 cm
-            0.25, // σᵧ: ±0.5 cm
-            Units.degreesToRadians(10.0) // σθ: ±2°
+            0.18, // σₓ: vision ±0.5 cm
+            0.18, // σᵧ: ±0.5 cm
+            Units.degreesToRadians(4.0) // σθ: ±2°
     );
 
         public static List<Integer> TAGS = List.of();

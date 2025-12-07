@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -119,23 +118,23 @@ public class Vision extends SubsystemBase {
         // Ambiguity gating: reject bad single-tag results
         var bestTarget = last.getBestTarget();
         double ambiguity = bestTarget.getPoseAmbiguity();
-        if (numTags == 1 && ambiguity > 0.2) {
-            // too ambiguous – skip this measurement
-            return;
-        }
+        // if (numTags == 1 && ambiguity > 0.2) {
+        //     // too ambiguous – skip this measurement
+        //     return;
+        // }
 
-        // Distance-based rejection for far single-tag
-        if (numTags == 1 && avgTagDist > 3.0) {
-            stdDevs = VecBuilder.fill(
-                    Double.MAX_VALUE,
-                    Double.MAX_VALUE,
-                    Double.MAX_VALUE);
-        } else {
+        // // Distance-based rejection for far single-tag
+        // if (numTags == 1 && avgTagDist > 3.0) {
+        //     stdDevs = VecBuilder.fill(
+        //             Double.MAX_VALUE,
+        //             Double.MAX_VALUE,
+        //             Double.MAX_VALUE);
+        // } else {
             // Quadratic ramp based on distance
             double normDist = avgTagDist / 1.5;
             double rampFactor = 1.0 + normDist * normDist;
             stdDevs = stdDevs.times(rampFactor);
-        }
+        // }
 
         // PhotonVision timestamp (seconds since robot start, same timebase as WPILib)
         double ts = visionEst.timestampSeconds;
@@ -148,6 +147,7 @@ public class Vision extends SubsystemBase {
         double oldScore = latestTimestamp + ((latestNumTags > 1) ? 1e-4 : 0.0);
 
         if (latestPose == null || newScore > oldScore) {
+            
             latestPose = visionPose;
             latestStdDevs = stdDevs;
             latestTimestamp = ts;
