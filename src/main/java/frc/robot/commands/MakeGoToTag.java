@@ -48,12 +48,12 @@ public class MakeGoToTag extends Command {
         this.m_side = side;
         this.m_offsetMeters = offsetMeters;
         this.m_frontOffsetMeters = frontOffsetMeters;
-
-        addRequirements(drivetrain); // vision has no actuators
     }
 
     @Override
     public void initialize() {
+        System.out.println("MakeGoToTag INITIALIZED");
+
         timer = 0.0;
         updatePath();   // Build initial path immediately
     }
@@ -97,6 +97,10 @@ public class MakeGoToTag extends Command {
 
         // Schedule new path
         currentPathCommand.schedule();
+        System.out.println("PATH GOAL: " + goal);
+        System.out.println("MakeGoToTag updatePath()");
+
+
     }
 
 
