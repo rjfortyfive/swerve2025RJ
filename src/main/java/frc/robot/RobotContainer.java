@@ -62,11 +62,11 @@ public class RobotContainer {
         public static final CommandJoystick buttonPanel = new CommandJoystick(2);
 
         public final static CommandSwerveDrivetrain m_drivetrain = TunerConstants.createDrivetrain();
-        public Elevator m_elevator = new Elevator();
-        public Effector m_effector = new Effector();
-        public Intake m_intake = new Intake();
+        public final Elevator m_elevator = new Elevator();
+        public final Effector m_effector = new Effector();
+        public final Intake m_intake = new Intake();
         public final Hang m_hang = new Hang();
-        public Vision m_vision = new Vision();
+        public final Vision m_vision = new Vision();
         public final Lights m_lights = new Lights();
 
         public RobotContainer() {
