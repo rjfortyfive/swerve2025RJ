@@ -226,7 +226,10 @@ public class Effector extends SubsystemBase {
         if (Utils.isSimulation()) {
             simActionStartTime = Timer.getFPGATimestamp();
             simIsIntaking = false;
+            simInReversePhase = false; // Reset reverse phase flag
+            simReverseStartTime = 0.0; // Reset reverse start time
             simCoralPresent = true; // Coral present for outtake
+            lastIntakeForwardVelocity = 0.0; // Reset intake velocity tracking
         }
     }
 
@@ -255,6 +258,9 @@ public class Effector extends SubsystemBase {
                     } else if (reverseElapsed >= SIM_REVERSE_DURATION) {
                         // After reverse duration, coral is locked in place
                         simCoralPresent = true;
+                    } else {
+                        // Between 0.2 and SIM_REVERSE_DURATION: coral is still absent during transition
+                        simCoralPresent = false;
                     }
                 } else if (simActionStartTime > 0) {
                     // Forward intake phase - coral appears after delay
@@ -271,6 +277,9 @@ public class Effector extends SubsystemBase {
                     double elapsed = Timer.getFPGATimestamp() - simActionStartTime;
                     if (elapsed >= SIM_OUTTAKE_DURATION) {
                         simCoralPresent = false; // Coral ejected
+                    } else {
+                        // Before ejection, coral is still present
+                        simCoralPresent = true;
                     }
                 }
             }
