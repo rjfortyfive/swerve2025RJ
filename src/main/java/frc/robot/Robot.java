@@ -47,6 +47,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         //Load Elastic Dashboard
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+        Constants.setL4();
     }
 
     
@@ -75,7 +76,6 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
-        Constants.setL4();
 
     }
 

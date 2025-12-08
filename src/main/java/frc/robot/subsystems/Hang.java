@@ -15,8 +15,8 @@ import frc.robot.Constants.CanIDs;
 import frc.robot.Constants.hang;
 
 public class Hang extends SubsystemBase{
-    public static TalonFX hangFX = new TalonFX(CanIDs.HANG_FX_ID);
-    public final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(0);
+    private final TalonFX hangFX = new TalonFX(CanIDs.HANG_FX_ID);
+    private final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(0);
 
 public Hang() {
     //setting Hang motor to Brake mode

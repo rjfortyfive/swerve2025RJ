@@ -19,9 +19,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class Elevator extends SubsystemBase {
-    public final static TalonFX elevatorLeftFX = new TalonFX(CanIDs.ELEVATOR_LEFT_FX_ID);
-    public final static TalonFX elevatorRightFX = new TalonFX(CanIDs.ELEVATOR_RIGHT_FX_ID);
-    public final static DigitalInput bottomlimitSwitch = new DigitalInput(0);
+    private final TalonFX elevatorLeftFX = new TalonFX(CanIDs.ELEVATOR_LEFT_FX_ID);
+    private final TalonFX elevatorRightFX = new TalonFX(CanIDs.ELEVATOR_RIGHT_FX_ID);
+    private final DigitalInput bottomlimitSwitch = new DigitalInput(0);
     private boolean hasZeroed = false;
 
     public Elevator() {

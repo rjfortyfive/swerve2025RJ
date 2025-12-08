@@ -26,12 +26,12 @@ import com.revrobotics.spark.SparkBase;
 
 
 public class Effector extends SubsystemBase {
-    private static LaserCan effectorSensor = new LaserCan(CanIDs.EFFECTOR_LASER_ID);
+    private final LaserCan effectorSensor = new LaserCan(CanIDs.EFFECTOR_LASER_ID);
 
-    private static TalonFX effectorLeftFX = new TalonFX(CanIDs.EFFECTOR_LEFT_FX_ID);
-    private static TalonFX effectorRightFX = new TalonFX(CanIDs.EFFECTOR_RIGHT_FX_ID);
+    private final TalonFX effectorLeftFX = new TalonFX(CanIDs.EFFECTOR_LEFT_FX_ID);
+    private final TalonFX effectorRightFX = new TalonFX(CanIDs.EFFECTOR_RIGHT_FX_ID);
 
-    private static SparkMax algaeMotor = new SparkMax(1, MotorType.kBrushed);
+    private final SparkMax algaeMotor = new SparkMax(1, MotorType.kBrushed);
 
     private final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0);
 

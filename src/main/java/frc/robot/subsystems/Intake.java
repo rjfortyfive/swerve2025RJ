@@ -15,8 +15,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class Intake extends SubsystemBase {
 
-    private static TalonFX intakeLeftFX = new TalonFX(CanIDs.INTAKE_LEFT_FX_ID);
-    private static TalonFX intakeRightFX = new TalonFX(CanIDs.INTAKE_RIGHT_FX_ID);
+    private final TalonFX intakeLeftFX = new TalonFX(CanIDs.INTAKE_LEFT_FX_ID);
+    private final TalonFX intakeRightFX = new TalonFX(CanIDs.INTAKE_RIGHT_FX_ID);
 
     private final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0);
 
