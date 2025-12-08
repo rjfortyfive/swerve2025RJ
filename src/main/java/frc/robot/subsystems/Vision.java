@@ -23,6 +23,12 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.util.TagUtils;
 
+// PhotonVision simulation imports
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.VisionSystemSim;
+import org.photonvision.simulation.SimCameraProperties;
+import edu.wpi.first.math.geometry.Transform3d;
+
 public class Vision extends SubsystemBase {
 
     // Cameras
@@ -33,6 +39,11 @@ public class Vision extends SubsystemBase {
     private final PhotonPoseEstimator estimator1;
     private final PhotonPoseEstimator estimator2;
 
+    // Simulation support
+    private VisionSystemSim visionSim;
+    private PhotonCameraSim cameraSim1;
+    private PhotonCameraSim cameraSim2;
+
     // Telemetry state
     private Pose2d latestPose;
     private Matrix<N3, N1> latestStdDevs;
@@ -41,6 +52,10 @@ public class Vision extends SubsystemBase {
     private int lastSeenTagId = -1;
     private double latestAmbiguity = 1.0;
     private int latestNumTags = 0;
+    
+    // Rate limiting for vision fusion
+    private double lastVisionFusionTime = 0.0;
+    private static final double MIN_VISION_UPDATE_INTERVAL = 0.1; // Minimum 100ms between vision fusions
 
     public Vision() {
         camera1.setPipelineIndex(0);
@@ -58,10 +73,48 @@ public class Vision extends SubsystemBase {
 
         estimator1.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         estimator2.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        
+        // Setup simulation if in sim mode
+        if (Utils.isSimulation()) {
+            setupSimulation();
+        }
+    }
+    
+    /**
+     * Sets up PhotonVision simulation
+     */
+    private void setupSimulation() {
+        // Create vision system sim
+        visionSim = new VisionSystemSim("main");
+        
+        // Add AprilTag field layout
+        visionSim.addAprilTags(TAG_LAYOUT);
+        
+        // Create camera properties
+        SimCameraProperties cameraProps = new SimCameraProperties();
+        cameraProps.setCalibration(960, 720, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(90));
+        cameraProps.setFPS(30);
+        cameraProps.setAvgLatencyMs(50);
+        cameraProps.setLatencyStdDevMs(15);
+        
+        // Create simulated cameras
+        cameraSim1 = new PhotonCameraSim(camera1, cameraProps);
+        cameraSim2 = new PhotonCameraSim(camera2, cameraProps);
+        
+        // Add cameras to vision sim with their robot-to-camera transforms
+        visionSim.addCamera(cameraSim1, ROBOT_TO_CAM_1);
+        visionSim.addCamera(cameraSim2, ROBOT_TO_CAM_2);
     }
 
     @Override
     public void periodic() {
+        // Update vision simulation if in sim mode
+        if (Utils.isSimulation() && visionSim != null) {
+            // Update vision sim with current robot pose
+            Pose2d robotPose = RobotContainer.m_drivetrain.getPose();
+            visionSim.update(robotPose);
+        }
+        
         processCamera(camera1, estimator1);
         processCamera(camera2, estimator2);
 
@@ -132,9 +185,60 @@ public class Vision extends SubsystemBase {
             stdDevs = stdDevs.times(1.0 + normDist * normDist);
         }
 
-        double ts = Utils.fpgaToCurrentTime(visionEst.timestampSeconds);
+        // Get current robot pose estimate and speeds
+        Pose2d currentPose = RobotContainer.m_drivetrain.getPose();
+        var driveState = RobotContainer.m_drivetrain.getState();
+        var speeds = driveState.Speeds;
+        
+        // Calculate robot velocity magnitude
+        double velocityMagnitude = Math.sqrt(
+            speeds.vxMetersPerSecond * speeds.vxMetersPerSecond +
+            speeds.vyMetersPerSecond * speeds.vyMetersPerSecond
+        );
+        double angularVelocityMagnitude = Math.abs(speeds.omegaRadiansPerSecond);
+        
+        // If robot is stationary (or nearly stationary), don't fuse vision to prevent drift
+        // This is especially important in simulation where vision noise can cause drift
+        double velocityThreshold = Utils.isSimulation() ? 0.05 : 0.02; // 5cm/s in sim, 2cm/s on robot
+        double angularThreshold = Utils.isSimulation() ? Math.toRadians(2.0) : Math.toRadians(1.0);
+        
+        if (velocityMagnitude < velocityThreshold && angularVelocityMagnitude < angularThreshold) {
+            // Robot is stationary, skip vision fusion to prevent drift
+            return;
+        }
+        
+        // Calculate difference between vision pose and current pose
+        double poseDifference = visionPose.getTranslation().getDistance(currentPose.getTranslation());
+        double rotationDifference = Math.abs(visionPose.getRotation().minus(currentPose.getRotation()).getRadians());
+        
+        // Rate limiting - don't fuse vision too frequently
+        double currentTime = Utils.fpgaToCurrentTime(visionEst.timestampSeconds);
+        if (currentTime - lastVisionFusionTime < MIN_VISION_UPDATE_INTERVAL) {
+            return; // Skip if too soon since last fusion
+        }
+        
+        // Only fuse vision measurements if there's a meaningful difference
+        // This prevents drift when robot is stationary
+        // Stricter thresholds to prevent drift
+        double translationThreshold = Utils.isSimulation() ? 0.20 : 0.10; // Even stricter thresholds
+        double rotationThreshold = Utils.isSimulation() ? Math.toRadians(10.0) : Math.toRadians(5.0);
+        
+        if (poseDifference < translationThreshold && rotationDifference < rotationThreshold) {
+            // Vision pose is too close to current estimate, skip fusion to prevent drift
+            return;
+        }
+        
+        // In simulation, increase standard deviations significantly to reduce vision weight
+        // This makes vision much less influential and reduces drift
+        if (Utils.isSimulation()) {
+            stdDevs = stdDevs.times(3.0); // Triple the uncertainty in simulation
+        }
 
-        // ✅ ✅ ✅ DIRECT FUSION (THIS IS THE CRITICAL PART)
+        double ts = Utils.fpgaToCurrentTime(visionEst.timestampSeconds);
+        
+        // Update last fusion time
+        lastVisionFusionTime = currentTime;
+
         RobotContainer.m_drivetrain.addVisionMeasurement(
                 visionPose,
                 ts,

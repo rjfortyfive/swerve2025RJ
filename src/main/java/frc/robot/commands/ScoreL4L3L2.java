@@ -1,8 +1,10 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Effector;
+import com.ctre.phoenix6.Utils;
 
 public class ScoreL4L3L2 extends Command {
     private final Effector m_effector;
@@ -10,6 +12,9 @@ public class ScoreL4L3L2 extends Command {
     private boolean coralGone = false;
     private double targetPositionLeft;
     private double targetPositionRight;
+    private double positionMoveStartTime = 0.0;
+    private static final double POSITION_TIMEOUT = 2.0; // Timeout in seconds for position movement
+    private static final double SIM_POSITION_TIMEOUT = 0.5; // Shorter timeout for simulation
     
     public ScoreL4L3L2(Effector m_effector) {
 
@@ -21,6 +26,7 @@ public class ScoreL4L3L2 extends Command {
     @Override
     public void initialize() {
         coralGone = false;
+        positionMoveStartTime = 0.0;
 
         // Begin normal outtake
         m_effector.start(40);
@@ -40,6 +46,7 @@ public class ScoreL4L3L2 extends Command {
 
             // Command motion magic to rotate additional amount
             m_effector.moveToPositions(targetPositionLeft, targetPositionRight);
+            positionMoveStartTime = Timer.getFPGATimestamp();
         }
     }
 
@@ -49,7 +56,19 @@ public class ScoreL4L3L2 extends Command {
          if (!coralGone) return false;
 
          // Check if both motors are at or near their target
-         return m_effector.coralAtPosition(targetPositionLeft, targetPositionRight);
+         if (m_effector.coralAtPosition(targetPositionLeft, targetPositionRight)) {
+             return true;
+         }
+         
+         // Timeout check - if we've been trying to reach position for too long, finish anyway
+         if (positionMoveStartTime > 0) {
+             double timeout = Utils.isSimulation() ? SIM_POSITION_TIMEOUT : POSITION_TIMEOUT;
+             if ((Timer.getFPGATimestamp() - positionMoveStartTime) >= timeout) {
+                 return true; // Timeout reached, finish command
+             }
+         }
+         
+         return false;
     }
 
     @Override

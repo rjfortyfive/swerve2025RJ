@@ -1,8 +1,10 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Effector;
+import com.ctre.phoenix6.Utils;
 
 /**
  * Command for scoring at L1 using asymmetric outtake velocities
@@ -17,6 +19,9 @@ public class ScoreL1Asymmetric extends Command {
     private boolean coralGone = false;
     private double targetPositionLeft;
     private double targetPositionRight;
+    private double positionMoveStartTime = 0.0;
+    private static final double POSITION_TIMEOUT = 2.0; // Timeout in seconds for position movement
+    private static final double SIM_POSITION_TIMEOUT = 0.5; // Shorter timeout for simulation
     
     public ScoreL1Asymmetric(Effector m_effector) {
         this.m_effector = m_effector;
@@ -26,6 +31,7 @@ public class ScoreL1Asymmetric extends Command {
     @Override
     public void initialize() {
         coralGone = false;
+        positionMoveStartTime = 0.0;
 
         // Begin asymmetric outtake for L1
         m_effector.start(LEFT_VELOCITY, RIGHT_VELOCITY);
@@ -46,6 +52,7 @@ public class ScoreL1Asymmetric extends Command {
 
             // Command motion magic to rotate additional amount
             m_effector.moveToPositions(targetPositionLeft, targetPositionRight);
+            positionMoveStartTime = Timer.getFPGATimestamp();
         }
     }
 
@@ -55,7 +62,19 @@ public class ScoreL1Asymmetric extends Command {
          if (!coralGone) return false;
 
          // Check if both motors are at or near their target
-         return m_effector.coralAtPosition(targetPositionLeft, targetPositionRight);
+         if (m_effector.coralAtPosition(targetPositionLeft, targetPositionRight)) {
+             return true;
+         }
+         
+         // Timeout check - if we've been trying to reach position for too long, finish anyway
+         if (positionMoveStartTime > 0) {
+             double timeout = Utils.isSimulation() ? SIM_POSITION_TIMEOUT : POSITION_TIMEOUT;
+             if ((Timer.getFPGATimestamp() - positionMoveStartTime) >= timeout) {
+                 return true; // Timeout reached, finish command
+             }
+         }
+         
+         return false;
     }
 
     @Override

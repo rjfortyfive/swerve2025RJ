@@ -209,57 +209,65 @@ public class RobotContainer {
         }
 
         private void configureNamedCommands() {
+                // State-aware scoring commands
                 NamedCommands.registerCommand("scoreL1Coral",
                                 new SequentialCommandGroup(
+                                                // Move elevator to L1 position
                                                 new InstantCommand(
                                                                 () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L1 + 2.0),
+                                                                                Constants.elevator.level.L1),
                                                                 m_elevator),
-                                                new InstantCommand(() -> m_effector.start(30, 10),
-                                                                m_effector),
+                                                // Wait for elevator to reach position
+                                                new WaitCommand(0.5),
+                                                // Use state-aware scoring for L1 (asymmetric outtake)
+                                                StateAwareScore.create(m_stateManager, m_elevator, m_effector, 1),
+                                                // Return elevator to bottom after scoring
                                                 new InstantCommand(
-                                                                () -> m_elevator.toPosition(Constants.elevator.level.L1),
+                                                                () -> m_elevator.toPosition(0),
                                                                 m_elevator)));
 
                 NamedCommands.registerCommand("scoreL4Coral",
                                 new SequentialCommandGroup(
+                                                // Move elevator to L4 position
                                                 new InstantCommand(
                                                                 () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.L4),
                                                                 m_elevator),
-
-                                                new WaitCommand(.9),
-
-                                                new ScoreL4L3L2(m_effector),
+                                                // Wait for elevator to reach position
+                                                new WaitCommand(0.9),
+                                                // Use state-aware scoring for L4
+                                                StateAwareScore.create(m_stateManager, m_elevator, m_effector, 4),
+                                                // Return elevator to L1 after scoring
                                                 new InstantCommand(
                                                                 () -> m_elevator.toPosition(
-                                                                                Constants.elevator.level.L1))));
+                                                                                Constants.elevator.level.L1),
+                                                                m_elevator)));
 
+                // Start intake (prepares elevator and effector, doesn't run full intake sequence)
                 NamedCommands.registerCommand("startIntakeCoral",
                                 sequence(
-                                                // 1) move the elevator up to position intake
+                                                // Move the elevator up to intake position
                                                 new InstantCommand(
                                                                 () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.INTAKE),
                                                                 m_elevator),
-
+                                                // Start effector wheels
                                                 new InstantCommand(
                                                                 () -> m_effector.start(40),
-                                                                m_effector
+                                                                m_effector)));
 
-                                                )));
-
+                // Raise elevator to L2 (no state change needed for just moving elevator)
                 NamedCommands.registerCommand("raiseL2",
                                 sequence(
-                                                // 1) move the elevator up to L2
+                                                // Move the elevator up to L2 + 5
                                                 new InstantCommand(
                                                                 () -> m_elevator.toPosition(
                                                                                 Constants.elevator.level.L2 + 5),
-                                                                m_elevator)
+                                                                m_elevator)));
 
-                                ));
+                // Full intake sequence (state-aware)
                 NamedCommands.registerCommand("intakeCoral",
-                                sequence(new CoralIntake(m_elevator, m_effector, m_intake)));
+                                StateAwareCoralIntake.create(m_stateManager, m_elevator, m_effector, m_intake));
 
         }
 
