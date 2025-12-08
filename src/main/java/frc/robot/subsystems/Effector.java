@@ -45,6 +45,7 @@ public class Effector extends SubsystemBase {
     private double simReverseStartTime = 0.0; // Track when reverse phase starts
     private boolean simIsIntaking = false; // Track if we're intaking or outtaking
     private boolean simInReversePhase = false; // Track if we're in reverse phase of intake
+    private double lastIntakeForwardVelocity = 0.0; // Track last intake forward velocity to detect changes
     private static final double SIM_OUTTAKE_DURATION = 0.5; // Time in seconds for coral to be ejected in sim
     private static final double SIM_INTAKE_DURATION = 0.3; // Time in seconds for coral to appear during intake in sim
     private static final double SIM_REVERSE_DURATION = 0.4; // Time in seconds for reverse phase to complete
@@ -165,6 +166,7 @@ public class Effector extends SubsystemBase {
             simActionStartTime = 0.0;
             simReverseStartTime = 0.0;
             simInReversePhase = false;
+            lastIntakeForwardVelocity = 0.0;
             // Don't reset coral state here - let it persist for next action
         }
     }
@@ -188,12 +190,17 @@ public class Effector extends SubsystemBase {
                     simCoralPresent = true; // Coral present for outtake
                     simActionStartTime = Timer.getFPGATimestamp();
                     simReverseStartTime = 0.0;
+                    lastIntakeForwardVelocity = 0.0; // Reset
                 } else {
                     // Lower velocity (20-30) = intake forward
-                    if (!simInReversePhase) {
-                        // Only reset timer if not already in reverse phase
+                    // Only reset timer if velocity changed or if we're starting a new intake phase
+                    // This prevents timer from resetting on repeated calls with same velocity
+                    boolean velocityChanged = Math.abs(velocity - lastIntakeForwardVelocity) > 1.0;
+                    if (!simInReversePhase && (velocityChanged || simActionStartTime == 0.0)) {
+                        // Reset timer only if velocity changed or timer hasn't been started
                         simActionStartTime = Timer.getFPGATimestamp();
                     }
+                    lastIntakeForwardVelocity = velocity;
                     simIsIntaking = true;
                     simInReversePhase = false;
                     simReverseStartTime = 0.0;
@@ -205,6 +212,7 @@ public class Effector extends SubsystemBase {
                 simInReversePhase = true;
                 simReverseStartTime = Timer.getFPGATimestamp();
                 simCoralPresent = false; // Coral disappears during reverse
+                lastIntakeForwardVelocity = 0.0; // Reset
             }
         }
     }
