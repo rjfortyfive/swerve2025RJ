@@ -57,8 +57,8 @@ public class RobotContainer {
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
 
-        public static final CommandJoystick joystick = new CommandJoystick(0);
-        public static final CommandXboxController XboxController = new CommandXboxController(1);
+        public static final CommandJoystick DriverController = new CommandJoystick(0);
+        public static final CommandXboxController OperatorController = new CommandXboxController(1);
         public static final CommandJoystick buttonPanel = new CommandJoystick(2);
 
         public final static CommandSwerveDrivetrain m_drivetrain = TunerConstants.createDrivetrain();
@@ -102,33 +102,33 @@ public class RobotContainer {
                 buttonPanel.button(Constants.buttonPanel.coral.OUT)
                                 .onTrue(new ScoreL4L3L2(m_effector));
                 // Elevator To Intake Position                                
-                XboxController.b().onTrue(
+                OperatorController.b().onTrue(
                                 new SequentialCommandGroup(
                                                 new InstantCommand(() -> m_elevator
                                                                 .toPosition(Constants.elevator.level.L1 + 2))));
                 // Coral Intake Command
-                XboxController.x()
+                OperatorController.x()
                                 .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
                 // Elevator to zero position
-                XboxController.y()
+                OperatorController.y()
                                 .onTrue(new InstantCommand(() -> m_elevator.toPosition(0)));
                 // Algae Effector Up and Down on D-Pad
-                XboxController.povUp()
+                OperatorController.povUp()
                                 .whileTrue(new StartEndCommand(() -> m_effector.moveAlgaeEffector(1), 
                                                                 () -> m_effector.stopAlgaeEffector(), m_effector));
-                XboxController.povDown()
+                OperatorController.povDown()
                                 .whileTrue(new StartEndCommand(() -> m_effector.moveAlgaeEffector(-1), 
                                                                 () -> m_effector.stopAlgaeEffector(), m_effector));
                 // Asymmetric Effector outtake for L1
-                XboxController.a()
+                OperatorController.a()
                                 .whileTrue(new StartEndCommand(() -> m_effector.start(20.0, 6.0), 
                                                                 () -> m_effector.stop(), m_effector));
                 // Hang control triggers: Only when left bumper is held and a trigger is pressed
-                new Trigger(() -> XboxController.leftBumper().getAsBoolean()
-                                && XboxController.getRightTriggerAxis() > 0.25)
+                new Trigger(() -> OperatorController.leftBumper().getAsBoolean()
+                                && OperatorController.getRightTriggerAxis() > 0.25)
                                 .whileTrue(new StartEndCommand(() -> m_hang.start(100), () -> m_hang.stop(), m_hang, m_drivetrain));
-                new Trigger(() -> XboxController.leftBumper().getAsBoolean()
-                                && XboxController.getLeftTriggerAxis() > 0.25)
+                new Trigger(() -> OperatorController.leftBumper().getAsBoolean()
+                                && OperatorController.getLeftTriggerAxis() > 0.25)
                                 .whileTrue(new StartEndCommand(() -> m_hang.start(-100), () -> m_hang.stop(), m_hang, m_drivetrain));
                 // reset the field-centric heading on middle button press
                 // joystick.button(2).onTrue(drivetrain.runOnce(() ->
@@ -137,7 +137,7 @@ public class RobotContainer {
                 // Button commands and stick-based triggers for strafeRight and strafeLeft
                 if (!Constants.MASTER_NERF) {
                         // Strafe Right: schedule and track the command, only one at a time
-                        joystick.button(Constants.Joystick.STRAFE_RIGHT)
+                        DriverController.button(Constants.Joystick.STRAFE_RIGHT)
                                 .onTrue(new MakeGoToTag(
                                         m_drivetrain,
                                         m_vision,
@@ -147,7 +147,7 @@ public class RobotContainer {
                                 ));
 
                         // Strafe Left: schedule and track the command, only one at a time
-                        joystick.button(Constants.Joystick.STRAFE_LEFT)
+                        DriverController.button(Constants.Joystick.STRAFE_LEFT)
                                 .onTrue(new MakeGoToTag(
                                         m_drivetrain,
                                         m_vision,
@@ -218,17 +218,17 @@ public class RobotContainer {
                 // Default command for driving with joystick
                 m_drivetrain.setDefaultCommand(
                         m_drivetrain.applyRequest(() -> 
-                                drive.withVelocityX(joystick.getY() * MaxSpeed)
-                                     .withVelocityY(joystick.getX() * MaxSpeed)
-                                     .withRotationalRate(-joystick.getTwist() * MaxAngularRate)
+                                drive.withVelocityX(DriverController.getY() * MaxSpeed)
+                                     .withVelocityY(DriverController.getX() * MaxSpeed)
+                                     .withRotationalRate(-DriverController.getTwist() * MaxAngularRate)
                         )
                 );
 
                 // Default command for effector control with Xbox triggers                                              
                 m_effector.setDefaultCommand(
                         new RunCommand(() -> {
-                            double lt = XboxController.getLeftTriggerAxis();
-                            double rt = XboxController.getRightTriggerAxis();
+                            double lt = OperatorController.getLeftTriggerAxis();
+                            double rt = OperatorController.getRightTriggerAxis();
                     
                             if (rt > 0.1) {
                                 m_effector.start(70 * rt);  // Outtake
