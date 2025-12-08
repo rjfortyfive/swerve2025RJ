@@ -70,38 +70,29 @@ public class MakeGoToTag extends Command {
 
 
     private void updatePath() {
-        // Get current robot pose
         Pose2d robotPose = m_drivetrain.getPose();
-
-        // Determine closest tag
+    
         int tagId = m_vision.getClosestTagId(robotPose);
-        if (tagId < 0) {
-            return; // no tag found, do nothing
-        }
-
-        // Compute the target pose using user offsets
+        if (tagId < 0) return;
+    
         Pose2d goal = TagUtils.computeTagAdjacencyPose(
             tagId, m_side, m_offsetMeters, m_frontOffsetMeters);
-
-        // Cancel any ongoing path
-        if (currentPathCommand != null) {
-            currentPathCommand.cancel();
-            currentPathCommand = null;
+    
+        System.out.println("GoToTag goal = " + goal);
+    
+        if (currentPathCommand != null && currentPathCommand.isScheduled()) {
+            return;
         }
-
-        // Build a new path to the latest goal
+    
         currentPathCommand = AutoBuilder.pathfindToPose(
             goal,
             constraints,
-            0.0);
-
-        // Schedule new path
+            0.0
+        );
+    
         currentPathCommand.schedule();
-        System.out.println("PATH GOAL: " + goal);
-        System.out.println("MakeGoToTag updatePath()");
-
-
     }
+    
 
 
     @Override
