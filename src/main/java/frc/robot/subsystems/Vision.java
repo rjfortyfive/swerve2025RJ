@@ -10,6 +10,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -212,8 +213,10 @@ public class Vision extends SubsystemBase {
         double rotationDifference = Math.abs(visionPose.getRotation().minus(currentPose.getRotation()).getRadians());
         
         // Rate limiting - don't fuse vision too frequently
-        double currentTime = Utils.fpgaToCurrentTime(visionEst.timestampSeconds);
-        if (currentTime - lastVisionFusionTime < MIN_VISION_UPDATE_INTERVAL) {
+        // Use actual current wall-clock time for rate limiting, not vision measurement timestamp
+        // This ensures rate limiting works correctly even with gaps in vision updates
+        double currentWallClockTime = Timer.getFPGATimestamp();
+        if (currentWallClockTime - lastVisionFusionTime < MIN_VISION_UPDATE_INTERVAL) {
             return; // Skip if too soon since last fusion
         }
         
@@ -234,10 +237,12 @@ public class Vision extends SubsystemBase {
             stdDevs = stdDevs.times(3.0); // Triple the uncertainty in simulation
         }
 
+        // Use vision measurement timestamp for the actual fusion (this is correct)
         double ts = Utils.fpgaToCurrentTime(visionEst.timestampSeconds);
         
-        // Update last fusion time
-        lastVisionFusionTime = currentTime;
+        // Update last fusion time with actual wall-clock time (not vision timestamp)
+        // This ensures rate limiting works correctly even with gaps in vision updates
+        lastVisionFusionTime = currentWallClockTime;
 
         RobotContainer.m_drivetrain.addVisionMeasurement(
                 visionPose,

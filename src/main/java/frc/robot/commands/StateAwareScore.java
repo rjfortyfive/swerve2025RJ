@@ -24,6 +24,12 @@ public class StateAwareScore {
      * @return Command sequence that transitions state, scores, then returns to IDLE
      */
     public static Command create(StateManager stateManager, Elevator elevator, Effector effector, int level) {
+        // Validate level - reject invalid levels to prevent state mismatch
+        if (level < 1 || level > 4) {
+            System.err.println("Error: Invalid scoring level " + level + ". Level must be 1-4.");
+            return Commands.print("Invalid scoring level: " + level + ". Command cancelled.");
+        }
+        
         RobotState scoringState;
         switch (level) {
             case 1:
@@ -39,7 +45,9 @@ public class StateAwareScore {
                 scoringState = RobotState.SCORING_L4;
                 break;
             default:
-                scoringState = RobotState.IDLE;
+                // Should never reach here due to validation above
+                System.err.println("Error: Unexpected level in switch: " + level);
+                return Commands.print("Unexpected scoring level: " + level + ". Command cancelled.");
         }
         
         // For L1, use asymmetric outtake; for L2/L3/L4, use ScoreL4L3L2
@@ -73,6 +81,9 @@ public class StateAwareScore {
      * @return Command sequence that transitions state, scores, then returns to IDLE
      */
     public static Command createAutoLevel(StateManager stateManager, Elevator elevator, Effector effector) {
+        // Store detected level to ensure consistency between state and command selection
+        final int[] detectedLevel = {0};
+        
         return Commands.sequence(
             // Determine level from elevator position and transition to scoring state
             Commands.runOnce(() -> {
@@ -83,27 +94,53 @@ public class StateAwareScore {
                 double tolerance = 2.0; // Allow 2 rotations of tolerance
                 if (Math.abs(currentPos - Constants.elevator.level.L4) < tolerance) {
                     scoringState = RobotState.SCORING_L4;
+                    detectedLevel[0] = 4;
                 } else if (Math.abs(currentPos - Constants.elevator.level.L3) < tolerance) {
                     scoringState = RobotState.SCORING_L3;
+                    detectedLevel[0] = 3;
                 } else if (Math.abs(currentPos - Constants.elevator.level.L2) < tolerance) {
                     scoringState = RobotState.SCORING_L2;
+                    detectedLevel[0] = 2;
                 } else if (Math.abs(currentPos - Constants.elevator.level.L1) < tolerance) {
                     scoringState = RobotState.SCORING_L1;
+                    detectedLevel[0] = 1;
+                } else {
+                    // No level matches within tolerance - find closest level as fallback
+                    double distL1 = Math.abs(currentPos - Constants.elevator.level.L1);
+                    double distL2 = Math.abs(currentPos - Constants.elevator.level.L2);
+                    double distL3 = Math.abs(currentPos - Constants.elevator.level.L3);
+                    double distL4 = Math.abs(currentPos - Constants.elevator.level.L4);
+                    
+                    double minDist = Math.min(Math.min(distL1, distL2), Math.min(distL3, distL4));
+                    
+                    // Use tolerance-based comparison to handle floating-point precision
+                    double comparisonTolerance = 0.001;
+                    if (Math.abs(minDist - distL1) < comparisonTolerance) {
+                        scoringState = RobotState.SCORING_L1;
+                        detectedLevel[0] = 1;
+                    } else if (Math.abs(minDist - distL2) < comparisonTolerance) {
+                        scoringState = RobotState.SCORING_L2;
+                        detectedLevel[0] = 2;
+                    } else if (Math.abs(minDist - distL3) < comparisonTolerance) {
+                        scoringState = RobotState.SCORING_L3;
+                        detectedLevel[0] = 3;
+                    } else {
+                        scoringState = RobotState.SCORING_L4;
+                        detectedLevel[0] = 4;
+                    }
                 }
                 
-                // Only transition if we determined a valid scoring state
-                if (scoringState != RobotState.IDLE) {
-                    stateManager.setState(scoringState);
-                }
+                // Always transition to the determined scoring state
+                stateManager.setState(scoringState);
             }),
             
-            // Run the appropriate scoring command based on detected level
+            // Run the appropriate scoring command based on stored detected level
+            // Use stored level to ensure consistency with state
             Commands.defer(() -> {
-                double currentPos = elevator.getPosition();
-                double tolerance = 2.0;
+                int level = detectedLevel[0];
                 
-                // Determine level again (since we're in a deferred command)
-                if (Math.abs(currentPos - Constants.elevator.level.L1) < tolerance) {
+                // Select command based on stored level - matches state detection
+                if (level == 1) {
                     // L1: Asymmetric outtake
                     return new ScoreL1Asymmetric(effector);
                 } else {
