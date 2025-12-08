@@ -78,23 +78,50 @@ public class StateAwareScore {
             Commands.runOnce(() -> {
                 double currentPos = elevator.getPosition();
                 RobotState scoringState = RobotState.IDLE;
+                int detectedLevel = 0;
                 
                 // Determine which level based on elevator position (with tolerance)
                 double tolerance = 2.0; // Allow 2 rotations of tolerance
                 if (Math.abs(currentPos - Constants.elevator.level.L4) < tolerance) {
                     scoringState = RobotState.SCORING_L4;
+                    detectedLevel = 4;
                 } else if (Math.abs(currentPos - Constants.elevator.level.L3) < tolerance) {
                     scoringState = RobotState.SCORING_L3;
+                    detectedLevel = 3;
                 } else if (Math.abs(currentPos - Constants.elevator.level.L2) < tolerance) {
                     scoringState = RobotState.SCORING_L2;
+                    detectedLevel = 2;
                 } else if (Math.abs(currentPos - Constants.elevator.level.L1) < tolerance) {
                     scoringState = RobotState.SCORING_L1;
+                    detectedLevel = 1;
+                } else {
+                    // No level matches within tolerance - find closest level as fallback
+                    // This ensures we always have a valid state when scoring
+                    double distL1 = Math.abs(currentPos - Constants.elevator.level.L1);
+                    double distL2 = Math.abs(currentPos - Constants.elevator.level.L2);
+                    double distL3 = Math.abs(currentPos - Constants.elevator.level.L3);
+                    double distL4 = Math.abs(currentPos - Constants.elevator.level.L4);
+                    
+                    double minDist = Math.min(Math.min(distL1, distL2), Math.min(distL3, distL4));
+                    
+                    if (minDist == distL1) {
+                        scoringState = RobotState.SCORING_L1;
+                        detectedLevel = 1;
+                    } else if (minDist == distL2) {
+                        scoringState = RobotState.SCORING_L2;
+                        detectedLevel = 2;
+                    } else if (minDist == distL3) {
+                        scoringState = RobotState.SCORING_L3;
+                        detectedLevel = 3;
+                    } else {
+                        scoringState = RobotState.SCORING_L4;
+                        detectedLevel = 4;
+                    }
                 }
                 
-                // Only transition if we determined a valid scoring state
-                if (scoringState != RobotState.IDLE) {
-                    stateManager.setState(scoringState);
-                }
+                // Always transition to the determined scoring state
+                // This ensures state accurately reflects robot operation
+                stateManager.setState(scoringState);
             }),
             
             // Run the appropriate scoring command based on detected level
@@ -103,12 +130,26 @@ public class StateAwareScore {
                 double tolerance = 2.0;
                 
                 // Determine level again (since we're in a deferred command)
+                // Use same logic as above to ensure consistency
                 if (Math.abs(currentPos - Constants.elevator.level.L1) < tolerance) {
                     // L1: Asymmetric outtake
                     return new ScoreL1Asymmetric(effector);
                 } else {
-                    // L2, L3, L4: Use ScoreL4L3L2 command
-                    return new ScoreL4L3L2(effector);
+                    // Check if we need to find closest level
+                    double distL1 = Math.abs(currentPos - Constants.elevator.level.L1);
+                    double distL2 = Math.abs(currentPos - Constants.elevator.level.L2);
+                    double distL3 = Math.abs(currentPos - Constants.elevator.level.L3);
+                    double distL4 = Math.abs(currentPos - Constants.elevator.level.L4);
+                    
+                    double minDist = Math.min(Math.min(distL1, distL2), Math.min(distL3, distL4));
+                    
+                    if (minDist == distL1) {
+                        // L1: Asymmetric outtake
+                        return new ScoreL1Asymmetric(effector);
+                    } else {
+                        // L2, L3, L4: Use ScoreL4L3L2 command
+                        return new ScoreL4L3L2(effector);
+                    }
                 }
             }, Set.of(elevator, effector)),
             
