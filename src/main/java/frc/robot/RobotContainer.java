@@ -75,6 +75,7 @@ public class RobotContainer {
         public final Hang m_hang = new Hang();
         public final Vision m_vision = new Vision();
         public final Lights m_lights = new Lights();
+        public final StateManager m_stateManager = new StateManager();
 
         public RobotContainer() {
                 configureAutoBuilder();
@@ -103,19 +104,22 @@ public class RobotContainer {
                 //                 .onTrue(new InstantCommand(() -> Sequences.removeL2Algae()));
                 // buttonPanel.button(Constants.buttonPanel.algae.Upper)
                 //                 .onTrue(new InstantCommand(() -> Sequences.removeL3Algae()));
-                // Intake and Reef Score on Button Board
+                // Intake and Reef Score on Button Board (State-Aware)
                 buttonPanel.button(Constants.buttonPanel.coral.IN)
-                                .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
+                                .onTrue(StateAwareCoralIntake.create(
+                                        m_stateManager, m_elevator, m_effector, m_intake));
                 buttonPanel.button(Constants.buttonPanel.coral.OUT)
-                                .onTrue(new ScoreL4L3L2(m_effector));
+                                .onTrue(StateAwareScore.createAutoLevel(
+                                        m_stateManager, m_elevator, m_effector));
                 // Elevator To Intake Position                                
                 OperatorController.b().onTrue(
                                 new SequentialCommandGroup(
                                                 new InstantCommand(() -> m_elevator
                                                                 .toPosition(Constants.elevator.level.L1 + 2))));
-                // Coral Intake Command
+                // Coral Intake Command (State-Aware)
                 OperatorController.x()
-                                .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
+                                .onTrue(StateAwareCoralIntake.create(
+                                        m_stateManager, m_elevator, m_effector, m_intake));
                 // Elevator to zero position
                 OperatorController.y()
                                 .onTrue(new InstantCommand(() -> m_elevator.toPosition(0)));
