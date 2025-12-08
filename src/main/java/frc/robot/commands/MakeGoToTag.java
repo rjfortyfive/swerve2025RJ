@@ -80,8 +80,9 @@ public class MakeGoToTag extends Command {
     
         System.out.println("GoToTag goal = " + goal);
     
+        // Cancel existing path command if it's still running
         if (currentPathCommand != null && currentPathCommand.isScheduled()) {
-            return;
+            currentPathCommand.cancel();
         }
     
         currentPathCommand = AutoBuilder.pathfindToPose(

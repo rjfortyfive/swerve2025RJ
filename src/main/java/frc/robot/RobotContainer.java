@@ -33,7 +33,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.generated.TunerConstants;
-import frc.robot.util.TagUtils.tagSide;;
+import frc.robot.util.TagUtils.tagSide;
 
 public class RobotContainer {
         
@@ -102,7 +102,7 @@ public class RobotContainer {
                 buttonPanel.button(Constants.buttonPanel.coral.OUT)
                                 .onTrue(new ScoreL4L3L2(m_effector));
                 // Elevator To Intake Position                                
-                XboxController.a().onTrue(
+                XboxController.b().onTrue(
                                 new SequentialCommandGroup(
                                                 new InstantCommand(() -> m_elevator
                                                                 .toPosition(Constants.elevator.level.L1 + 2))));

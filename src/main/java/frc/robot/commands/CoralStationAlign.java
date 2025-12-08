@@ -64,7 +64,7 @@ public class CoralStationAlign extends Command {
                 .withVelocityY(0)
                 .withRotationalRate(rotRateRad)
         );
-    };
+    }
     
     @Override
     public void end(boolean interrupted) {
@@ -74,5 +74,5 @@ public class CoralStationAlign extends Command {
                 .withVelocityX(0)
                 .withVelocityY(0)
                 .withRotationalRate(0));
-    };
+    }
 }
