@@ -59,7 +59,7 @@ public class RobotContainer {
 
         // Driver controller selection: true = Xbox controller, false = flight joystick
         // Change this value to switch between controllers
-        private static final boolean useXboxForDriver = true; // Set to true to use Xbox controller for driving
+        public static final boolean useXboxForDriver = true; // Set to true to use Xbox controller for driving
 
         // Driver controllers - only one will be used based on useXboxForDriver
         public static final CommandJoystick DriverJoystick = new CommandJoystick(0);
@@ -163,6 +163,21 @@ public class RobotContainer {
                                                 tagSide.RIGHT,
                                                 0.197,
                                                 0.345
+                                        ));
+
+                                // Coral Station Align commands on Xbox controller triggers
+                                // Left trigger: align to LEFT coral station
+                                new Trigger(() -> DriverXbox.getLeftTriggerAxis() > 0.25)
+                                        .whileTrue(new CoralStationAlign(
+                                                m_drivetrain,
+                                                CoralStationAlign.CoralStationSide.LEFT
+                                        ));
+
+                                // Right trigger: align to RIGHT coral station
+                                new Trigger(() -> DriverXbox.getRightTriggerAxis() > 0.25)
+                                        .whileTrue(new CoralStationAlign(
+                                                m_drivetrain,
+                                                CoralStationAlign.CoralStationSide.RIGHT
                                         ));
                         } else {
                                 // Strafe commands on joystick buttons
