@@ -22,11 +22,13 @@ public class StateAwareScore {
      * @param effector The effector subsystem
      * @param level The scoring level (1-4)
      * @return Command sequence that transitions state, scores, then returns to IDLE
+     * @throws IllegalArgumentException if level is not 1-4
      */
     public static Command create(StateManager stateManager, Elevator elevator, Effector effector, int level) {
         // Validate level - reject invalid levels to prevent state mismatch
         if (level < 1 || level > 4) {
             System.err.println("Error: Invalid scoring level " + level + ". Level must be 1-4.");
+            // Return a no-op command that logs the error and does nothing
             return Commands.print("Invalid scoring level: " + level + ". Command cancelled.");
         }
         
@@ -45,7 +47,7 @@ public class StateAwareScore {
                 scoringState = RobotState.SCORING_L4;
                 break;
             default:
-                // Should never reach here due to validation above
+                // This should never be reached due to validation above, but keep for safety
                 System.err.println("Error: Unexpected level in switch: " + level);
                 return Commands.print("Unexpected scoring level: " + level + ". Command cancelled.");
         }
@@ -82,10 +84,24 @@ public class StateAwareScore {
      */
     public static Command createAutoLevel(StateManager stateManager, Elevator elevator, Effector effector) {
         // Store detected level to ensure consistency between state and command selection
+        // Use array to allow modification within lambda
         final int[] detectedLevel = {0};
         
         return Commands.sequence(
+            // Wait for elevator to be within tolerance of a level position
+            // This prevents detecting intermediate positions when elevator is mid-motion
+            Commands.waitUntil(() -> {
+                double currentPos = elevator.getPosition();
+                double tolerance = 2.0; // Allow 2 rotations of tolerance
+                // Check if elevator is within tolerance of any level
+                return Math.abs(currentPos - Constants.elevator.level.L4) < tolerance ||
+                       Math.abs(currentPos - Constants.elevator.level.L3) < tolerance ||
+                       Math.abs(currentPos - Constants.elevator.level.L2) < tolerance ||
+                       Math.abs(currentPos - Constants.elevator.level.L1) < tolerance;
+            }).withTimeout(2.0), // Timeout after 2 seconds to prevent infinite waiting
+            
             // Determine level from elevator position and transition to scoring state
+            // Store the detected level to ensure consistency with command selection
             Commands.runOnce(() -> {
                 double currentPos = elevator.getPosition();
                 RobotState scoringState = RobotState.IDLE;
@@ -106,6 +122,7 @@ public class StateAwareScore {
                     detectedLevel[0] = 1;
                 } else {
                     // No level matches within tolerance - find closest level as fallback
+                    // This ensures we always have a valid state when scoring
                     double distL1 = Math.abs(currentPos - Constants.elevator.level.L1);
                     double distL2 = Math.abs(currentPos - Constants.elevator.level.L2);
                     double distL3 = Math.abs(currentPos - Constants.elevator.level.L3);
@@ -113,8 +130,8 @@ public class StateAwareScore {
                     
                     double minDist = Math.min(Math.min(distL1, distL2), Math.min(distL3, distL4));
                     
-                    // Use tolerance-based comparison to handle floating-point precision
-                    double comparisonTolerance = 0.001;
+                    // Use tolerance-based comparison to handle floating-point precision issues
+                    double comparisonTolerance = 0.001; // Small tolerance for floating-point comparison
                     if (Math.abs(minDist - distL1) < comparisonTolerance) {
                         scoringState = RobotState.SCORING_L1;
                         detectedLevel[0] = 1;
@@ -131,12 +148,15 @@ public class StateAwareScore {
                 }
                 
                 // Always transition to the determined scoring state
+                // This ensures state accurately reflects robot operation
                 stateManager.setState(scoringState);
             }),
             
-            // Run the appropriate scoring command based on stored detected level
-            // Use stored level to ensure consistency with state
+            // Run the appropriate scoring command based on detected level
+            // Use the stored level from runOnce to ensure consistency with state
             Commands.defer(() -> {
+                // Use the level detected in runOnce to ensure state-command consistency
+                // This prevents mismatch if elevator position changes between state detection and command selection
                 int level = detectedLevel[0];
                 
                 // Select command based on stored level - matches state detection
@@ -144,7 +164,7 @@ public class StateAwareScore {
                     // L1: Asymmetric outtake
                     return new ScoreL1Asymmetric(effector);
                 } else {
-                    // L2, L3, L4: Use ScoreL4L3L2 command
+                    // L2, L3, L4: Use ScoreL4L3L2 command (works for all three levels)
                     return new ScoreL4L3L2(effector);
                 }
             }, Set.of(elevator, effector)),

@@ -198,6 +198,10 @@ public class Vision extends SubsystemBase {
         );
         double angularVelocityMagnitude = Math.abs(speeds.omegaRadiansPerSecond);
         
+        // Get current time for rate limiting checks
+        // Use actual current time for rate limiting, not vision measurement timestamp
+        double currentWallClockTime = Timer.getFPGATimestamp();
+        
         // If robot is stationary (or nearly stationary), don't fuse vision to prevent drift
         // This is especially important in simulation where vision noise can cause drift
         double velocityThreshold = Utils.isSimulation() ? 0.05 : 0.02; // 5cm/s in sim, 2cm/s on robot
@@ -205,6 +209,9 @@ public class Vision extends SubsystemBase {
         
         if (velocityMagnitude < velocityThreshold && angularVelocityMagnitude < angularThreshold) {
             // Robot is stationary, skip vision fusion to prevent drift
+            // Update last fusion time to maintain consistent rate limiting behavior
+            // This prevents rapid fusions when robot resumes moving
+            lastVisionFusionTime = currentWallClockTime;
             return;
         }
         
@@ -213,10 +220,11 @@ public class Vision extends SubsystemBase {
         double rotationDifference = Math.abs(visionPose.getRotation().minus(currentPose.getRotation()).getRadians());
         
         // Rate limiting - don't fuse vision too frequently
-        // Use actual current wall-clock time for rate limiting, not vision measurement timestamp
+        // Use actual current wall-clock time for rate limiting (already calculated above)
         // This ensures rate limiting works correctly even with gaps in vision updates
-        double currentWallClockTime = Timer.getFPGATimestamp();
         if (currentWallClockTime - lastVisionFusionTime < MIN_VISION_UPDATE_INTERVAL) {
+            // Don't update timestamp when skipping due to rate limiting
+            // The timestamp should only reflect the last ACTUAL fusion, not skipped checks
             return; // Skip if too soon since last fusion
         }
         
@@ -228,6 +236,8 @@ public class Vision extends SubsystemBase {
         
         if (poseDifference < translationThreshold && rotationDifference < rotationThreshold) {
             // Vision pose is too close to current estimate, skip fusion to prevent drift
+            // Update last fusion time to maintain rate limiting contract
+            lastVisionFusionTime = currentWallClockTime;
             return;
         }
         
