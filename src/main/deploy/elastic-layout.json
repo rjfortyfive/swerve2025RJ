@@ -132,6 +132,34 @@
               "data_type": "string",
               "show_submit_button": false
             }
+          },
+          {
+            "title": "Current State",
+            "x": 512.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/StateManager/CurrentState",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Previous State",
+            "x": 768.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/StateManager/PreviousState",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
+            }
           }
         ]
       }
