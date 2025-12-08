@@ -57,7 +57,14 @@ public class RobotContainer {
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
 
-        public static final CommandJoystick DriverController = new CommandJoystick(0);
+        // Driver controller selection: true = Xbox controller, false = flight joystick
+        // Change this value to switch between controllers
+        private static final boolean useXboxForDriver = true; // Set to true to use Xbox controller for driving
+
+        // Driver controllers - only one will be used based on useXboxForDriver
+        public static final CommandJoystick DriverJoystick = new CommandJoystick(0);
+        public static final CommandXboxController DriverXbox = new CommandXboxController(0);
+        
         public static final CommandXboxController OperatorController = new CommandXboxController(1);
         public static final CommandJoystick buttonPanel = new CommandJoystick(2);
 
@@ -134,27 +141,51 @@ public class RobotContainer {
                 // joystick.button(2).onTrue(drivetrain.runOnce(() ->
                 // drivetrain.seedFieldCentric()));
                 m_drivetrain.registerTelemetry(logger::telemeterize);
-                // Button commands and stick-based triggers for strafeRight and strafeLeft
+                // Strafe commands - different bindings based on driver controller type
                 if (!Constants.MASTER_NERF) {
-                        // Strafe Right: schedule and track the command, only one at a time
-                        DriverController.button(Constants.Joystick.STRAFE_RIGHT)
-                                .onTrue(new MakeGoToTag(
-                                        m_drivetrain,
-                                        m_vision,
-                                        tagSide.RIGHT,
-                                        0.197,
-                                        0.345
-                                ));
+                        if (useXboxForDriver) {
+                                // Strafe commands on Xbox controller bumpers
+                                // Strafe Left: left bumper
+                                DriverXbox.leftBumper()
+                                        .whileTrue(new MakeGoToTag(
+                                                m_drivetrain,
+                                                m_vision,
+                                                tagSide.LEFT,
+                                                0.165,
+                                                0.345
+                                        ));
 
-                        // Strafe Left: schedule and track the command, only one at a time
-                        DriverController.button(Constants.Joystick.STRAFE_LEFT)
-                                .onTrue(new MakeGoToTag(
-                                        m_drivetrain,
-                                        m_vision,
-                                        tagSide.LEFT,
-                                        0.165,
-                                        0.345
-                                ));
+                                // Strafe Right: right bumper
+                                DriverXbox.rightBumper()
+                                        .whileTrue(new MakeGoToTag(
+                                                m_drivetrain,
+                                                m_vision,
+                                                tagSide.RIGHT,
+                                                0.197,
+                                                0.345
+                                        ));
+                        } else {
+                                // Strafe commands on joystick buttons
+                                // Strafe Right: runs while button is held
+                                DriverJoystick.button(Constants.Joystick.STRAFE_RIGHT)
+                                        .whileTrue(new MakeGoToTag(
+                                                m_drivetrain,
+                                                m_vision,
+                                                tagSide.RIGHT,
+                                                0.197,
+                                                0.345
+                                        ));
+
+                                // Strafe Left: runs while button is held
+                                DriverJoystick.button(Constants.Joystick.STRAFE_LEFT)
+                                        .whileTrue(new MakeGoToTag(
+                                                m_drivetrain,
+                                                m_vision,
+                                                tagSide.LEFT,
+                                                0.165,
+                                                0.345
+                                        ));
+                        }
                 }
         }
 
@@ -214,15 +245,26 @@ public class RobotContainer {
         }
 
         private void configureDefaultCommands() {
-
-                // Default command for driving with joystick
-                m_drivetrain.setDefaultCommand(
-                        m_drivetrain.applyRequest(() -> 
-                                drive.withVelocityX(DriverController.getY() * MaxSpeed)
-                                     .withVelocityY(DriverController.getX() * MaxSpeed)
-                                     .withRotationalRate(-DriverController.getTwist() * MaxAngularRate)
-                        )
-                );
+                // Default command for driving - switches between joystick and Xbox controller
+                if (useXboxForDriver) {
+                        // Drive with Xbox controller: Left stick for translation, Right stick X for rotation
+                        m_drivetrain.setDefaultCommand(
+                                m_drivetrain.applyRequest(() -> 
+                                        drive.withVelocityX(-DriverXbox.getLeftY() * MaxSpeed)
+                                             .withVelocityY(-DriverXbox.getLeftX() * MaxSpeed)
+                                             .withRotationalRate(-DriverXbox.getRightX() * MaxAngularRate)
+                                )
+                        );
+                } else {
+                        // Drive with flight joystick
+                        m_drivetrain.setDefaultCommand(
+                                m_drivetrain.applyRequest(() -> 
+                                        drive.withVelocityX(DriverJoystick.getY() * MaxSpeed)
+                                             .withVelocityY(DriverJoystick.getX() * MaxSpeed)
+                                             .withRotationalRate(-DriverJoystick.getTwist() * MaxAngularRate)
+                                )
+                        );
+                }
 
                 // Default command for effector control with Xbox triggers                                              
                 m_effector.setDefaultCommand(
