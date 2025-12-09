@@ -177,7 +177,12 @@ public class Effector extends SubsystemBase {
     }
 
     public boolean isCoralDetected() {
-        return effectorSensor.getMeasurement().distance_mm < 10;
+        try {
+            return effectorSensor.getMeasurement().distance_mm < 10;
+        } catch (Exception e) {
+            // If sensor fails, assume no coral detected to prevent blocking
+            return false;
+        }
     }
 
     public void moveAlgaeEffector(double percent) {
