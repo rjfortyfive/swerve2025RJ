@@ -106,8 +106,9 @@ public class RobotContainer {
                 // Intake and Reef Score on Button Board
                 buttonPanel.button(Constants.buttonPanel.coral.IN)
                                 .onTrue(new CoralIntake(m_elevator, m_effector, m_intake));
+                // Smart scoring: automatically selects L1 asymmetric or L2/L3/L4 scoring based on elevator position
                 buttonPanel.button(Constants.buttonPanel.coral.OUT)
-                                .onTrue(new ScoreL4L3L2(m_effector));
+                                .whileTrue(SmartScore.create(m_elevator, m_effector));
                 // Elevator To Intake Position                                
                 OperatorController.b().onTrue(
                                 new SequentialCommandGroup(
