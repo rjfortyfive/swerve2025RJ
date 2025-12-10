@@ -19,6 +19,24 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.Matrix;
 
+/**
+ * Constants class containing all configuration values for the robot.
+ * 
+ * This class is organized into nested classes by subsystem:
+ * - CanIDs: CAN bus device IDs
+ * - Pathfinding: PathPlanner path constraints
+ * - Joystick: Joystick button mappings
+ * - buttonPanel: Button panel mappings
+ * - effector: Effector motor PID, limits, and configuration
+ * - elevator: Elevator heights, PID, limits, and configuration
+ * - hang: Hang mechanism configuration
+ * - intake: Intake motor configuration
+ * - lights: LED color definitions
+ * - Vision: Camera configurations and AprilTag settings
+ * 
+ * Also includes master multipliers for testing/troubleshooting and
+ * alliance-specific configuration via setL4().
+ */
 public class Constants {
     public static final double MASTER_SPEED_MULTIPLIER = 1; // For troubleshooting/testing
     public static final double MASTER_DRIVE_MULTIPLIER = 1; // For troubleshooting/testing Drivetrain
@@ -242,20 +260,30 @@ public class Constants {
         public static final int PIPLINE_INDEX = 0;
 
     }
-// Sets L4 and Tags based on alliance color
+    /**
+     * Sets L4 elevator height and vision tag list based on alliance color.
+     * 
+     * Called during robotInit() to configure alliance-specific settings.
+     * Different alliance sides have slightly different L4 heights due to
+     * field geometry, and different AprilTag IDs for pose estimation.
+     * 
+     * Blue Alliance:
+     *   - L4 height: 72.5 rotations
+     *   - Tags: 17, 18, 19, 20, 21, 22
+     * 
+     * Red Alliance:
+     *   - L4 height: 73.0 rotations (74.0 for good wheels)
+     *   - Tags: 6, 7, 8, 9, 10, 11
+     */
     public static void setL4() {
         var driverStation = DriverStationJNI.getAllianceStation().toString();
         if (driverStation.contains("Blue")) {
             elevator.level.L4 = 72.5;
-
             Vision.TAGS = List.of(17, 18, 19, 20, 21, 22);
-
             System.out.println("Setting blue side L4");
         } else {
             elevator.level.L4 = 73; // 74.0 for good wheels
-
             Vision.TAGS = List.of(6, 7, 8, 9, 10, 11);
-
             System.out.println("Setting red side L4");
         }
     }

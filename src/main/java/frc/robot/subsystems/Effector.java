@@ -25,12 +25,28 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase;
 
 
+/**
+ * Effector subsystem manages the coral scoring mechanism and algae removal.
+ * 
+ * The effector consists of:
+ * - Two TalonFX motors (left and right) that control scoring wheels
+ * - A LaserCan sensor that detects when coral is present
+ * - A SparkMax brushed motor for algae removal mechanism
+ * 
+ * The scoring wheels can run symmetrically (same speed both directions) or
+ * asymmetrically (different speeds) for special scoring techniques at L1.
+ * The right motor is inverted to allow opposing rotation for locking coral.
+ */
 public class Effector extends SubsystemBase {
+    /** LaserCan sensor to detect coral presence (distance < 10mm = coral present) */
     private final LaserCan effectorSensor = new LaserCan(CanIDs.EFFECTOR_LASER_ID);
 
+    /** Left effector motor (TalonFX) */
     private final TalonFX effectorLeftFX = new TalonFX(CanIDs.EFFECTOR_LEFT_FX_ID);
+    /** Right effector motor (TalonFX) - inverted for opposing rotation */
     private final TalonFX effectorRightFX = new TalonFX(CanIDs.EFFECTOR_RIGHT_FX_ID);
 
+    /** Algae removal motor (SparkMax brushed) */
     private final SparkMax algaeMotor = new SparkMax(1, MotorType.kBrushed);
 
     private final static VelocityVoltage m_velocityVoltage = new VelocityVoltage(0);
@@ -138,11 +154,19 @@ public class Effector extends SubsystemBase {
         effectorRightFX.setControl(m_positionVoltage.withPosition(rightPos));
     }
 // Check if both motors are at position
+    /**
+     * Checks if both effector motors have reached their target positions.
+     * Used to determine when lock rotation or scoring rotation is complete.
+     * 
+     * @param leftTarget Target position for left motor in rotations
+     * @param rightTarget Target position for right motor in rotations
+     * @return true if both motors are within 0.02 rotations of their targets
+     */
     public boolean coralAtPosition(double leftTarget, double rightTarget) {
         double leftErr  = Math.abs(getLeftPosition()  - leftTarget);
         double rightErr = Math.abs(getRightPosition() - rightTarget);
-        return leftErr < 0.02 && rightErr < 0.02;   // tweak threshold if needed
-}
+        return leftErr < 0.02 && rightErr < 0.02;  // 0.02 rotations tolerance
+    }
 
     public void stop() {
         effectorLeftFX.set(0);
@@ -150,37 +174,68 @@ public class Effector extends SubsystemBase {
 
     }
 
+    /**
+     * Starts effector wheels at the same velocity (symmetric operation).
+     * Used for normal intake/outtake operations.
+     * 
+     * @param velocity Target velocity in rotations per second (applied to both motors)
+     */
     public void start(double velocity) {
-        //symmetric start for effector wheels
+        // Symmetric start for effector wheels - both run at same speed
         effectorLeftFX.setControl(m_velocityVoltage.withVelocity(velocity * Constants.MASTER_SPEED_MULTIPLIER));
         effectorRightFX.setControl(m_velocityVoltage.withVelocity(velocity * Constants.MASTER_SPEED_MULTIPLIER));
-
     }
 
+    /**
+     * Starts effector wheels at different velocities (asymmetric operation).
+     * Used for L1 scoring where different speeds help place coral accurately.
+     * 
+     * @param velocityLeft Target velocity for left motor in RPS
+     * @param velocityRight Target velocity for right motor in RPS
+     */
     public void start(double velocityLeft, double velocityRight) {
-        //asymmetric start for effector wheels
+        // Asymmetric start for effector wheels - different speeds for each motor
         effectorLeftFX.setControl(m_velocityVoltage.withVelocity(velocityLeft * Constants.MASTER_SPEED_MULTIPLIER));
         effectorRightFX.setControl(m_velocityVoltage.withVelocity(velocityRight * Constants.MASTER_SPEED_MULTIPLIER));
-
     }
 
+    /**
+     * Locks coral in place by rotating the effector wheels in opposite directions.
+     * 
+     * Uses MotionMagic position control to rotate:
+     * - Left motor: forward by LOCK_ROTATIONS
+     * - Right motor: backward by LOCK_ROTATIONS (inverted, so this rotates forward relative to mechanism)
+     * 
+     * This creates a pinching/twisting motion that secures the coral.
+     */
     public void startLock() {
-        // Locking coral by rotating effector LOCK_ROTATIONS
+        // Get current positions
         double leftCurrentPos = effectorLeftFX.getPosition().getValueAsDouble();
         double rightCurrentPos = effectorRightFX.getPosition().getValueAsDouble();
 
+        // Calculate target positions - rotate in opposite directions
+        // Left rotates forward (+), right rotates backward (-) due to inversion
         double leftTarget = leftCurrentPos + effector.LOCK_ROTATIONS;
         double rightTarget = rightCurrentPos - effector.LOCK_ROTATIONS; 
 
+        // Command motors to target positions using MotionMagic
         effectorLeftFX.setControl(m_positionVoltage.withPosition(leftTarget));
         effectorRightFX.setControl(m_positionVoltage.withPosition(rightTarget));
     }
 
+    /**
+     * Checks if coral is detected by the LaserCan sensor.
+     * 
+     * @return true if coral is detected (distance < 10mm), false otherwise
+     *         Returns false if sensor fails to prevent blocking commands
+     */
     public boolean isCoralDetected() {
         try {
+            // Coral is detected when sensor reads distance less than 10mm
             return effectorSensor.getMeasurement().distance_mm < 10;
         } catch (Exception e) {
-            // If sensor fails, assume no coral detected to prevent blocking
+            // If sensor fails (disconnected, error, etc.), assume no coral detected
+            // This prevents commands from blocking waiting for coral that will never be detected
             return false;
         }
     }

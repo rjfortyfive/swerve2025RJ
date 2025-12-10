@@ -18,10 +18,29 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+/**
+ * Elevator subsystem controls the vertical movement of the scoring mechanism.
+ * 
+ * The elevator consists of:
+ * - Two TalonFX motors (left master, right follower) that move the elevator up/down
+ * - A digital limit switch at the bottom for zeroing/calibration
+ * - MotionMagic control for smooth, precise positioning to scoring heights
+ * 
+ * The elevator moves between several predefined heights:
+ * - L1 (0.05 rotations): Bottom position
+ * - L2 (15.5 rotations): Second scoring level
+ * - L3 (37.5 rotations): Third scoring level
+ * - L4 (72.5-73 rotations): Top scoring level (varies by alliance)
+ * - INTAKE (1.2 rotations): Position for picking up coral from ground
+ */
 public class Elevator extends SubsystemBase {
+    /** Left elevator motor (master) */
     private final TalonFX elevatorLeftFX = new TalonFX(CanIDs.ELEVATOR_LEFT_FX_ID);
+    /** Right elevator motor (follower, inverted) */
     private final TalonFX elevatorRightFX = new TalonFX(CanIDs.ELEVATOR_RIGHT_FX_ID);
+    /** Bottom limit switch for zeroing/calibration */
     private final DigitalInput bottomlimitSwitch = new DigitalInput(0);
+    /** Tracks whether elevator has been zeroed this cycle */
     private boolean hasZeroed = false;
 
     public Elevator() {
@@ -94,29 +113,56 @@ public class Elevator extends SubsystemBase {
         checkBottomLimitAndZero();
     }
 
+    /**
+     * Checks the bottom limit switch and zeros the elevator encoder when pressed.
+     * 
+     * This method is called periodically to detect when the elevator reaches the bottom.
+     * When the limit switch is pressed, it resets both motor encoders to 0 rotations,
+     * providing an absolute reference point for position control.
+     * 
+     * The hasZeroed flag prevents multiple zero operations in the same switch press cycle.
+     */
     public void checkBottomLimitAndZero(){
+        // Limit switch is normally-open, so pressed = false (inverted)
         boolean bottomPressed = !bottomlimitSwitch.get();
 
         if (bottomPressed && !hasZeroed) {
             System.out.println("BOTTOM LIMIT SWITCH PRESSED > ZEROING ELEVATOR");
 
+            // Reset encoder positions to zero
             elevatorLeftFX.setPosition(0);
             elevatorRightFX.setPosition(0);
 
+            // Mark as zeroed to prevent multiple zero operations
             hasZeroed = true;
         }
 
+        // Reset flag when switch is released to allow zeroing again next time
         if(!bottomPressed) {
             hasZeroed = false;
         }
     }
 
+    /**
+     * Moves the elevator to a target position using MotionMagic.
+     * 
+     * MotionMagic provides smooth acceleration/deceleration profiles and precise
+     * positioning. The right motor follows the left motor automatically.
+     * 
+     * @param rotations Target position in rotations (0 = bottom, higher = higher up)
+     */
     public void toPosition(double rotations) {
         System.out.println("Going to " + rotations);
+        // MotionMagic provides smooth motion profile to target position
         elevatorLeftFX.setControl(new MotionMagicVoltage(rotations));
+        // Right motor follows automatically via Follower configuration
     }
 
-
+    /**
+     * Gets the current elevator position.
+     * 
+     * @return Current position in rotations (0 = bottom reference)
+     */
     public double getPosition() {
         return elevatorLeftFX.getPosition().getValueAsDouble();
     }
